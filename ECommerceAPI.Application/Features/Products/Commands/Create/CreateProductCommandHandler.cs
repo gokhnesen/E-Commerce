@@ -15,6 +15,12 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Create
         private readonly IProductWriteRepository _productWriteRepository;
         private readonly IMapper _mapper;
 
+        public CreateProductCommandHandler(IProductWriteRepository productWriteRepository, IMapper mapper)
+        {
+            _productWriteRepository = productWriteRepository;
+            _mapper = mapper;
+        }
+
         public async Task<CreateProductResponse>? Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             Product product = _mapper.Map<Product>(request);

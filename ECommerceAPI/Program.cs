@@ -11,15 +11,14 @@ namespace ECommerceAPI
 
             builder.Services.AddApplicationServices();
             builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
-
+            builder.Services.AddSwaggerGen();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger(); // <== Swagger JSON endpoint
+                app.UseSwaggerUI(); // <== Swagger UI arayüzü
             }
-
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using ECommerceAPI.Application.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace ECommerceAPI.Application
             {
                 configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
+            services.AddScoped<IProductWriteRepository, ProductWriteReposiyory>();
 
             return services;
         }
