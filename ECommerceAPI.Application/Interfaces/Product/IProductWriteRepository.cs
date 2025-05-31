@@ -9,5 +9,6 @@ namespace ECommerceAPI.Application.Interfaces
 {
     public interface IProductWriteRepository : IWriteRepository<Product>
     {
+
     }
 }

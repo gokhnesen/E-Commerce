@@ -18,7 +18,6 @@ namespace ECommerceAPI.Application
             {
                 configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
-            services.AddScoped<IProductWriteRepository, ProductWriteReposiyory>();
 
             return services;
         }

@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Interfaces
 {
-    public interface IReadRepository<TEntity> where TEntity : class
+    public interface IReadRepository<T> where T : class
     {
-        Task<TEntity> GetByIdAsync(Guid id);
-        Task<List<TEntity>> GetAllAsync();
-        Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        IQueryable<T> GetAll(bool tracking = true);
+        IQueryable<T> GetWhere(Expression<Func<T, bool>> method, bool tracking = true);
+
+        Task<T> GetSingleAsync(Expression<Func<T, bool>> method, bool tracking = true);
+        Task<T> GetByIdAsync(string id, bool tracking = true);
     }
 }

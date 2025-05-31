@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Interfaces
 {
-    public interface IWriteRepository<TEntity> where TEntity : class
+    public interface IWriteRepository<T> where T : class
     {
-        Task<TEntity> AddAsync(TEntity entity);
-        Task UpdateAsync(TEntity entity);
-        Task DeleteAsync(TEntity entity);
+        Task<bool> AddAsync(T model);
+        Task<bool> AddRangeAsync(List<T> models);
+        bool Remove(T model);
+
+        Task<bool> RemoveAsync(string id);
+        bool RemoveRange(List<T> model);
+
+        bool Update(T model);
+
+        Task<int> SaveAsync();
 
     }
 }
