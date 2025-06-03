@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Application.Features.Products.Commands.Create;
+using ECommerceAPI.Application.Features.Products.Commands.Delete;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,13 @@ namespace ECommerceAPI.Controllers
         public async Task<IActionResult> CreateHotel([FromBody] CreateProductCommand createProductCommand)
         {
             CreateProductResponse response = await Mediator.Send(createProductCommand);
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
+        {
+            DeleteProductResponse response = await Mediator.Send(new DeleteProductCommand { Id = id });
             return Ok(response);
         }
     }
