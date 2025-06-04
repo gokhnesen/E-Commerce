@@ -31,7 +31,7 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Update
             product = _mapper.Map(request, product);
 
             _productWriteRepository.Update(product);
-
+            _productWriteRepository.SaveAsync();
             UpdateProductResponse response = _mapper.Map<UpdateProductResponse>(product);
             return response;
         }
