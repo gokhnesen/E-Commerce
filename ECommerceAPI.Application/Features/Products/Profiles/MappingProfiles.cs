@@ -3,6 +3,7 @@ using ECommerceAPI.Application.Features.Products.Commands.Create;
 using ECommerceAPI.Application.Features.Products.Commands.Delete;
 using ECommerceAPI.Application.Features.Products.Commands.Update;
 using ECommerceAPI.Application.Features.Products.Queries.GetById;
+using ECommerceAPI.Application.Features.Products.Queries.GetList;
 using ECommerceAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace ECommerceAPI.Application.Features.Products.Profiles
             CreateMap<Product, GetByIdProductQuery>().ReverseMap();
             CreateMap<Product, GetByIdProductQueryResponse>().ReverseMap();
 
+            CreateMap<Product, GetListProductQueryResponse>().ReverseMap();
         }
     }
 }

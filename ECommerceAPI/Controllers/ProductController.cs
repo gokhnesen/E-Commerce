@@ -2,6 +2,7 @@
 using ECommerceAPI.Application.Features.Products.Commands.Delete;
 using ECommerceAPI.Application.Features.Products.Commands.Update;
 using ECommerceAPI.Application.Features.Products.Queries.GetById;
+using ECommerceAPI.Application.Features.Products.Queries.GetList;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,13 @@ namespace ECommerceAPI.Controllers
     [ApiController]
     public class ProductController : BaseController
     {
-
+        [HttpGet]
+        public async Task<IActionResult> GetList()
+        {
+            var query = new GetListProductQuery();
+            var response = await Mediator.Send(query);
+            return Ok(response);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute]Guid id)
