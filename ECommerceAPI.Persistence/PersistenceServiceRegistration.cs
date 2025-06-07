@@ -21,6 +21,7 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<IProductWriteRepository, ProductWriteRepository>();
             services.AddScoped<IProductReadRepository, ProductReadRepository>();
             services.AddScoped<ICategoryReadRepository, CategoryReadRepository>();
+            services.AddScoped<ICategoryWriteRepository, CategoryWriteRepository>();
 
 
 
