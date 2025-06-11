@@ -18,8 +18,8 @@ namespace ECommerceAPI
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger(); // <== Swagger JSON endpoint
-                app.UseSwaggerUI(); // <== Swagger UI arayüzü
+                app.UseSwagger(); 
+                app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();
 
