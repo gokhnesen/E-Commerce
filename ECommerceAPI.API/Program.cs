@@ -1,5 +1,4 @@
-
-using ECommerceAPI.Application;
+﻿using ECommerceAPI.Application;
 using ECommerceAPI.Persistence;
 
 namespace ECommerceAPI
@@ -14,16 +13,10 @@ namespace ECommerceAPI
             {
                 options.AddPolicy("AllowSpecificOrigin", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
-                });
-                options.AddPolicy("AllowAll", policy =>
-                {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
                 });
             });
 
@@ -36,7 +29,7 @@ namespace ECommerceAPI
             app.UseCors("AllowSpecificOrigin");
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger(); 
+                app.UseSwagger();
                 app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();

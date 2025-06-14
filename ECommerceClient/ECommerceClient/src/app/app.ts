@@ -5,28 +5,17 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Product } from './shared/models/product';
 import { ProductService } from './core/services/productService';
+import { Products} from "./features/products/products";
 
 
 
 @Component({
   selector: 'app-root',
-  imports: [Header,CommonModule],
+  imports: [Header, CommonModule, Products],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App implements OnInit {
-  private productService = inject(ProductService)
+export class App{
+    protected title = 'ECommerceClient';
 
-
-  protected title = 'ECommerceClient';
-
-  products: Product[] = [];
-
-ngOnInit(): void {
-  this.productService.getProducts().subscribe({
-    next: response => this.products = response,
-    error: error => console.log('Error:', error),
-    complete: () => console.log('complete')
-  })
-}
 }
