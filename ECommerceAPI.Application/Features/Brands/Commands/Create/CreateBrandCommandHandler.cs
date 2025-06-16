@@ -1,0 +1,31 @@
+using AutoMapper;
+using ECommerceAPI.Application.Interfaces.Brand;
+using ECommerceAPI.Domain.Entities;
+using MediatR;
+
+namespace ECommerceAPI.Application.Features.Brands.Commands.Create
+{
+    public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, CreateBrandResponse>
+    {
+        private readonly IBrandWriteRepository _brandWriteRepository;
+        private readonly IMapper _mapper;
+
+        public CreateBrandCommandHandler(IBrandWriteRepository brandWriteRepository, IMapper mapper)
+        {
+            _brandWriteRepository = brandWriteRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<CreateBrandResponse> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
+        {
+            Brand brand = _mapper.Map<Brand>(request);
+            brand.Id = Guid.NewGuid();
+            
+            await _brandWriteRepository.AddAsync(brand);
+            await _brandWriteRepository.SaveAsync();
+
+            CreateBrandResponse response = _mapper.Map<CreateBrandResponse>(brand);
+            return response;
+        }
+    }
+} 
