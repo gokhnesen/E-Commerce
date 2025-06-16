@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { Product } from '../../shared/models/product';
+import { response } from 'express';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,8 @@ import { Product } from '../../shared/models/product';
 export class ProductService {
   baseURL = 'https://localhost:7091/api/'
   private http = inject(HttpClient);
+  types: string[]=[];
+  brands:string[]=[];
 
   getProducts(): Observable<Product[]> {
     console.log('🚀 Service getProducts çağrıldı');
@@ -34,5 +37,18 @@ export class ProductService {
         return throwError(() => error);
       })
     );
+  }
+  getBrands(){
+    if(this.brands.length > 0) return;
+    return this.http.get<string[]>(this.baseURL + 'brand').subscribe({
+      next: response => this.brands = response
+    })
+  }
+
+  getTypes(){
+      if(this.types.length > 0) return;
+    return this.http.get<string[]>(this.baseURL + 'products/type').subscribe({
+      next: response => this.brands = response
+    })
   }
 }
