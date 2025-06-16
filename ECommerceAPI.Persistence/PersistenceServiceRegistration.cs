@@ -1,6 +1,8 @@
 ﻿using ECommerceAPI.Application.Interfaces;
+using ECommerceAPI.Application.Interfaces.Brand;
 using ECommerceAPI.Persistence.Contexts;
 using ECommerceAPI.Persistence.Repositories;
+using ECommerceAPI.Persistence.Repositories.Brand;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,9 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<IProductReadRepository, ProductReadRepository>();
             services.AddScoped<ICategoryReadRepository, CategoryReadRepository>();
             services.AddScoped<ICategoryWriteRepository, CategoryWriteRepository>();
+            services.AddScoped<IBrandWriteRepository, BrandWriteRepository>();
+            services.AddScoped<IBrandReadRepository, BrandReadRepository>();
+
 
 
 
