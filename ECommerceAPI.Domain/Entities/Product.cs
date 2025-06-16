@@ -17,8 +17,11 @@ namespace ECommerceAPI.Domain.Entities
         public string? PictureUrl { get; set; }
 
         public Guid CategoryId { get; set; }
-        
-        
+        public Guid? BrandId { get; set; }
+
+        [ForeignKey("BrandId")]
+        public Brand Brand { get; set; }
+
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
     }
