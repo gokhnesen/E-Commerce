@@ -14,6 +14,7 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetById
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public string? PictureUrl { get; set; }
+        public string? BrandName { get; set; }
 
         public string CategoryName { get; set; }
     }

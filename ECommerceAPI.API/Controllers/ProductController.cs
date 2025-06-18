@@ -13,7 +13,7 @@ namespace ECommerceAPI.Controllers
     public class ProductController : BaseController
     {
         [HttpGet]
-        public async Task<IActionResult> GetList()
+        public async Task<IActionResult> GetList([FromQuery] string[] brands = null, [FromQuery] string[] types = null)
         {
             var query = new GetListProductQuery();
             var response = await Mediator.Send(query);

@@ -30,6 +30,24 @@ namespace ECommerceAPI.Persistence.Repositories
             return query;
         }
 
+        public IQueryable<T> GetAll(bool tracking = true, params Expression<Func<T, bool>>[] filters)
+        {
+            var query = Table.AsQueryable();
+            
+            if(!tracking)
+                query = query.AsNoTracking();
+
+            if (filters != null)
+            {
+                foreach (var filter in filters.Where(f => f != null))
+                {
+                    query = query.Where(filter);
+                }
+            }
+
+            return query;
+        }
+
         public async Task<T> GetSingleAsync(Expression<Func<T,bool>> method, bool tracking = true)
         {
             var query = Table.AsQueryable();

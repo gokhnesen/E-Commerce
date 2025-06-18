@@ -4,6 +4,5 @@ namespace ECommerceAPI.Application.Features.Brands.Queries.GetById
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
     }
 } 

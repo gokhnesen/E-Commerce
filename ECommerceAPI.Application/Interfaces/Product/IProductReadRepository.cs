@@ -9,6 +9,7 @@ namespace ECommerceAPI.Application.Interfaces
 {
     public interface IProductReadRepository : IReadRepository<Product>
     {
+        IQueryable<Product> GetFilteredProducts(bool tracking = true, List<string>? brands = null, List<string>? types = null);
 
     }
 }
