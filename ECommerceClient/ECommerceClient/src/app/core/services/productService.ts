@@ -13,53 +13,38 @@ export class ProductService {
   types: string[] = [];
   brands: Brand[] = [];
 
-  getProducts(brands?: Brand[], types?: string[]): Observable<Product[]> {
-    console.log('🚀 Service getProducts çağrıldı');
-    console.log('🌐 API URL:', this.baseURL + 'Product');
-    
-    let params = new HttpParams();
-    
-    // Brand filtreleme
-    if (brands && brands.length > 0) {
-      // Brand objesinden ID veya name değerini al
-      const brandValues = brands.map(brand => brand.id || brand.name).filter(Boolean);
-      if (brandValues.length > 0) {
-        params = params.append('brands', brandValues.join(','));
-        console.log('🏷️ Brand filtresi eklendi:', brandValues.join(','));
-      }
+ getProducts(brands?: Brand[], types?: string[], brandName?: string): Observable<Product[]> {
+  console.log('🚀 Service getProducts çağrıldı');
+  console.log('🌐 API URL:', this.baseURL + 'Product');
+  
+  let params = new HttpParams();
+  
+  if (brands && brands.length > 0) {
+    const brandValues = brands.map(brand => brand.id || brand.name).filter(Boolean);
+    if (brandValues.length > 0) {
+      params = params.append('brand', brandValues.join(','));
+      console.log('🏷️ Brand filtresi eklendi:', brandValues.join(','));
     }
-    
-    // Type filtreleme
-    if (types && types.length > 0) {
-      params = params.append('types', types.join(','));
-      console.log('📝 Type filtresi eklendi:', types.join(','));
-    }
-    
-    // Final URL'i logla
-    const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
-    console.log('🔗 Final URL:', finalUrl);
-    
-    return this.http.get<Product[]>(this.baseURL + 'Product', { params }).pipe(
-      tap(response => {
-        console.log('✅ Service - HTTP Response alındı:', response);
-        console.log('📊 Response type:', typeof response);
-        console.log('📋 Is Array?', Array.isArray(response));
-        console.log('📏 Response length:', response?.length);
-        
-        if (response && response.length > 0) {
-          console.log('🔍 İlk item:', response[0]);
-          console.log('🔑 İlk item keys:', Object.keys(response[0]));
-        }
-      }),
-      catchError(error => {
-        console.error('❌ Service HTTP Error:', error);
-        console.error('❌ Error status:', error.status);
-        console.error('❌ Error message:', error.message);
-        console.error('❌ Error URL:', error.url);
-        return throwError(() => error);
-      })
-    );
   }
+  
+  if (brandName && brandName.trim() !== '') {
+    params = params.append('brandName', brandName.trim());
+    console.log('🏷️ BrandName filtresi eklendi:', brandName);
+  }
+  
+
+  if (types && types.length > 0) {
+    params = params.append('types', types.join(','));
+    console.log('📝 Type filtresi eklendi:', types.join(','));
+  }
+  
+
+  const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
+  console.log('🔗 Final URL:', finalUrl);
+  
+  return this.http.get<Product[]>(this.baseURL + 'Product', { params }).pipe(
+  );
+}
 
   getBrands(): void {
     if (this.brands.length > 0) return;

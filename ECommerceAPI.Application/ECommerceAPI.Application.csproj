@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Specification\" />
     <Folder Include="Features\Products\Queries\GetList\" />
   </ItemGroup>
 

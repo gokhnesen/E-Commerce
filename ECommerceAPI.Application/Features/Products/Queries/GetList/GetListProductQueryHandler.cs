@@ -1,4 +1,5 @@
 using AutoMapper;
+using ECommerceAPI.Application.Features.Products.ProductSpecs;
 using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;
 using ECommerceAPI.Domain.Entities;
@@ -23,7 +24,8 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
 
         public async Task<List<GetListProductQueryResponse>> Handle(GetListProductQuery request, CancellationToken cancellationToken)
         {
-            var products = _productReadRepository.GetAll().ToList();
+            var spec = new ProductSpecification(request.Brand,request.Category);
+            var products = await _productReadRepository.ListAsync(spec);
             var response = _mapper.Map<List<GetListProductQueryResponse>>(products);
 
             foreach (var item in response)
@@ -33,16 +35,16 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
                 {
                     var category = await _categoryReadRepository.GetByIdAsync(product.CategoryId);
                     var brand = await _brandReadRepository.GetByIdAsync(product.BrandId);
-                    if (category != null || brand != null)
-                    {
+
+                    if (category != null)
                         item.CategoryName = category.Name;
+
+                    if (brand != null)
                         item.BrandName = brand.Name;
-                    }
                 }
-                
             }
 
             return response;
         }
     }
-} 
+}
