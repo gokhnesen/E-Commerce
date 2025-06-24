@@ -55,6 +55,7 @@ namespace ECommerceAPI.Persistence.Repositories
 
         public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
         {
+            
             return await ApplySpecification(spec).ToListAsync();
         }
 

@@ -24,7 +24,7 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
 
         public async Task<List<GetListProductQueryResponse>> Handle(GetListProductQuery request, CancellationToken cancellationToken)
         {
-            var spec = new ProductSpecification(request.Brand,request.Category);
+            var spec = new ProductSpecification(request.SpecParams);
             var products = await _productReadRepository.ListAsync(spec);
             var response = _mapper.Map<List<GetListProductQueryResponse>>(products);
 
@@ -46,5 +46,6 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
 
             return response;
         }
+
     }
 }

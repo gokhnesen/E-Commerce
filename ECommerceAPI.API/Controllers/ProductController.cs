@@ -13,10 +13,10 @@ namespace ECommerceAPI.API.Controllers
     public class ProductController : BaseController
     {
         [HttpGet]
-        public async Task<IActionResult> GetList(string? brand, string? category, string? sort)
+        public async Task<IActionResult> GetList([FromQuery]ProductSpecParams specParams)
         {
 
-            var query = new GetListProductQuery { Brand = brand, Category = category };
+            var query = new GetListProductQuery(specParams);
             var response = await Mediator.Send(query);
             return Ok(response);
         }
