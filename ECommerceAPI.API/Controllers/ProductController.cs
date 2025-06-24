@@ -13,7 +13,7 @@ namespace ECommerceAPI.API.Controllers
     public class ProductController : BaseController
     {
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery]ProductSpecParams specParams)
+        public async Task<IActionResult> GetList([FromQuery]ProductSpecParams? specParams)
         {
 
             var query = new GetListProductQuery(specParams);

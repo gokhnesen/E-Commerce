@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using ECommerceAPI.Application.Interfaces;
+using ECommerceAPI.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,5 +12,7 @@ namespace ECommerceAPI.Controllers
     {
         private IMediator? _mediator;
         protected IMediator? Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
+
+
     }
 }

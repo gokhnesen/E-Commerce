@@ -1,5 +1,6 @@
 using AutoMapper;
 using ECommerceAPI.Application.Features.Products.ProductSpecs;
+using ECommerceAPI.Application.Features.Specification;
 using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;
 using ECommerceAPI.Domain.Entities;
@@ -26,7 +27,9 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
         {
             var spec = new ProductSpecification(request.SpecParams);
             var products = await _productReadRepository.ListAsync(spec);
-            var response = _mapper.Map<List<GetListProductQueryResponse>>(products);
+            var count = await _productReadRepository.CountAsync(spec);
+            var pagination = new Pagination<Product>(request.SpecParams.PageIndex, request.SpecParams.PageSize, count, products);
+            var response = _mapper.Map<List<GetListProductQueryResponse>>(pagination.Data);
 
             foreach (var item in response)
             {

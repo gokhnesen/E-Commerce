@@ -16,5 +16,7 @@ namespace ECommerceAPI.Application.Interfaces
         int Skip { get; }
         bool IsPagingEnabled { get; }
 
+        IQueryable<T> ApplyCriteria(IQueryable<T> query);
+
     }
 }

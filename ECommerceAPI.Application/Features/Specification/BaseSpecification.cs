@@ -23,6 +23,15 @@ namespace ECommerceAPI.Application.Features.Specification
 
         public bool IsPagingEnabled { get; private set; }
 
+        public IQueryable<T> ApplyCriteria(IQueryable<T> query)
+        {
+            if(criteria != null)
+            {
+                query = query.Where(criteria);
+            }
+            return query;
+        }
+
         protected void AddOrderBy(Expression<Func<T,object>> orderByExpression)
         {
             OrderBy = orderByExpression;
