@@ -3,6 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { Product } from '../../shared/models/product';
 import { Brand } from '../../shared/models/brands';
+import { ShopParams } from '../../shared/models/productParam';
+import { Pagination } from '../../shared/models/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -13,38 +15,76 @@ export class ProductService {
   types: string[] = [];
   brands: Brand[] = [];
 
- getProducts(brands?: Brand[], types?: string[], brandName?: string): Observable<Product[]> {
-  console.log('🚀 Service getProducts çağrıldı');
-  console.log('🌐 API URL:', this.baseURL + 'Product');
-  
-  let params = new HttpParams();
-  
-  if (brands && brands.length > 0) {
-    const brandValues = brands.map(brand => brand.id || brand.name).filter(Boolean);
-    if (brandValues.length > 0) {
-      params = params.append('brand', brandValues.join(','));
-      console.log('🏷️ Brand filtresi eklendi:', brandValues.join(','));
+  getProducts(shopParams: ShopParams): Observable<Pagination<Product>> {
+    console.log('🚀 Service getProducts çağrıldı');
+    console.log('🌐 API URL:', this.baseURL + 'Product');
+    console.log('📦 ShopParams:', shopParams);
+    
+    let params = new HttpParams();
+    
+    if (shopParams.brands && shopParams.brands.length > 0) {
+      const brandNames = shopParams.brands
+        .map(brand => {
+          // Eğer brand bir obje ise name özelliğini al
+          if (typeof brand === 'object' && brand !== null && 'name' in brand) {
+            return (brand as any).name;
+          }
+          // Eğer brand zaten string ise direkt kullan
+          if (typeof brand === 'string') {
+            return brand;
+          }
+          return null;
+        })
+        .filter(Boolean); 
+      
+      if (brandNames.length > 0) {
+        params = params.append('brands', brandNames.join(','));
+        console.log('🏷️ Brand filtresi eklendi:', brandNames);
+        console.log('🏷️ Brand string:', brandNames.join(','));
+      }
     }
+    
+    // Search filtresi
+    if (shopParams.search && shopParams.search.trim() !== '') {
+      params = params.append('search', shopParams.search.trim());
+      console.log('🔍 Search filtresi eklendi:', shopParams.search);
+    }
+    
+    // Categories filtresi
+    if (shopParams.categories && shopParams.categories.length > 0) {
+      params = params.append('categories', shopParams.categories.join(','));
+      console.log('📝 Category filtresi eklendi:', shopParams.categories.join(','));
+    }
+    
+    // Sort filtresi
+    if (shopParams.sort && shopParams.sort.trim() !== '') {
+      params = params.append('Sort', shopParams.sort.trim());
+      console.log('🔄 Sort filtresi eklendi:', shopParams.sort);
+    }
+    
+    // Pagination parametreleri
+    if (shopParams.pageNumber > 0) {
+      params = params.append('pageNumber', shopParams.pageNumber.toString());
+      console.log('📄 Page Number:', shopParams.pageNumber);
+    }
+    
+    if (shopParams.pageSize > 0) {
+      params = params.append('pageSize', shopParams.pageSize.toString());
+      console.log('📊 Page Size:', shopParams.pageSize);
+    }
+    
+    const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
+    console.log('🔗 Final URL:', finalUrl);
+    
+    // ANA HATA BURADA: .get.Pagination yerine .get olmalı
+    return this.http.get<Pagination<Product>>(this.baseURL + 'Product', { params }).pipe(
+      tap(response => console.log('✅ API Response:', response)),
+      catchError(error => {
+        console.error('❌ getProducts Error:', error);
+        return throwError(() => error);
+      })
+    );
   }
-  
-  if (brandName && brandName.trim() !== '') {
-    params = params.append('brandName', brandName.trim());
-    console.log('🏷️ BrandName filtresi eklendi:', brandName);
-  }
-  
-
-  if (types && types.length > 0) {
-    params = params.append('types', types.join(','));
-    console.log('📝 Type filtresi eklendi:', types.join(','));
-  }
-  
-
-  const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
-  console.log('🔗 Final URL:', finalUrl);
-  
-  return this.http.get<Product[]>(this.baseURL + 'Product', { params }).pipe(
-  );
-}
 
   getBrands(): void {
     if (this.brands.length > 0) return;
