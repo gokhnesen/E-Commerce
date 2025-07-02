@@ -44,11 +44,11 @@ export class ProductService {
       }
     }
     
-    // Search filtresi
-    if (shopParams.search && shopParams.search.trim() !== '') {
-      params = params.append('search', shopParams.search.trim());
-      console.log('🔍 Search filtresi eklendi:', shopParams.search);
-    }
+    // // Search filtresi
+    // if (shopParams.search && shopParams.search.trim() !== '') {
+    //   params = params.append('search', shopParams.search.trim());
+    //   console.log('🔍 Search filtresi eklendi:', shopParams.search);
+    // }
     
     // Categories filtresi
     if (shopParams.categories && shopParams.categories.length > 0) {
@@ -71,6 +71,9 @@ export class ProductService {
     if (shopParams.pageSize > 0) {
       params = params.append('pageSize', shopParams.pageSize.toString());
       console.log('📊 Page Size:', shopParams.pageSize);
+    }
+    if(shopParams.search){
+      params = params.append('search',shopParams.search)
     }
     
     const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');

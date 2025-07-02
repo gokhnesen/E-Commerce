@@ -11,6 +11,7 @@ namespace ECommerceAPI.Application.Features.Products.ProductSpecs
     public class ProductSpecification : BaseSpecification<Product>
     {
         public ProductSpecification(ProductSpecParams specParams) : base(x => 
+        (string.IsNullOrEmpty(specParams.Search) || x.Name.ToLower().Contains(specParams.Search)) &&
         (specParams.Brands.Count == 0 || specParams.Brands.Contains(x.Brand.Name)) &&
         (specParams.Categories.Count == 0 || specParams.Categories.Contains(x.Category.Name))
         )

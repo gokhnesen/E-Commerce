@@ -16,6 +16,7 @@ import { ShopParams } from '../../shared/models/productParam';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Pagination } from '../../shared/models/pagination';
 import { count } from 'node:console';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-products',
@@ -28,7 +29,8 @@ import { count } from 'node:console';
     MatSelectionList,
     MatListOption,
     MatMenuTrigger,
-    MatPaginator
+    MatPaginator,
+    FormsModule
   ],
   templateUrl: './products.html',
   styleUrl: './products.scss'
@@ -67,6 +69,10 @@ export class Products implements OnInit {
       this.totalCount = this.products$.subscribe.length;
     });
     
+  }
+  onSearchChange(){
+    this.shopParams.pageNumber = 1;
+    this.getProducts();
   }
 
   handlePageEvent(event: PageEvent){
