@@ -11,7 +11,7 @@ import { Products} from "./features/products/products";
 
 @Component({
   selector: 'app-root',
-  imports: [Header, CommonModule, Products],
+  imports: [RouterOutlet,Header, CommonModule, Products],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
