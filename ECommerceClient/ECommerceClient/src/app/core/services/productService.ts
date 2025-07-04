@@ -44,12 +44,7 @@ export class ProductService {
       }
     }
     
-    // // Search filtresi
-    // if (shopParams.search && shopParams.search.trim() !== '') {
-    //   params = params.append('search', shopParams.search.trim());
-    //   console.log('🔍 Search filtresi eklendi:', shopParams.search);
-    // }
-    
+
     // Categories filtresi
     if (shopParams.categories && shopParams.categories.length > 0) {
       params = params.append('categories', shopParams.categories.join(','));
@@ -79,7 +74,6 @@ export class ProductService {
     const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
     console.log('🔗 Final URL:', finalUrl);
     
-    // ANA HATA BURADA: .get.Pagination yerine .get olmalı
     return this.http.get<Pagination<Product>>(this.baseURL + 'Product', { params }).pipe(
       tap(response => console.log('✅ API Response:', response)),
       catchError(error => {
@@ -88,6 +82,13 @@ export class ProductService {
       })
     );
   }
+
+
+getProduct(id: string): Observable<Product> {
+  const finalUrl = `${this.baseURL}Product/${id}`;
+  console.log('🔗 Final URL:', finalUrl);
+  return this.http.get<Product>(finalUrl);
+}
 
   getBrands(): void {
     if (this.brands.length > 0) return;

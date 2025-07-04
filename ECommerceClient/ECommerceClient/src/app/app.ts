@@ -6,12 +6,13 @@ import { CommonModule } from '@angular/common';
 import { Product } from './shared/models/product';
 import { ProductService } from './core/services/productService';
 import { Products} from "./features/products/products";
+import { ProductDetails } from "./features/products/product-details/product-details";
 
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,Header, CommonModule, Products],
+  imports: [RouterOutlet, Header, CommonModule, Products, ProductDetails],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
