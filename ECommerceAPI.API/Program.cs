@@ -1,5 +1,7 @@
 ﻿using ECommerceAPI.Application;
 using ECommerceAPI.Persistence;
+using ECommerceAPI.Infrastructure;
+
 
 namespace ECommerceAPI
 {
@@ -22,6 +24,7 @@ namespace ECommerceAPI
 
             builder.Services.AddApplicationServices();
             builder.Services.AddPersistenceServices(builder.Configuration);
+            builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
             var app = builder.Build();

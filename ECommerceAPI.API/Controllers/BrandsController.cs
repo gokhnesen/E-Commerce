@@ -3,6 +3,7 @@ using ECommerceAPI.Application.Features.Brands.Commands.Delete;
 using ECommerceAPI.Application.Features.Brands.Commands.Update;
 using ECommerceAPI.Application.Features.Brands.Queries.GetById;
 using ECommerceAPI.Application.Features.Brands.Queries.GetList;
+using ECommerceAPI.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace ECommerceAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BrandsController : ControllerBase
+    public class BrandsController : BaseController
     {
         private readonly IMediator _mediator;
 
