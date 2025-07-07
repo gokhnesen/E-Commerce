@@ -16,7 +16,7 @@ namespace ECommerceAPI.API.Controllers
             var cart = await cartReadService.GetCartAsync(id);
             return Ok(cart ?? new Cart { Id = id });
         }
-        [HttpPost("add-item")]
+        [HttpPost("update-cart")]
         public async Task<ActionResult<Cart>> UpdateCart(Cart cart)
         {
             var updatedCart = await cartWriteService.SetCartAsync(cart);

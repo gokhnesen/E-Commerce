@@ -36,8 +36,8 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetById
             Category category = await _categoryReadRepository.GetByIdAsync(product.CategoryId);
 
             GetByIdProductQueryResponse response = _mapper.Map<GetByIdProductQueryResponse>(product);
-            response.CategoryName = category?.Name;
-            response.BrandName = brand?.Name;
+            response.Category = category?.Name;
+            response.Brand = brand?.Name;
 
             return response;
         }

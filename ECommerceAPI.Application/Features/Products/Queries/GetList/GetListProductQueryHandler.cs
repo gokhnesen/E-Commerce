@@ -40,10 +40,10 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
                     var brand = await _brandReadRepository.GetByIdAsync(product.BrandId);
 
                     if (category != null)
-                        item.CategoryName = category.Name;
+                        item.Category = category.Name;
 
                     if (brand != null)
-                        item.BrandName = brand.Name;
+                        item.Brand = brand.Name;
                 }
             }
 

@@ -17,8 +17,9 @@ namespace ECommerceAPI.Persistence.Repositories.Cart
         private readonly IDatabase _database = redis.GetDatabase();
         public async Task<Domain.Entities.Cart> GetCartAsync(Guid key)
         {
-            var data = await _database.StringGetAsync(key);
+            var redisKey = key.ToString();
+            var data = await _database.StringGetAsync(redisKey);
             return data.IsNullOrEmpty ? null : JsonSerializer.Deserialize<Domain.Entities.Cart>(data!);
         }
-    }
+    }   
 }

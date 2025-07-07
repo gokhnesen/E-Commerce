@@ -8,7 +8,7 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public string? PictureUrl { get; set; }
-        public string? BrandName { get; set; }
-        public string CategoryName { get; set; }
+        public string? Brand { get; set; }
+        public string Category { get; set; }
     }
 } 
