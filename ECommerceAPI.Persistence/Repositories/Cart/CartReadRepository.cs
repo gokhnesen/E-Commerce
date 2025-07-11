@@ -15,10 +15,10 @@ namespace ECommerceAPI.Persistence.Repositories.Cart
     public class CartReadRepository(IConnectionMultiplexer redis) : ICartReadRepository
     {
         private readonly IDatabase _database = redis.GetDatabase();
-        public async Task<Domain.Entities.Cart> GetCartAsync(Guid key)
+        public async Task<Domain.Entities.Cart> GetCartAsync(string key)
         {
-            var redisKey = key.ToString();
-            var data = await _database.StringGetAsync(redisKey);
+            
+            var data = await _database.StringGetAsync(key);
             return data.IsNullOrEmpty ? null : JsonSerializer.Deserialize<Domain.Entities.Cart>(data!);
         }
     }   

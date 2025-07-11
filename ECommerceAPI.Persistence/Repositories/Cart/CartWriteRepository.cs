@@ -21,7 +21,7 @@ namespace ECommerceAPI.Persistence.Repositories.Cart
             _database = redis.GetDatabase();
         }
 
-        public async Task<bool> DeleteCartAsync(Guid key)
+        public async Task<bool> DeleteCartAsync(string key)
         {
             return await _database.KeyDeleteAsync(key.ToString());
         }
@@ -29,7 +29,7 @@ namespace ECommerceAPI.Persistence.Repositories.Cart
 
         public async Task<Domain.Entities.Cart> SetCartAsync(Domain.Entities.Cart cart)
         {
-            var created = await _database.StringSetAsync(cart.Id.ToString(), JsonSerializer.Serialize(cart), TimeSpan.FromDays(7));
+            var created = await _database.StringSetAsync(cart.Id, JsonSerializer.Serialize(cart), TimeSpan.FromDays(7));
             if (!created) return null;
 
             return await GetCartAsync(cart.Id);

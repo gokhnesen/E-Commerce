@@ -12,7 +12,8 @@ export type CartItem = {
     quantity: number;
     pictureUrl: string;
     brand: string;
-    description: string
+    description: string;
+    category: string;
 
 
 }

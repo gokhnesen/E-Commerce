@@ -11,12 +11,12 @@ namespace ECommerceAPI.API.Controllers
     public class CartController(ICartReadRepository cartReadService, ICartWriteRepository cartWriteService) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<Cart>> GetCartById(Guid id)
+        public async Task<ActionResult<Cart>> GetCartById(string id)
         {
             var cart = await cartReadService.GetCartAsync(id);
             return Ok(cart ?? new Cart { Id = id });
         }
-        [HttpPost("update-cart")]
+        [HttpPost]
         public async Task<ActionResult<Cart>> UpdateCart(Cart cart)
         {
             var updatedCart = await cartWriteService.SetCartAsync(cart);
@@ -27,7 +27,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(updatedCart);
         }
         [HttpDelete("remove-cart/{id}")]
-        public async Task<ActionResult> DeleteCart(Guid id)
+        public async Task<ActionResult> DeleteCart(string id)
         {
             var result = await cartWriteService.DeleteCartAsync(id);
             if (!result) return BadRequest("Error deleting cart");

@@ -9,7 +9,7 @@ namespace ECommerceAPI.Application.Interfaces.Cart
 {
     public interface ICartReadRepository
     {
-        Task<Domain.Entities.Cart> GetCartAsync(Guid key);
+        Task<Domain.Entities.Cart> GetCartAsync(string key);
 
     }
 }

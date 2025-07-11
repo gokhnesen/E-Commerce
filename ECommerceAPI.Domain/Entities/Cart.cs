@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Domain.Entities
 {
-    public class Cart : BaseEntity
+    public class Cart
     {
+        public string Id { get; set; }
         public List<CartItem> Items { get; set; }
     }
 }

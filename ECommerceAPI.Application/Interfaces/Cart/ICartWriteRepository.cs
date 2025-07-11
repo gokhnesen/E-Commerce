@@ -10,6 +10,6 @@ namespace ECommerceAPI.Application.Interfaces.Cart
     public interface ICartWriteRepository
     {
         Task<Domain.Entities.Cart> SetCartAsync(Domain.Entities.Cart cart);
-        Task<bool> DeleteCartAsync(Guid key); 
+        Task<bool> DeleteCartAsync(string key); 
     }
 }
