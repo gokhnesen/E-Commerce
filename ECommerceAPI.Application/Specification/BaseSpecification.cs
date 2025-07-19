@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerceAPI.Application.Features.Specification
+namespace ECommerceAPI.Application.Specification
 {
     public class BaseSpecification<T>(Expression<Func<T, bool>> criteria) : ISpecification<T>
     {

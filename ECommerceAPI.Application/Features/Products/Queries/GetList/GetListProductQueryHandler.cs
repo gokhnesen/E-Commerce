@@ -1,8 +1,8 @@
 using AutoMapper;
 using ECommerceAPI.Application.Features.Products.ProductSpecs;
-using ECommerceAPI.Application.Features.Specification;
 using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;
+using ECommerceAPI.Application.Specification;
 using ECommerceAPI.Domain.Entities;
 using MediatR;
 

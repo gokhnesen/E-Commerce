@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerceAPI.Application.Features.Specification
+namespace ECommerceAPI.Application.Specification
 {
     public class Pagination<T>(int pageIndex, int pageSize, int count, IReadOnlyList<T> data)
     {

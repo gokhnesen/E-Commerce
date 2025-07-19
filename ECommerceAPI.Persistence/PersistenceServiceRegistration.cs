@@ -1,6 +1,7 @@
 ﻿using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;
 using ECommerceAPI.Application.Interfaces.Cart;
+using ECommerceAPI.Domain.Entities;
 using ECommerceAPI.Persistence.Contexts;
 using ECommerceAPI.Persistence.Repositories;
 using ECommerceAPI.Persistence.Repositories.Brand;
@@ -29,7 +30,8 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<IBrandWriteRepository, BrandWriteRepository>();
             services.AddScoped<IBrandReadRepository, BrandReadRepository>();
             services.AddSingleton<ICartReadRepository, CartReadRepository>(); 
-            services.AddSingleton<ICartWriteRepository, CartWriteRepository>(); 
+            services.AddSingleton<ICartWriteRepository, CartWriteRepository>();
+
 
 
 

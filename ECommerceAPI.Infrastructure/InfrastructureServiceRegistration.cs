@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using ECommerceAPI.Domain.Entities;
+using ECommerceAPI.Persistence.Contexts;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System;
@@ -19,6 +21,5 @@ namespace ECommerceAPI.Infrastructure
 
             return services;
         }
-
     }
 }

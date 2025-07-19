@@ -3,12 +3,15 @@ import { Home } from './features/home/home';
 import { Products } from './features/products/products';
 import { ProductDetails } from './features/products/product-details/product-details';
 import { Cart } from './features/cart/cart';
+import { Checkout } from './features/checkout/checkout';
 
 export const routes: Routes = [
     {path: '', component: Home},
     {path: 'product', component: Products},
     {path: 'product/:id', component: ProductDetails},
     {path: 'cart', component: Cart},
+    {path: 'checkout', component: Checkout},
+
 
     {path: '**', redirectTo: '', pathMatch: 'full'},
 

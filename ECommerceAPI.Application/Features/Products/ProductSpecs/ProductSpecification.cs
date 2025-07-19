@@ -1,4 +1,4 @@
-﻿using ECommerceAPI.Application.Features.Specification;
+﻿using ECommerceAPI.Application.Specification;
 using ECommerceAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
