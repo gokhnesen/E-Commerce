@@ -6,6 +6,7 @@ using ECommerceAPI.Persistence.Contexts;
 using ECommerceAPI.Persistence.Repositories;
 using ECommerceAPI.Persistence.Repositories.Brand;
 using ECommerceAPI.Persistence.Repositories.Cart;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,7 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<IBrandReadRepository, BrandReadRepository>();
             services.AddSingleton<ICartReadRepository, CartReadRepository>(); 
             services.AddSingleton<ICartWriteRepository, CartWriteRepository>();
-
+            services.AddScoped<UserManager<User>>();
 
 
 

@@ -48,7 +48,7 @@ namespace ECommerceAPI.API.Controllers
                 user.Name,
                 user.LastName,
                 user.Email,
-                Address = user.Address
+                user.Address,
          
             });
         }
@@ -66,7 +66,7 @@ namespace ECommerceAPI.API.Controllers
         [HttpPost("address")]
         public async Task<ActionResult> CreateOrUpdateAddress(UpdateAddressCommand updateAddressCommand)
         {
-            var response = Mediator.Send(updateAddressCommand);
+            var response = await Mediator.Send(updateAddressCommand);
 
             return Ok(response);
         }

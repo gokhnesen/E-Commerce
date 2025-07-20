@@ -9,8 +9,11 @@ namespace ECommerceAPI.Application.Features.Users.Commands.UpdateAddress
     public class UpdateAddressResponse
     {
         public bool IsSuccess { get; set; }
-        public string Message { get; set; } = string.Empty;
-
+        public string Message { get; set; }
         public bool IsNewAddress { get; set; }
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string PostalCode { get; set; }
+        public string Country { get; set; }
     }
 }

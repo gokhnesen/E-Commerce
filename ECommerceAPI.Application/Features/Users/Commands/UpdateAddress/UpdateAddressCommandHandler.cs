@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.Application.Extensions;
+﻿using AutoMapper;
+using ECommerceAPI.Application.Extensions;
 using ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress;
 using ECommerceAPI.Application.Features.Users.Commands.UpdateAddress;
 using ECommerceAPI.Domain.Entities;
@@ -14,15 +15,18 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
         private readonly UserManager<User> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<UpdateAddressCommandHandler> _logger;
+        private readonly IMapper _mapper;
 
         public UpdateAddressCommandHandler(
             UserManager<User> userManager,
             IHttpContextAccessor httpContextAccessor,
-            ILogger<UpdateAddressCommandHandler> logger)
+            ILogger<UpdateAddressCommandHandler> logger,
+            IMapper mapper)
         {
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<UpdateAddressResponse> Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
@@ -41,11 +45,13 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
 
                 if (isNewAddress)
                 {
-                    currentUser.Address = CreateNewAddress(request);
+                    // AutoMapper ile yeni adres oluştur
+                    currentUser.Address = _mapper.Map<Address>(request);
                 }
                 else
                 {
-                    UpdateExistingAddress(currentUser.Address, request);
+                    // Mevcut adrese AutoMapper ile map et
+                    _mapper.Map(request, currentUser.Address);
                 }
 
                 var result = await _userManager.UpdateAsync(currentUser);
@@ -55,13 +61,11 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
                     _logger.LogInformation("Adres {Action} - UserId: {UserId}",
                         isNewAddress ? "oluşturuldu" : "güncellendi", currentUser.Id);
 
-                    // Response'u explicit olarak oluştur
-                    var response = new UpdateAddressResponse
-                    {
-                        IsSuccess = true,
-                        Message = $"Adres başarıyla {(isNewAddress ? "oluşturuldu" : "güncellendi")}.",
-                        IsNewAddress = isNewAddress
-                    };
+                    // AutoMapper ile response oluştur
+                    var response = _mapper.Map<UpdateAddressResponse>(currentUser.Address);
+                    response.IsSuccess = true;
+                    response.Message = $"Adres başarıyla {(isNewAddress ? "oluşturuldu" : "güncellendi")}.";
+                    response.IsNewAddress = isNewAddress;
 
                     return response;
                 }
@@ -73,29 +77,6 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
                 _logger.LogError(ex, "Adres güncelleme sırasında hata oluştu");
                 return CreateErrorResponse("Kullanıcı bulunamadı veya adres işlemi başarısız.");
             }
-        }
-
-        private static Address CreateNewAddress(UpdateAddressCommand request)
-        {
-            return new Address
-            {
-                Line1 = request.Line1,
-                Line2 = request.Line2,
-                City = request.City,
-                State = request.State,
-                Country = request.Country,
-                PostalCode = request.PostalCode
-            };
-        }
-
-        private static void UpdateExistingAddress(Address address, UpdateAddressCommand request)
-        {
-            address.Line1 = request.Line1;
-            address.Line2 = request.Line2;
-            address.City = request.City;
-            address.State = request.State;
-            address.Country = request.Country;
-            address.PostalCode = request.PostalCode;
         }
 
         private static UpdateAddressResponse CreateErrorResponse(string message)

@@ -21,6 +21,6 @@ namespace ECommerceAPI.Application.Features.Users.Commands.UpdateAddress
         [Required]
         public  string Country { get; set; } = string.Empty;
         [Required]
-        public string PostalCode { get; set; } = string.Empty;
+        public string? PostalCode { get; set; } = string.Empty;
     }
 }
