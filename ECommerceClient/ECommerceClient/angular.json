@@ -67,6 +67,11 @@
           "defaultConfiguration": "production"
         },
         "serve": {
+            "options": {
+    "ssl": true,
+    "sslKey": "C:/localhost.pfx",
+    "sslCert": "C:/localhost.pfx"
+  },
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {

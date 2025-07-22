@@ -20,12 +20,14 @@ namespace ECommerceAPI.API.Controllers
     public class AccountController(SignInManager<User> signInManager) : BaseController
     {
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterUserCommand register)
+        public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
         {
-            var responsse = await Mediator.Send(register);
-
-            return Ok(responsse);
-
+            var response = await Mediator.Send(command);
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [Authorize]

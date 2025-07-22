@@ -3,10 +3,11 @@ import { provideRouter } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { InitService } from './core/services/initService';
 import { lastValueFrom } from 'rxjs';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { authInterceptor } from './core/interceptors/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,14 +15,15 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes), 
     provideClientHydration(withEventReplay()),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([
+      authInterceptor
+    ])),
     provideAppInitializer(async () => {
       const platformId = inject(PLATFORM_ID);
       
       if (isPlatformBrowser(platformId)) {
         const initService = inject(InitService);
         return lastValueFrom(initService.init()).finally(() => {
-          // Document'e sadece tarayıcı ortamında erişin
           const splash = document.getElementById('initial-splash');
           if (splash) {
             splash.remove();
@@ -29,7 +31,6 @@ export const appConfig: ApplicationConfig = {
         });
       }
       
-      // SSR ortamında hiçbir şey yapmadan Promise.resolve() döndür
       return Promise.resolve();
     }),
     {

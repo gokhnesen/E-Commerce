@@ -33,7 +33,6 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
         {
             try
             {
-                // HttpContext null check
                 if (_httpContextAccessor.HttpContext?.User == null)
                 {
                     return CreateErrorResponse("Kullanıcı bilgisi bulunamadı.");
@@ -45,12 +44,10 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
 
                 if (isNewAddress)
                 {
-                    // AutoMapper ile yeni adres oluştur
                     currentUser.Address = _mapper.Map<Address>(request);
                 }
                 else
                 {
-                    // Mevcut adrese AutoMapper ile map et
                     _mapper.Map(request, currentUser.Address);
                 }
 
@@ -61,7 +58,6 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
                     _logger.LogInformation("Adres {Action} - UserId: {UserId}",
                         isNewAddress ? "oluşturuldu" : "güncellendi", currentUser.Id);
 
-                    // AutoMapper ile response oluştur
                     var response = _mapper.Map<UpdateAddressResponse>(currentUser.Address);
                     response.IsSuccess = true;
                     response.Message = $"Adres başarıyla {(isNewAddress ? "oluşturuldu" : "güncellendi")}.";
@@ -70,7 +66,12 @@ namespace ECommerceAPI.Application.Features.Addresses.Commands.UpdateAddress
                     return response;
                 }
 
-                return CreateErrorResponse("Adres güncellenirken bir hata oluştu.");
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return new UpdateAddressResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Adres güncellenirken bir hata oluştu: {errors}"
+                };
             }
             catch (Exception ex)
             {

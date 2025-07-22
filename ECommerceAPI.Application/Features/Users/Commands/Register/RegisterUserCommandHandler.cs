@@ -38,10 +38,10 @@ namespace ECommerceAPI.Application.Features.Users.Commands.Register
                     return CreateErrorResponse("Bu email adresi zaten kayıtlı.", new List<string> { "Bu email adresi zaten kayıtlı." });
                 }
 
-                // AutoMapper ile User oluştur
+                
                 var newUser = _mapper.Map<User>(request);
-                newUser.UserName = request.Email; // UserName'i Email ile eşitle
-                newUser.EmailConfirmed = false; // Email onayını false yap
+                newUser.UserName = request.Email; 
+                newUser.EmailConfirmed = false;
 
                 var result = await _userManager.CreateAsync(newUser, request.Password);
 
@@ -49,7 +49,6 @@ namespace ECommerceAPI.Application.Features.Users.Commands.Register
                 {
                     _logger.LogInformation("Kullanıcı başarıyla kaydedildi: {Email}", request.Email);
 
-                    // AutoMapper ile response oluştur
                     var response = _mapper.Map<RegisterUserResponse>(newUser);
                     response.IsSuccess = true;
                     response.Message = "Kullanıcı başarıyla kaydedildi.";

@@ -1,7 +1,8 @@
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CartService } from './cartService';
-import { of, Observable } from 'rxjs';
+import { of, Observable, forkJoin } from 'rxjs';
+import { AccountService } from './accountService';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ import { of, Observable } from 'rxjs';
 export class InitService {
   private cartService = inject(CartService);
   private platformId = inject(PLATFORM_ID);
+  private accountService = inject(AccountService);
   
   init(): Observable<any> {
     if (isPlatformBrowser(this.platformId)) {
@@ -21,6 +23,10 @@ export class InitService {
       }
     }
     
-    return of(null);
+    const cart$ = of(null);
+    return forkJoin({
+      cart: cart$,
+      user: this.accountService.getUserInfo()
+    });
   }
 }
