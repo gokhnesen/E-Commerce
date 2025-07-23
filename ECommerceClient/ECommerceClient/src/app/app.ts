@@ -7,12 +7,13 @@ import { Product } from './shared/models/product';
 import { ProductService } from './core/services/productService';
 import { Products} from "./features/products/products";
 import { ProductDetails } from "./features/products/product-details/product-details";
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, CommonModule, Products, ProductDetails],
+  imports: [RouterOutlet, Header, CommonModule, Products, ProductDetails, MatSnackBarModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

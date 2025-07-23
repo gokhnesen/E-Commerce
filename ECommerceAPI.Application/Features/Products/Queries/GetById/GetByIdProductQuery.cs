@@ -9,6 +9,6 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetById
 {
     public class GetByIdProductQuery : IRequest<GetByIdProductQueryResponse>
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
     }
 }

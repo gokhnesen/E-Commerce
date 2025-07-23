@@ -33,7 +33,7 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
 
             foreach (var item in response)
             {
-                var product = products.FirstOrDefault(p => p.Id == item.Id);
+                var product = products.FirstOrDefault(p => p.Id == Guid.Parse(item.Id));
                 if (product != null)
                 {
                     var category = await _categoryReadRepository.GetByIdAsync(product.CategoryId);

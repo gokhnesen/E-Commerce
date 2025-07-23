@@ -41,13 +41,6 @@ namespace ECommerceAPI.Persistence.Repositories
             return await query.FirstOrDefaultAsync(method);
         }
 
-        public async Task<T> GetByIdAsync(Guid id, bool tracking = true)
-        {
-            var query = Table.AsQueryable();
-            if (!tracking)
-                query = query.AsNoTracking();
-            return await query.FirstOrDefaultAsync(data => data.Id == id);
-        }
         public async Task<T?> GetEntityWithSpec(ISpecification<T> spec)
         {
             return await ApplySpecification(spec).FirstOrDefaultAsync();
@@ -77,5 +70,13 @@ namespace ECommerceAPI.Persistence.Repositories
 
             return await query.CountAsync();
         }
+
+        public async Task<T> GetByIdAsync(string id, bool tracking = true)
+        {
+            var query = Table.AsQueryable();
+            if (!tracking)
+                query = query.AsNoTracking();
+            return await query.FirstOrDefaultAsync(data => data.Id.ToString() == id);
+        }
     }
-}
+    }

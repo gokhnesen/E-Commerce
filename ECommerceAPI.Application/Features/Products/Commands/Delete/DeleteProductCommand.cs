@@ -9,6 +9,6 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Delete
 {
     public class DeleteProductCommand : IRequest<DeleteProductResponse>
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
     }
 }

@@ -8,6 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../../core/services/accountService';
 import { Router } from '@angular/router';
 import { JsonPipe } from '@angular/common';
+import { TextInput } from "../../../shared/components/text-input/text-input";
 
 @Component({
   selector: 'app-register',
@@ -19,10 +20,9 @@ import { JsonPipe } from '@angular/common';
     MatLabel,
     MatInput,
     JsonPipe,
-    MatError
-
-
-  ],
+    MatError,
+    TextInput
+],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })

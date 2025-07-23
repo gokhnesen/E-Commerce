@@ -20,7 +20,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] string id)
         {
             var query = new GetByIdCategoryQuery { Id = id };
             var response = await Mediator.Send(query);
@@ -35,7 +35,7 @@ namespace ECommerceAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             DeleteCategoryResponse response = await Mediator.Send(new DeleteCategoryCommand { Id = id });
             return Ok(response);

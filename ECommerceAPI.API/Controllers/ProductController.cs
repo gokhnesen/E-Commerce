@@ -22,7 +22,7 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute]Guid id)
+        public async Task<IActionResult> GetById([FromRoute]string id)
         {
             var query = new GetByIdProductQuery { Id = id };
             var response = await Mediator.Send(query);
@@ -37,7 +37,7 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteProduct([FromRoute] string id)
         {
             DeleteProductResponse response = await Mediator.Send(new DeleteProductCommand { Id = id });
             return Ok(response);

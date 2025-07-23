@@ -34,7 +34,7 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Create
             }
 
             Product product = _mapper.Map<Product>(request);
-            product.CategoryId = category.Id;
+            product.CategoryId = category.Id.ToString();
             product.Id = Guid.NewGuid();
             await _productWriteRepository.AddAsync(product);
             await _productWriteRepository.SaveAsync();
