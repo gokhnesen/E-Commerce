@@ -4,7 +4,7 @@ namespace ECommerceAPI.Application.Features.Brands.Commands.Update
 {
     public class UpdateBrandCommand : IRequest<UpdateBrandResponse>
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
     }
 } 

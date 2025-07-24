@@ -24,7 +24,7 @@ namespace ECommerceAPI.Persistence.Repositories.Payment
             var shippingPrice = 0m;
             if (!string.IsNullOrEmpty(cart.PaymentIntentId))
             {
-                var deliveryMethod = await dm.GetByIdAsync(cart.DeliveryMethodId);
+                var deliveryMethod = await dm.GetByIdAsync(Guid.Parse(cart.DeliveryMethodId));
                 if (deliveryMethod == null) return null;
 
                 shippingPrice = deliveryMethod.Price;
@@ -32,7 +32,7 @@ namespace ECommerceAPI.Persistence.Repositories.Payment
 
             foreach (var item in cart.Items)
             {
-                var product = await productReadRepository.GetByIdAsync(item.ProductId);
+                var product = await productReadRepository.GetByIdAsync(Guid.Parse(item.ProductId));
                 if (product == null) return null;
                 if(item.Price != product.Price)
                 {

@@ -16,8 +16,8 @@ namespace ECommerceAPI.Domain.Entities
         public int Stock { get; set; }
         public string? PictureUrl { get; set; }
 
-        public string CategoryId { get; set; }
-        public string BrandId { get; set; }
+        public Guid CategoryId { get; set; }
+        public Guid BrandId { get; set; }
 
         [ForeignKey("BrandId")]
         public Brand Brand { get; set; }
