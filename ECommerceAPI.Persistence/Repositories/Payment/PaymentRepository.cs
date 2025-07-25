@@ -48,7 +48,7 @@ namespace ECommerceAPI.Persistence.Repositories.Payment
                 var options = new PaymentIntentCreateOptions
                 {
                     Amount = ((long)cart.Items.Sum(x => x.Quantity * (x.Price * 100)) + (long)shippingPrice * 100),
-                    Currency = "usd",
+                    Currency = "try",
                     PaymentMethodTypes = ["card"]
 
                     

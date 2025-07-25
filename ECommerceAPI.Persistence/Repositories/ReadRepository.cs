@@ -52,9 +52,9 @@ namespace ECommerceAPI.Persistence.Repositories
             return await ApplySpecification(spec).ToListAsync();
         }
 
-        public Task<IReadOnlyList<T>> GetAllAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await Table.AsNoTracking().ToListAsync();
         }
 
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
