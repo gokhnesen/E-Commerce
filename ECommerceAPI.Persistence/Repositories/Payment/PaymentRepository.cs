@@ -13,20 +13,19 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Persistence.Repositories.Payment
 {
-    public class PaymentRepository(IConfiguration config, ICartReadRepository cartReadRepository,ICartWriteRepository cartWriteRepository, IProductReadRepository productReadRepository,IReadRepository<DeliveryMethod> dm) : IPaymentInterface
+    public class PaymentRepository(IConfiguration config, ICartReadRepository cartReadRepository, ICartWriteRepository cartWriteRepository, IProductReadRepository productReadRepository, IReadRepository<DeliveryMethod> dm) : IPaymentInterface
     {
         public async Task<Domain.Entities.Cart> CreateOrUpdatePaymentIntent(string cartId)
         {
             StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
             var cart = await cartReadRepository.GetCartAsync(cartId);
-            if(cart == null) return null;
+            if (cart == null) return null;
 
             var shippingPrice = 0m;
-            if (!string.IsNullOrEmpty(cart.PaymentIntentId))
+            if (!string.IsNullOrEmpty(cart.DeliveryMethodId))
             {
                 var deliveryMethod = await dm.GetByIdAsync(Guid.Parse(cart.DeliveryMethodId));
                 if (deliveryMethod == null) return null;
-
                 shippingPrice = deliveryMethod.Price;
             }
 
@@ -34,39 +33,64 @@ namespace ECommerceAPI.Persistence.Repositories.Payment
             {
                 var product = await productReadRepository.GetByIdAsync(Guid.Parse(item.ProductId));
                 if (product == null) return null;
-                if(item.Price != product.Price)
+                if (item.Price != product.Price)
                 {
                     item.Price = product.Price;
                 }
             }
 
             var service = new PaymentIntentService();
-            PaymentIntent? intent = null;
+            PaymentIntent intent;
 
-            if(string.IsNullOrEmpty(cart.PaymentIntentId))
+            if (string.IsNullOrEmpty(cart.PaymentIntentId))
             {
                 var options = new PaymentIntentCreateOptions
                 {
-                    Amount = ((long)cart.Items.Sum(x => x.Quantity * (x.Price * 100)) + (long)shippingPrice * 100),
+                    Amount = (long)(cart.Items.Sum(x => x.Quantity * x.Price * 100) + shippingPrice * 100),
                     Currency = "try",
                     PaymentMethodTypes = ["card"]
-
-                    
                 };
                 intent = await service.CreateAsync(options);
-                cart.PaymentIntentId = intent.Id;
-                cart.ClientSecret = intent.ClientSecret;
             }
             else
             {
-                var options = new PaymentIntentUpdateOptions
+                var existingIntent = await service.GetAsync(cart.PaymentIntentId);
+
+                if (existingIntent.Status == "succeeded")
                 {
-                    Amount = ((long)cart.Items.Sum(x => x.Quantity * (x.Price * 100)) + (long)shippingPrice * 100),
-                };
-                intent = await service.UpdateAsync(cart.PaymentIntentId, options);
+                    var createOptions = new PaymentIntentCreateOptions
+                    {
+                        Amount = (long)(cart.Items.Sum(x => x.Quantity * x.Price * 100) + shippingPrice * 100),
+                        Currency = "try",
+                        PaymentMethodTypes = ["card"]
+                    };
+                    intent = await service.CreateAsync(createOptions);
+                }
+                else if (new[] { "requires_payment_method", "requires_confirmation", "requires_action" }
+                        .Contains(existingIntent.Status))
+                {
+                    var updateOptions = new PaymentIntentUpdateOptions
+                    {
+                        Amount = (long)(cart.Items.Sum(x => x.Quantity * x.Price * 100) + shippingPrice * 100)
+                    };
+                    intent = await service.UpdateAsync(cart.PaymentIntentId, updateOptions);
+                }
+                else
+                {
+                    var createOptions = new PaymentIntentCreateOptions
+                    {
+                        Amount = (long)(cart.Items.Sum(x => x.Quantity * x.Price * 100) + shippingPrice * 100),
+                        Currency = "try",
+                        PaymentMethodTypes = ["card"]
+                    };
+                    intent = await service.CreateAsync(createOptions);
+                }
             }
 
+            cart.PaymentIntentId = intent.Id;
+            cart.ClientSecret = intent.ClientSecret;
             await cartWriteRepository.SetCartAsync(cart);
+
             return cart;
         }
     }

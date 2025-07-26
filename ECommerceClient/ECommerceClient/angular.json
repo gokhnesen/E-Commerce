@@ -69,8 +69,8 @@
         "serve": {
             "options": {
     "ssl": true,
-    "sslKey": "C:/localhost.pfx",
-    "sslCert": "C:/localhost.pfx"
+    "sslKey": "ssl/localhost-key.pem",
+    "sslCert": "ssl/localhost.pem"
   },
           "builder": "@angular/build:dev-server",
           "configurations": {

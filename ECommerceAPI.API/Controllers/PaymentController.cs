@@ -20,7 +20,6 @@ namespace ECommerceAPI.API.Controllers
             if (cart == null)
             {
                 return BadRequest("Ödeme işlemi başarısız.");
-
                
             }
             return Ok(cart);

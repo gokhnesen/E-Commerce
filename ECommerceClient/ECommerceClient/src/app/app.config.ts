@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { InitService } from './core/services/initService';
+import { AccountService } from './core/services/accountService'; // <- Ekleyin
 import { lastValueFrom } from 'rxjs';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
@@ -20,17 +21,20 @@ export const appConfig: ApplicationConfig = {
     ])),
     provideAppInitializer(async () => {
       const platformId = inject(PLATFORM_ID);
-      
+             
       if (isPlatformBrowser(platformId)) {
         const initService = inject(InitService);
-        return lastValueFrom(initService.init()).finally(() => {
-          const splash = document.getElementById('initial-splash');
-          if (splash) {
-            splash.remove();
-          }
-        });
+        const accountService = inject(AccountService);
+        await lastValueFrom(initService.init());
+        await accountService.loadUserFromStorage();
+        const splash = document.getElementById('initial-splash');
+        if (splash) {
+          splash.remove();
+        }
+        
+        return;
       }
-      
+             
       return Promise.resolve();
     }),
     {
