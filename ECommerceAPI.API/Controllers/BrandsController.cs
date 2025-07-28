@@ -13,46 +13,41 @@ namespace ECommerceAPI.API.Controllers
     [ApiController]
     public class BrandsController : BaseController
     {
-        private readonly IMediator _mediator;
-
-        public BrandsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        
 
         [HttpGet]
         public async Task<IActionResult> GetList()
         {
             GetListBrandQuery getListBrandQuery = new();
-            List<GetListBrandResponse> response = await _mediator.Send(getListBrandQuery);
+            List<GetListBrandResponse> response = await Mediator.Send(getListBrandQuery);
             return Ok(response);
         }
 
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetById([FromRoute] GetByIdBrandQuery getByIdBrandQuery)
         {
-            GetByIdBrandResponse response = await _mediator.Send(getByIdBrandQuery);
+            GetByIdBrandResponse response = await Mediator.Send(getByIdBrandQuery);
             return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CreateBrandCommand createBrandCommand)
         {
-            CreateBrandResponse response = await _mediator.Send(createBrandCommand);
+            CreateBrandResponse response = await Mediator.Send(createBrandCommand);
             return Ok(response);
         }
 
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateBrandCommand updateBrandCommand)
         {
-            UpdateBrandResponse response = await _mediator.Send(updateBrandCommand);
+            UpdateBrandResponse response = await Mediator.Send(updateBrandCommand);
             return Ok(response);
         }
 
         [HttpDelete("{Id}")]
         public async Task<IActionResult> Delete([FromRoute] DeleteBrandCommand deleteBrandCommand)
         {
-            DeleteBrandResponse response = await _mediator.Send(deleteBrandCommand);
+            DeleteBrandResponse response = await Mediator.Send(deleteBrandCommand);
             return Ok(response);
         }
     }

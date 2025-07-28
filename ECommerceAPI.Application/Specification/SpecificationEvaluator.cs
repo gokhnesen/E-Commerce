@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,10 @@ namespace ECommerceAPI.Application.Specification
             {
                 query = query.Skip(spec.Skip).Take(spec.Take);
             }
+
+            query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+            query = spec.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
+
 
             return query;
         }

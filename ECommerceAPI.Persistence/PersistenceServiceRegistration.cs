@@ -1,12 +1,16 @@
 ﻿using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;
 using ECommerceAPI.Application.Interfaces.Cart;
+using ECommerceAPI.Application.Interfaces.DeliveryMethod;
+using ECommerceAPI.Application.Interfaces.Order;
 using ECommerceAPI.Application.Interfaces.Payment;
 using ECommerceAPI.Domain.Entities;
 using ECommerceAPI.Persistence.Contexts;
 using ECommerceAPI.Persistence.Repositories;
 using ECommerceAPI.Persistence.Repositories.Brand;
 using ECommerceAPI.Persistence.Repositories.Cart;
+using ECommerceAPI.Persistence.Repositories.DeliveryMethod;
+using ECommerceAPI.Persistence.Repositories.Order;
 using ECommerceAPI.Persistence.Repositories.Payment;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +40,11 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<ICartWriteRepository, CartWriteRepository>();
             services.AddScoped<UserManager<User>>();
             services.AddScoped<IPaymentInterface, PaymentRepository>();
+            services.AddScoped<IOrderReadRepository, OrderReadRepository>();
+            services.AddScoped<IOrderWriteRepository, OrderWriteRepository>();
+            services.AddScoped<IDeliveryReadRepository, DeliveryReadRepository>();
+            services.AddScoped<IDeliveryWriteRepository, DeliveryWriteRepository>();
+
             services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
 
 

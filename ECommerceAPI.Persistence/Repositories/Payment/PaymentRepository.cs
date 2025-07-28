@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Cart;
+using ECommerceAPI.Application.Interfaces.DeliveryMethod;
 using ECommerceAPI.Application.Interfaces.Payment;
 using ECommerceAPI.Domain.Entities;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Persistence.Repositories.Payment
 {
-    public class PaymentRepository(IConfiguration config, ICartReadRepository cartReadRepository, ICartWriteRepository cartWriteRepository, IProductReadRepository productReadRepository, IReadRepository<DeliveryMethod> dm) : IPaymentInterface
+    public class PaymentRepository(IConfiguration config, ICartReadRepository cartReadRepository, ICartWriteRepository cartWriteRepository, IProductReadRepository productReadRepository, IDeliveryReadRepository deliveryReadRepository) : IPaymentInterface
     {
         public async Task<Domain.Entities.Cart> CreateOrUpdatePaymentIntent(string cartId)
         {
@@ -24,7 +25,7 @@ namespace ECommerceAPI.Persistence.Repositories.Payment
             var shippingPrice = 0m;
             if (!string.IsNullOrEmpty(cart.DeliveryMethodId))
             {
-                var deliveryMethod = await dm.GetByIdAsync(Guid.Parse(cart.DeliveryMethodId));
+                var deliveryMethod = await deliveryReadRepository.GetByIdAsync(Guid.Parse(cart.DeliveryMethodId));
                 if (deliveryMethod == null) return null;
                 shippingPrice = deliveryMethod.Price;
             }
