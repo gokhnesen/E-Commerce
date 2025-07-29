@@ -1,5 +1,4 @@
-﻿using ECommerceAPI.Application.Dto;
-using ECommerceAPI.Domain.Entities.Order;
+﻿using ECommerceAPI.Domain.Entities.Order;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

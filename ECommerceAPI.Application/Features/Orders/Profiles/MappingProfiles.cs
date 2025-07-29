@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
-using ECommerceAPI.Application.Dto;
 using ECommerceAPI.Application.Features.Orders.Commands.Create;
-using ECommerceAPI.Application.Features.Orders.Queries;
-using ECommerceAPI.Application.Features.Products.Queries.GetById;
+using ECommerceAPI.Application.Features.Orders.Queries.GetById;
+using ECommerceAPI.Application.Features.Orders.Queries.GetList;
 using ECommerceAPI.Domain.Entities;
 using ECommerceAPI.Domain.Entities.Order;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Orders.Profiles
 {
@@ -19,6 +13,7 @@ namespace ECommerceAPI.Application.Features.Orders.Profiles
         {
             CreateMap<Order, GetByIdOrderQuery>().ReverseMap();
             CreateMap<Order, GetByIdOrderQueryResponse>().ReverseMap();
+            CreateMap<Order, GetListOrderQueryResponse>().ReverseMap();
 
             CreateMap<CreateOrderCommand, Order>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))

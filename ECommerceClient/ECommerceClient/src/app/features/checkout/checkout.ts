@@ -16,6 +16,8 @@ import { CheckoutReview } from "./checkout-review/checkout-review";
 import { CartService } from '../../core/services/cartService';
 import { CurrencyPipe, JsonPipe } from '@angular/common';
 import { MatProgressSpinnerModule}  from '@angular/material/progress-spinner'
+import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
+import { OrderService } from '../../core/services/orderService';
 
 @Component({
   selector: 'app-checkout',
@@ -40,6 +42,7 @@ export class Checkout implements OnInit, OnDestroy {
   private snackbar = inject(MatSnackBar);
   private router = inject(Router)
   private accountService = inject(AccountService);
+  private orderService = inject(OrderService);
   cartService = inject(CartService);
   addressElement?: StripeAddressElement;
   paymentElement?: StripePaymentElement;
@@ -107,7 +110,7 @@ handleDeliveryChange(event: boolean) {
     
     if(event.selectedIndex === 1){
       if(this.saveAddress){
-        const address = await this.getAddressFromStripeAddress();
+        const address = await this.getAddressFromStripeAddress() as Address;
         address && firstValueFrom(this.accountService.updateAddress(address));
       }
     }
@@ -125,17 +128,25 @@ handleDeliveryChange(event: boolean) {
     try {
       if(this.confirmationToken){
         const result = await this.stripeService.confirmPayment(this.confirmationToken()!);
-        if(result.error){
-          throw new Error(result.error.message);
-        } else{
-          this.cartService.deleteCart();
-          this.cartService.selectedDelivery.set(null);
-          this.router.navigateByUrl('/checkout/success');
 
+        if(result.paymentIntent?.status === 'succeeded'){
+          const orderToCreate = await this.createOrderModel();
+          const orderResult = await firstValueFrom(this.orderService.createOrder(orderToCreate!));
+          if(orderResult){
+            this.cartService.deleteCart();
+            this.cartService.selectedDelivery.set(null);
+            this.router.navigateByUrl('/checkout/success');
+          } else {
+            throw new Error('Sipariş oluşturulamadı');
+          }
+        } else if(result.error){
+          throw new Error(result.error.message);
+        } else {
+          throw new Error('Ödeme işlemi başarısız oldu');
         }
       }
     } catch (error: any)  {
-      this.snackbar.open(error.message || 'something went wrong');
+      this.snackbar.open(error.message || 'Hata oluştu');
       stepper.previous();
       
     } finally{
@@ -144,13 +155,38 @@ handleDeliveryChange(event: boolean) {
     }
   }
 
+  private async createOrderModel(): Promise<OrderToCreate | undefined> {
+    const cart = this.cartService.cart();
+    const shippingAddress = await this.getAddressFromStripeAddress() as ShippingAddress
+    const deliveryMethod = this.cartService.selectedDelivery();
+    const card = this.confirmationToken()?.payment_method_preview?.card;
 
-  private async getAddressFromStripeAddress() : Promise<Address | null> {
+    if(!cart?.id || !shippingAddress || !deliveryMethod || !card){
+      this.snackbar.open('Tüm alanları doldurduğunuzdan emin olun');
+      return;
+    }
+
+    return {
+      cartId: cart.id,
+      paymentSummary: {
+        last4: +card.last4,
+        brand: card.brand,
+        expMonth: card.exp_month,
+        expYear: card.exp_year
+    },
+      shippingAddress: shippingAddress,
+      deliveryMethodId: cart.deliveryMethodId ?? ''
+    };
+  }
+
+
+  private async getAddressFromStripeAddress() : Promise<Address | ShippingAddress | null> {
     const result = await this.addressElement?.getValue();
     const address = result?.value.address;
 
     if(address){
       return{
+        name: result.value.name,
         line1: address.line1,
         line2: address.line2 || '',
         city: address.city,

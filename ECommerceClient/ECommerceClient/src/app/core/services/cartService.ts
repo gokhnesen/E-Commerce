@@ -13,9 +13,9 @@ export class CartService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   cart = signal<Cart | null>(null);
-  itemCount = computed(() => {
-    return this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0)
-  });
+itemCount = computed(() => {
+  return this.cart()?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+});
   selectedDelivery = signal<DeliveryMethod | null>(null);
   totals = computed(() =>{
     const cart = this.cart();
@@ -80,14 +80,15 @@ removeİtemFromCart(productId: string, quantity = 1 ){
     }
   }
 }
-  deleteCart() {
-    this.http.delete(this.baseUrl + 'cart?id=' + this.cart()?.id).subscribe({
-      next: () => {
-        localStorage.removeItem('cart_id');
-        this.cart.set(null);
-      }
-    })
-  }
+deleteCart() {
+
+  this.http.delete(this.baseUrl + 'cart/remove-cart/' + this.cart()?.id).subscribe({
+    next: () => {
+      localStorage.removeItem('cart_id');
+      this.cart.set(null);
+    }
+  })
+}
   private addOrUpdateItem(items: CartItem[], item: CartItem, quantity: number): CartItem[] {
     const index = items.findIndex(x => x.productId === item.productId);
     if(index === -1){

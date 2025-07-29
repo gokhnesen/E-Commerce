@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Application.Features.Orders.Commands.Create;
-using ECommerceAPI.Application.Features.Orders.Queries;
+using ECommerceAPI.Application.Features.Orders.Queries.GetById;
+using ECommerceAPI.Application.Features.Orders.Queries.GetList;
 using ECommerceAPI.Application.Features.Products.Queries.GetById;
 using ECommerceAPI.Controllers;
 using ECommerceAPI.Domain.Entities.Order;
@@ -29,6 +30,14 @@ namespace ECommerceAPI.API.Controllers
         {
             var query = new GetByIdOrderQuery { Id = id };
             GetByIdOrderQueryResponse response = await Mediator.Send(query);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IReadOnlyList<Order>>> GetOrders()
+        {
+            var query = new GetListOrderQuery(); 
+            var response = await Mediator.Send(query);
             return Ok(response);
         }
 

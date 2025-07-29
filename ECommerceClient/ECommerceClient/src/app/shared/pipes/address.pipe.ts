@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { ConfirmationToken } from "@stripe/stripe-js";
+import { ShippingAddress } from "../models/order";
 
 @Pipe({
   name: 'address',
@@ -7,24 +8,22 @@ import { ConfirmationToken } from "@stripe/stripe-js";
 })
 export class AddressPipe implements PipeTransform {
 
-  transform(value?: ConfirmationToken['shipping']): string {
-    if (!value?.address || !value.name) {
-      return 'Bilinmeyen adres';
+  transform(value?: ConfirmationToken['shipping'] | ShippingAddress | any): string {
+    if (!value) return 'Adres bilgisi yok';
+
+    if (value && 'address' in value && value.name) {
+      const { line1, line2, city, country, postal_code } = value.address;
+      return `${value.name}, ${line1}${line2 ? ', ' + line2 : ''}, ${city}, ${country}, ${postal_code}`;
+    } 
+    else if (value && 'line1' in value) {
+      const { name, line1, line2, city, state, country, postalCode } = value as ShippingAddress;
+      return `${name || ''}, ${line1}${line2 ? ', ' + line2 : ''}, ${city}, ${state || ''}, ${country}, ${postalCode}`;
     }
 
-    const { line1, line2, city, country, postal_code } = value.address;
-    
-    if (!line1 || !city) {
-      return 'Eksik adres bilgisi';
-    }
-    const addressParts = [
-      value.name,
-      line1,
-      ...(line2 ? [line2] : []),
-      ...(postal_code ? [`${postal_code} ${city}`] : [city]),
-      ...(country && country !== 'TR' ? [country] : []) 
-    ];
 
-    return addressParts.join(', ');
+    else{
+          return 'Bilinmeyen adres formatı';
+    }
+
   }
 }
