@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ECommerceAPI.Application.Dto;
+using ECommerceAPI.Application.Features.Orders.Commands.Create;
 using ECommerceAPI.Application.Features.Orders.Queries;
 using ECommerceAPI.Application.Features.Products.Queries.GetById;
 using ECommerceAPI.Domain.Entities;
@@ -19,7 +20,16 @@ namespace ECommerceAPI.Application.Features.Orders.Profiles
             CreateMap<Order, GetByIdOrderQuery>().ReverseMap();
             CreateMap<Order, GetByIdOrderQueryResponse>().ReverseMap();
 
-            CreateMap<Order, OrderDto>().ReverseMap();
+            CreateMap<CreateOrderCommand, Order>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+                .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Pending))
+                .ForMember(dest => dest.DeliveryMethod, opt => opt.Ignore())
+                .ForMember(dest => dest.OrderItems, opt => opt.Ignore())     
+                .ForMember(dest => dest.ShippingAddress, opt => opt.MapFrom(src => src.ShippingAddress))
+                .ForMember(dest => dest.PaymentSummary, opt => opt.MapFrom(src => src.PaymentSummary));
+
+            CreateMap<Order, CreateOrderResponse>().ReverseMap();
         }
     }
 }

@@ -19,5 +19,7 @@ namespace ECommerceAPI.Application.Features.Orders.Commands.Create
         public ShippingAddress ShippingAddress { get; set; }
         [Required]
         public PaymentSummary PaymentSummary { get; set; }
+
+
     }
 }
