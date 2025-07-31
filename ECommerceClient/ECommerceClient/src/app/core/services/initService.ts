@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { CartService } from './cartService';
 import { of, Observable, forkJoin, tap } from 'rxjs';
 import { AccountService } from './accountService';
-import { Signalr } from './signalrService';
+import { SignalrService } from './signalrService';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class InitService {
   private cartService = inject(CartService);
   private platformId = inject(PLATFORM_ID);
   private accountService = inject(AccountService);
-  private signalrService = inject(Signalr); 
+  private signalrService = inject(SignalrService); 
   
   init(): Observable<any> {
     if (isPlatformBrowser(this.platformId)) {
