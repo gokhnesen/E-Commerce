@@ -23,5 +23,12 @@ namespace ECommerceAPI.Application.Features.Orders.OrderSpecs
             AddInclude("DeliveryMethod");
 
         }
+
+        public OrderSpecification(string paymentIntentId, bool isPaymentIntent) : 
+            base(x => x.PaymentIntentId == paymentIntentId)
+        {
+            AddInclude("OrderItems");
+            AddInclude("DeliveryMethod");
+        }
     }
 }

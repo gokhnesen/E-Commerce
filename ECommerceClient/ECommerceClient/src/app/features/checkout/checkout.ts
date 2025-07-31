@@ -130,6 +130,7 @@ handleDeliveryChange(event: boolean) {
         const result = await this.stripeService.confirmPayment(this.confirmationToken()!);
 
         if(result.paymentIntent?.status === 'succeeded'){
+          this.orderService.orderComplete = true;
           const orderToCreate = await this.createOrderModel();
           const orderResult = await firstValueFrom(this.orderService.createOrder(orderToCreate!));
           if(orderResult){

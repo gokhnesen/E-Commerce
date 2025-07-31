@@ -80,15 +80,15 @@ namespace ECommerceAPI.Application.Features.Orders.Commands.Create
             order.BuyerEmail = email;
             order.PaymentIntentId = cart.PaymentIntentId;
             order.DeliveryMethod = deliveryMethod;
-            
 
             var createdOrder = await _orderWriteRepository.AddAsync(order);
             await _orderWriteRepository.SaveAsync();
             
             CreateOrderResponse createOrderResponse = _mapper.Map<CreateOrderResponse>(order);
-            createOrderResponse.Total = order.GetTotal();
             createOrderResponse.ShippingPrice = deliveryMethod.Price;
             createOrderResponse.Subtotal = order.Subtotal;
+            createOrderResponse.Total = order.GetTotal();
+
 
             return createOrderResponse;
 

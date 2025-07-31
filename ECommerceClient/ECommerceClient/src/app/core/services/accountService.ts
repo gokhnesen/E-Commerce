@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Address, User } from '../../shared/models/user';
 import { map, tap, catchError } from 'rxjs/operators';
 import { lastValueFrom, of } from 'rxjs';
+import { SignalrService } from './signalrService';
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +14,17 @@ export class AccountService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   currentUser = signal<User | null>(null);
+  private signalrService = inject(SignalrService);
 
   login(values: any) {
     let params = new HttpParams();
     params = params.append('useCookies', true);
     return this.http.post<User>(this.baseUrl + 'login', values, { params })
       .pipe(
-        tap(user => this.currentUser.set(user))
+        tap(user => {
+          this.currentUser.set(user);
+          this.signalrService.createHubConnection();
+        })
       );
   }
 
@@ -40,7 +45,10 @@ export class AccountService {
   logout() {
     return this.http.post(this.baseUrl + 'account/logout', {})
       .pipe(
-        tap(() => this.currentUser.set(null)) 
+        tap(() => {
+          this.currentUser.set(null);
+          this.signalrService.stopHubConnection();
+        })
       );
   }
 
@@ -74,7 +82,7 @@ export class AccountService {
 
       if (authStatus.isAuthenticated) {
         console.log('User is authenticated, fetching user info...');
-          await lastValueFrom(
+        await lastValueFrom(
           this.getUserInfo().pipe(
             catchError(error => {
               console.log('Failed to get user info:', error);
@@ -84,6 +92,11 @@ export class AccountService {
           )
         );
         
+        // User bilgisi başarıyla yüklendiyse SignalR bağlantısı kur
+        if (this.currentUser()) {
+          console.log('Creating SignalR connection after loading user...');
+          this.signalrService.createHubConnection();
+        }
       } else {
         console.log('User not authenticated');
         this.currentUser.set(null);

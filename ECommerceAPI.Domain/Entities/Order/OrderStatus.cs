@@ -10,8 +10,11 @@ namespace ECommerceAPI.Domain.Entities.Order
     {
         Pending,
 
-        PaymentReceivedd,
+        PaymentReceived,
 
-        PaymenFailed
+        PaymentFailed,
+
+        PaymentMismatch,
+
     }
 }

@@ -42,6 +42,8 @@ namespace ECommerceAPI.Persistence.Repositories
         public async Task<bool> RemoveAsync(string id)
         {
             T model = await Table.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+            if (model == null)
+                return false;
             return Remove(model);
         }
 
@@ -54,10 +56,17 @@ namespace ECommerceAPI.Persistence.Repositories
         public bool Update(T model)
         {
             EntityEntry entityEntry = Table.Update(model);
-            return entityEntry.State == EntityState.Added;
+            return entityEntry.State == EntityState.Modified;
         }
+        
+        public async Task<bool> UpdateAsync(T model)
+        {
+            EntityEntry entityEntry = Table.Update(model);
+            return entityEntry.State == EntityState.Modified;
+        }
+
+
         public async Task<int> SaveAsync()
                 => await _context.SaveChangesAsync();
-
     }
 }

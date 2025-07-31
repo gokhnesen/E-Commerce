@@ -30,9 +30,9 @@ namespace ECommerceAPI.Application.Features.Orders.Queries.GetById
         public async Task<GetByIdOrderQueryResponse> Handle(GetByIdOrderQuery request, CancellationToken cancellationToken)
         {
             var spec = new OrderSpecification(_contextAccessor.HttpContext.User.GetEmail());
-            var orders = await _orderReadRepository.GetEntityWithSpec(spec);
+            var order = await _orderReadRepository.GetEntityWithSpec(spec);
 
-            GetByIdOrderQueryResponse response = _mapper.Map<GetByIdOrderQueryResponse>(orders);
+            GetByIdOrderQueryResponse response = _mapper.Map<GetByIdOrderQueryResponse>(order);
             return response;
         }
     }

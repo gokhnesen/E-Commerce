@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Application;
+using ECommerceAPI.Application.SignalR;
 using ECommerceAPI.Domain.Entities;
 using ECommerceAPI.Infrastructure;
 using ECommerceAPI.Persistence;
@@ -24,9 +25,11 @@ namespace ECommerceAPI
                 });
             });
 
+
             builder.Services.AddApplicationServices();
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddSignalR();
             builder.Services.AddControllers();
 
             builder.Services.AddSwaggerGen(c =>
@@ -72,6 +75,7 @@ namespace ECommerceAPI
 
             var app = builder.Build();
 
+            app.UseHttpsRedirection();
             app.UseCors("AllowSpecificOrigin");
 
             if (app.Environment.IsDevelopment())
@@ -83,12 +87,12 @@ namespace ECommerceAPI
                     c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
                 });
             }
-
-            app.UseHttpsRedirection();
+   
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
             app.MapGroup("api").MapIdentityApi<User>();
+            app.MapHub<NotificationHub>("/hub/notifications");
 
             app.Run();
         }
