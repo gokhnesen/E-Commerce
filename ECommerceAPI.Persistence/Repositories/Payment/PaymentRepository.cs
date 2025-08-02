@@ -14,25 +14,41 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Persistence.Repositories.Payment
 {
-    public class PaymentRepository(IConfiguration config, ICartReadRepository cartReadRepository, ICartWriteRepository cartWriteRepository, IProductReadRepository productReadRepository, IDeliveryReadRepository deliveryReadRepository) : IPaymentInterface
+    public class PaymentRepository : IPaymentInterface
     {
+        private readonly IConfiguration _config;
+        private readonly ICartReadRepository _cartReadRepository;
+        private readonly ICartWriteRepository _cartWriteRepository;
+        private readonly IProductReadRepository _productReadRepository;
+        private readonly IDeliveryReadRepository _deliveryReadRepository;
+
+
+        public PaymentRepository(IConfiguration config, ICartReadRepository cartReadRepository, ICartWriteRepository cartWriteRepository, IProductReadRepository productReadRepository, IDeliveryReadRepository deliveryReadRepository)
+        {
+            _cartReadRepository = cartReadRepository;
+            _cartWriteRepository = cartWriteRepository;
+            _productReadRepository = productReadRepository;
+            _deliveryReadRepository = deliveryReadRepository;
+            _config = config;
+            StripeConfiguration.ApiKey = _config["StripeSettings:SecretKey"];
+        }
         public async Task<Domain.Entities.Cart> CreateOrUpdatePaymentIntent(string cartId)
         {
-            StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
-            var cart = await cartReadRepository.GetCartAsync(cartId);
+            
+            var cart = await _cartReadRepository.GetCartAsync(cartId);
             if (cart == null) return null;
 
             var shippingPrice = 0m;
             if (!string.IsNullOrEmpty(cart.DeliveryMethodId))
             {
-                var deliveryMethod = await deliveryReadRepository.GetByIdAsync(Guid.Parse(cart.DeliveryMethodId));
+                var deliveryMethod = await _deliveryReadRepository.GetByIdAsync(Guid.Parse(cart.DeliveryMethodId));
                 if (deliveryMethod == null) return null;
                 shippingPrice = deliveryMethod.Price;
             }
 
             foreach (var item in cart.Items)
             {
-                var product = await productReadRepository.GetByIdAsync(Guid.Parse(item.ProductId));
+                var product = await _productReadRepository.GetByIdAsync(Guid.Parse(item.ProductId));
                 if (product == null) return null;
                 if (item.Price != product.Price)
                 {
@@ -90,9 +106,23 @@ namespace ECommerceAPI.Persistence.Repositories.Payment
 
             cart.PaymentIntentId = intent.Id;
             cart.ClientSecret = intent.ClientSecret;
-            await cartWriteRepository.SetCartAsync(cart);
+            await _cartWriteRepository.SetCartAsync(cart);
 
             return cart;
         }
+        public async Task<string> RefundPayment(string paymentIntentId)
+        {
+            var refundOptions = new RefundCreateOptions
+            {
+                PaymentIntent = paymentIntentId
+            };
+
+            var refundService = new RefundService();
+            var result = await refundService.CreateAsync(refundOptions);
+
+            return result.Status;
+        }
+
+
     }
 }

@@ -51,6 +51,7 @@ namespace ECommerceAPI.API.Controllers
                 user.LastName,
                 user.Email,
                 user.Address,
+                Roles = User.FindFirstValue(ClaimTypes.Role)
          
             });
         }

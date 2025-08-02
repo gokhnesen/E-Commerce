@@ -5,6 +5,7 @@ using ECommerceAPI.Application.Features.Products.ProductSpecs;
 using ECommerceAPI.Application.Features.Products.Queries.GetById;
 using ECommerceAPI.Application.Features.Products.Queries.GetList;
 using ECommerceAPI.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("add")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand createProductCommand)
         {
@@ -36,6 +38,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
         {

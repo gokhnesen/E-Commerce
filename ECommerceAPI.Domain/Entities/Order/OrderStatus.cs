@@ -16,5 +16,7 @@ namespace ECommerceAPI.Domain.Entities.Order
 
         PaymentMismatch,
 
+        Refunded
+
     }
 }

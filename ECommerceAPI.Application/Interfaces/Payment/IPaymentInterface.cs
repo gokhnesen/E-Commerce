@@ -10,5 +10,6 @@ namespace ECommerceAPI.Application.Interfaces.Payment
     public interface IPaymentInterface
     {
         Task<Domain.Entities.Cart> CreateOrUpdatePaymentIntent(string cartId);
+        Task<string> RefundPayment(string paymentIntentId);
     }
 }

@@ -4,6 +4,7 @@ using ECommerceAPI.Domain.Entities;
 using ECommerceAPI.Infrastructure;
 using ECommerceAPI.Persistence;
 using ECommerceAPI.Persistence.Contexts;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 
 namespace ECommerceAPI
@@ -71,7 +72,9 @@ namespace ECommerceAPI
 
 
             builder.Services.AddAuthorization();
-            builder.Services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<ECommerceAPIDbContext>();
+            builder.Services.AddIdentityApiEndpoints<User>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ECommerceAPIDbContext>();
 
             var app = builder.Build();
 
