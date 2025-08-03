@@ -1,64 +1,104 @@
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { AfterViewInit, Component, inject, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import { Order } from '../../shared/models/order';
 import { AdminService } from '../../core/services/adminService';
 import { OrderParams } from '../../shared/models/orderParams';
 import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { MatLabel } from '@angular/material/form-field';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
+import { RouterLink } from '@angular/router';
+import { DialogService } from '../../core/services/dialogService';
 
 @Component({
   selector: 'app-admin',
   imports: [
     MatTableModule,
     MatPaginatorModule,
-    MatButton
+    MatButton,
+    MatIcon,
+    MatSelectModule,
+    DatePipe,
+    CurrencyPipe,
+    MatLabel,
+    MatTooltipModule,
+    MatTabsModule,
+    RouterLink
+
   ],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
-export class Admin implements AfterViewInit, OnInit {
+export class Admin implements OnInit {
 
-  displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'status','action'];
+  displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status','action'];
   dataSource = new MatTableDataSource<Order>([]);
-  private adminService = inject(AdminService); // Assuming you have an AdminService to fetch orders
+  private adminService = inject(AdminService); 
+  private dialogService = inject(DialogService)
+  private cdr = inject(ChangeDetectorRef);
   orderParams = new OrderParams();
   totalItems = 0;
   statusOptions = ['All', 'PaymentReceived', 'PaymentMismatch', 'Refunded', 'Pending'];
-
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-
+  loading = true;
   ngOnInit(): void {
     this.loadOrders();
   }
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
 
   loadOrders() {
+    this.loading = true;
     this.adminService.getOrders(this.orderParams).subscribe({
       next: response => {
+        console.log('Admin orders response:', response);
         if(response.data){
           this.dataSource.data = response.data;
-          this.paginator.length = response.count;
           this.totalItems = response.count;
+          console.log('Orders loaded:', response.data);
+        } else {
+          this.dataSource.data = response as any;
+          this.totalItems = (response as any).length;
+          console.log('Direct array orders:', response);
         }
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: error => {
+        console.error('Error loading orders:', error);
+        this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: PageEvent) {
     this.orderParams.pageNumber = event.pageIndex + 1;
     this.orderParams.pageSize = event.pageSize;
     this.loadOrders();
   }
 
-  onFilterSelect(event: any){
+  onFilterSelect(event: MatSelectChange){
     this.orderParams.filter = event.value;
     this.orderParams.pageNumber = 1;
     this.loadOrders();
+  }
 
+  async openConfirmDialog(id: string){
+    const confirmed = await this.dialogService.confirm(
+      'Confirm Refund',
+      'Are you sure you want to refund this order?'
+    )
+    if(confirmed) this.refundOrder(id);
+  }
+
+  refundOrder(id: string){
+    this.adminService.refundOrder(id).subscribe({
+      next: order =>{
+        this.dataSource.data = this.dataSource.data.map(o => o.id === order.id ? order : o);
+      }
+    });
   }
 }
 

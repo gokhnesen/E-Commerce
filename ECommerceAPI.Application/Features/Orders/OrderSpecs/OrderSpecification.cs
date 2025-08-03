@@ -31,13 +31,17 @@ namespace ECommerceAPI.Application.Features.Orders.OrderSpecs
             AddInclude("DeliveryMethod");
         }
 
-        public OrderSpecification(OrderSpecParams specParams) : base(x => string.IsNullOrEmpty((specParams.Status))
-            || x.Status == ParseStatus(specParams.Status) )
-        
+        public OrderSpecification(OrderSpecParams specParams) 
+            : base(x => specParams == null || string.IsNullOrEmpty(specParams.Status) || x.Status == ParseStatus(specParams.Status))
         {
             AddInclude("OrderItems");
             AddInclude("DeliveryMethod");
-            ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
+
+            if (specParams != null)
+            {
+                ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
+            }
+
             AddOrderByDescending(x => x.OrderDate);
         }
 

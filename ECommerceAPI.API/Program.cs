@@ -6,6 +6,7 @@ using ECommerceAPI.Persistence;
 using ECommerceAPI.Persistence.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 namespace ECommerceAPI
 {
@@ -31,7 +32,13 @@ namespace ECommerceAPI
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddSignalR();
-            builder.Services.AddControllers();
+            
+            // Enum'ları string olarak serialize etmek için JsonStringEnumConverter ekle
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
             builder.Services.AddSwaggerGen(c =>
             {
