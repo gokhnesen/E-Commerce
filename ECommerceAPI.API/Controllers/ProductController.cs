@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.Application.Features.Products.Commands.Create;
+﻿using ECommerceAPI.Application.Extensions;
+using ECommerceAPI.Application.Features.Products.Commands.Create;
 using ECommerceAPI.Application.Features.Products.Commands.Delete;
 using ECommerceAPI.Application.Features.Products.Commands.Update;
 using ECommerceAPI.Application.Features.Products.ProductSpecs;
@@ -14,6 +15,7 @@ namespace ECommerceAPI.API.Controllers
     public class ProductController : BaseController
     {
         [HttpGet]
+        //[Cache(600)]
         public async Task<IActionResult> GetList([FromQuery]ProductSpecParams? specParams)
         {
 
@@ -23,6 +25,8 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpGet("{id}")]
+        //[Cache(600)]
+
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var query = new GetByIdProductQuery { Id = id };
@@ -30,6 +34,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        [InvalidateCache("api/product|")]
         [Authorize(Roles = "Admin")]
         [HttpPost("add")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand createProductCommand)
@@ -37,6 +42,8 @@ namespace ECommerceAPI.API.Controllers
             CreateProductResponse response = await Mediator.Send(createProductCommand);
             return Ok(response);
         }
+
+        [InvalidateCache("api/product|")]
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
@@ -46,6 +53,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        [InvalidateCache("api/product|")]
         [HttpPut]
         public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductCommand updateProductCommand)
         {

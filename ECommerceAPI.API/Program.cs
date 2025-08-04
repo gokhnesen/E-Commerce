@@ -33,7 +33,6 @@ namespace ECommerceAPI
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddSignalR();
             
-            // Enum'ları string olarak serialize etmek için JsonStringEnumConverter ekle
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {

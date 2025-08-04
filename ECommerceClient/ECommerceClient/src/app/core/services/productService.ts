@@ -25,11 +25,9 @@ export class ProductService {
     if (shopParams.brands && shopParams.brands.length > 0) {
       const brandNames = shopParams.brands
         .map(brand => {
-          // Eğer brand bir obje ise name özelliğini al
           if (typeof brand === 'object' && brand !== null && 'name' in brand) {
             return (brand as any).name;
           }
-          // Eğer brand zaten string ise direkt kullan
           if (typeof brand === 'string') {
             return brand;
           }
@@ -45,19 +43,16 @@ export class ProductService {
     }
     
 
-    // Categories filtresi
     if (shopParams.categories && shopParams.categories.length > 0) {
       params = params.append('categories', shopParams.categories.join(','));
       console.log('📝 Category filtresi eklendi:', shopParams.categories.join(','));
     }
     
-    // Sort filtresi
     if (shopParams.sort && shopParams.sort.trim() !== '') {
       params = params.append('Sort', shopParams.sort.trim());
       console.log('🔄 Sort filtresi eklendi:', shopParams.sort);
     }
     
-    // Pagination parametreleri
     if (shopParams.pageNumber > 0) {
       params = params.append('pageNumber', shopParams.pageNumber.toString());
       console.log('📄 Page Number:', shopParams.pageNumber);
