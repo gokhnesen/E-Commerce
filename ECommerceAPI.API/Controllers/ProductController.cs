@@ -15,7 +15,7 @@ namespace ECommerceAPI.API.Controllers
     public class ProductController : BaseController
     {
         [HttpGet]
-        //[Cache(600)]
+        [Cache(600)]
         public async Task<IActionResult> GetList([FromQuery]ProductSpecParams? specParams)
         {
 
@@ -25,7 +25,7 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Cache(600)]
+        [Cache(600)]
 
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {

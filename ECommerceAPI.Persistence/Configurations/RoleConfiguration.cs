@@ -15,9 +15,7 @@ namespace ECommerceAPI.Persistence.Configurations
         {
             builder.HasData(
                 new IdentityRole { Id = "admin-id", Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole { Id = "customer-id", Name = "Customer", NormalizedName = "CUSTOMER" },
-                new IdentityRole { Id = "seller-id", Name = "Seller", NormalizedName = "SELLER" }
-
+                new IdentityRole { Id = "customer-id", Name = "Customer", NormalizedName = "CUSTOMER" }
 
                 );
         }

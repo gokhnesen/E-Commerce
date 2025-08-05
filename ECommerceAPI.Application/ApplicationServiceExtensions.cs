@@ -18,7 +18,6 @@ namespace ECommerceAPI.Application
             {
                 configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
-
             return services;
         }
     }

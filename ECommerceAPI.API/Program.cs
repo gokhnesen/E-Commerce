@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Application;
+using ECommerceAPI.Application.Middleware;
 using ECommerceAPI.Application.SignalR;
 using ECommerceAPI.Domain.Entities;
 using ECommerceAPI.Infrastructure;
@@ -32,7 +33,7 @@ namespace ECommerceAPI
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddSignalR();
-            
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -99,6 +100,7 @@ namespace ECommerceAPI
    
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<ExceptionMiddleware>();
             app.MapControllers();
             app.MapGroup("api").MapIdentityApi<User>();
             app.MapHub<NotificationHub>("/hub/notifications");
