@@ -11,14 +11,15 @@ import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { loadingInterceptor } from './core/interceptors/loading-interceptor';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withEnabledBlockingInitialNavigation()), 
-    // SSR geçici kapatıldı - loading interceptor sorunları için
-    // provideClientHydration(withEventReplay()),
+    // SSR sadece production'da aktif - development'ta SSL sorunları var
+    ...(environment.production ? [provideClientHydration(withEventReplay())] : []),
     provideHttpClient(withFetch(), withInterceptors([
       authInterceptor, errorInterceptor,
        loadingInterceptor

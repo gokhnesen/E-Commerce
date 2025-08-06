@@ -39,16 +39,6 @@
          <mat-icon>swap_vert</mat-icon>
          Sırala
       </button>
-      
-      <!-- DEBUG BUTTONS - Loading stuck için -->
-      <button class="match-input-height" mat-stroked-button color="warn" (click)="checkLoadingState()">
-         <mat-icon>bug_report</mat-icon>
-         Check
-      </button>
-      <button class="match-input-height" mat-stroked-button color="accent" (click)="resetLoading()">
-         <mat-icon>refresh</mat-icon>
-         Reset
-      </button>
 
       </div>
 
@@ -60,8 +50,6 @@
      }
 </div>
 </div>
-
-
 
 <mat-menu #sortMenu="matMenu">
    <mat-selection-list [multiple]="false" (selectionChange)="onSortChange($event)">

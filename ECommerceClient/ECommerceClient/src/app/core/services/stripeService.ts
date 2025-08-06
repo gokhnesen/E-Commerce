@@ -1,12 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { ConfirmationToken, loadStripe, Stripe, StripeAddressElement, StripeAddressElementOptions, StripeElements, StripePaymentElement } from '@stripe/stripe-js';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from './cartService';
 import { Cart } from '../../shared/models/cart';
 import { firstValueFrom, map } from 'rxjs';
 import { AccountService } from './accountService';
-import { User } from '../../shared/models/user';
 
 
 @Injectable({

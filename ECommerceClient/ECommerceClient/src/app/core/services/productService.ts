@@ -5,7 +5,7 @@ import { Product } from '../../shared/models/product';
 import { Brand } from '../../shared/models/brands';
 import { ShopParams } from '../../shared/models/productParam';
 import { Pagination } from '../../shared/models/pagination';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

@@ -128,19 +128,4 @@ export class Products implements OnInit {
       }
     })
   }
-
-  // DEBUG: Loading stuck durumunu kontrol et
-  checkLoadingState() {
-    const state = this.busyService.getState();
-    console.log('🔍 BusyService Current State:', state);
-    console.log('🔍 Component isLoading:', this.isLoading);
-  }
-
-  // DEBUG: Loading'i manuel olarak sıfırla
-  resetLoading() {
-    console.log('🔧 Manual loading reset triggered');
-    this.busyService.resetLoadingState();
-    this.isLoading = false;
-    console.log('✅ Loading reset completed');
-  }
 }
