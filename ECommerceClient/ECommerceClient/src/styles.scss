@@ -1,24 +1,112 @@
-@use "tailwindcss" as *;
+@use '@angular/material' as mat;
 @import "tailwindcss";
 
 
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }  
 
 
 
 .container {
-    @apply mx-auto max-w-screen-2xl;
-}
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1536px; /* max-w-screen-2xl equivalent */
+}   
 
 .text-primary {
     color: #7d00fa;
 }
 
+.snackbar-error,
+.mat-mdc-snack-bar-container.snackbar-error,
+.cdk-overlay-pane .snackbar-error {
+    --mdc-snackbar-container-color: #f44336 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    --mat-snack-bar-button-color: orange !important;
+    background-color: #f44336 !important;
+    color: white !important;
+}
 
+.snackbar-error .mat-mdc-snack-bar-container,
+.snackbar-error .mdc-snackbar__surface,
+.snackbar-error .mat-mdc-snack-bar-surface {
+    background-color: #f44336 !important;
+    color: white !important;
+}
+
+.snackbar-error .mat-mdc-button,
+.snackbar-error .mdc-button,
+.snackbar-error .mat-mdc-snack-bar-action {
+    color: orange !important;
+}
+
+.snackbar-error .mat-mdc-snack-bar-label,
+.snackbar-error .mdc-snackbar__label {
+    color: white !important;
+}
+
+.snackbar-success,
+.mat-mdc-snack-bar-container.snackbar-success,
+.cdk-overlay-pane .snackbar-success {
+    --mdc-snackbar-container-color: #4caf50 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    --mat-snack-bar-button-color: white !important;
+    background-color: #4caf50 !important;
+    color: white !important;
+}
+
+.snackbar-success .mat-mdc-snack-bar-container,
+.snackbar-success .mdc-snackbar__surface,
+.snackbar-success .mat-mdc-snack-bar-surface {
+    background-color: #4caf50 !important;
+    color: white !important;
+}
+
+.snackbar-success .mat-mdc-button,
+.snackbar-success .mdc-button,
+.snackbar-success .mat-mdc-snack-bar-action {
+    color: white !important;
+}
+
+.snackbar-success .mat-mdc-snack-bar-label,
+.snackbar-success .mdc-snackbar__label {
+    color: white !important;
+}
 
 .mdc-notched-outline__notch {
     border-right-style: none !important
+}
+
+.mat-mdc-snack-bar-container.snackbar-error {
+    --mdc-snackbar-container-color: #f44336 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    background-color: #f44336 !important;
+}
+
+.mat-mdc-snack-bar-container.snackbar-success {
+    --mdc-snackbar-container-color: #4caf50 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    background-color: #4caf50 !important;
+}
+
+.cdk-overlay-container .snackbar-error {
+    background-color: #f44336 !important;
+}
+
+.cdk-overlay-container .snackbar-success {
+    background-color: #4caf50 !important;
+}
+
+simple-snack-bar.snackbar-error,
+.mat-simple-snackbar.snackbar-error {
+    background-color: #f44336 !important;
+    color: white !important;
+}
+
+simple-snack-bar.snackbar-success,
+.mat-simple-snackbar.snackbar-success {
+    background-color: #4caf50 !important;
+    color: white !important;
 }
 

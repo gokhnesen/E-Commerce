@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ProductService } from '../../core/services/productService';
 import { Product } from '../../shared/models/product';
 import { CommonModule } from '@angular/common';
-import { Observable, of } from 'rxjs';
+import { Observable, of, tap, catchError, throwError } from 'rxjs';
 import { ProductItem } from "./product-item/product-item";
 import { MatDialog} from '@angular/material/dialog';
 import { FiltersDialog } from './filters-dialog/filters-dialog';
@@ -15,9 +15,8 @@ import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { ShopParams } from '../../shared/models/productParam';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Pagination } from '../../shared/models/pagination';
-import { count } from 'node:console';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { BusyService } from '../../core/services/busyService';
 
 @Component({
   selector: 'app-products',
@@ -38,7 +37,8 @@ import { RouterLink } from '@angular/router';
 })
 export class Products implements OnInit {
   private productService = inject(ProductService);
-  private dialogService = inject(MatDialog)
+  private dialogService = inject(MatDialog);
+  private busyService = inject(BusyService);
   products$: Observable<Pagination<Product>> = of({} as Pagination<Product>);
   sortOptions = [
     {name: 'Alphabetical', value: 'name'},
@@ -48,6 +48,7 @@ export class Products implements OnInit {
   totalCount = 0;
   shopParams = new ShopParams();
   pageSizeOptions= [5,10,15,20]
+  private isLoading = false; // Request debouncing flag
 
   constructor() {
     
@@ -59,17 +60,30 @@ export class Products implements OnInit {
 
   initializeProduct() {
     this.productService.getBrands();
-    this.productService.getTypes();
     this.getProducts();
   }
 
   getProducts(){
-    this.products$ = this.productService.getProducts(this.shopParams);
-    this.products$.subscribe(data => {
-      console.log('🎯 Async pipe - Veri geldi:', data);
-      this.totalCount = this.products$.subscribe.length;
-    });
+    if (this.isLoading) {
+      console.log('🛑 getProducts() atlandı - zaten yükleniyor');
+      return;
+    }
     
+    console.log('🎯 getProducts() çağrıldı - Stack trace:', new Error().stack);
+    this.isLoading = true;
+    
+    this.products$ = this.productService.getProducts(this.shopParams).pipe(
+      tap((data: Pagination<Product>) => {
+        console.log('🎯 Async pipe - Veri geldi:', data);
+        this.totalCount = data.count; // Toplam kayıt sayısı
+        this.isLoading = false; // Loading tamamlandı
+      }),
+      catchError(error => {
+        console.error('❌ Products yüklenemedi:', error);
+        this.isLoading = false; // Error durumunda da loading'i temizle
+        return throwError(() => error);
+      })
+    );
   }
   onSearchChange(){
     this.shopParams.pageNumber = 1;
@@ -113,5 +127,20 @@ export class Products implements OnInit {
         }
       }
     })
+  }
+
+  // DEBUG: Loading stuck durumunu kontrol et
+  checkLoadingState() {
+    const state = this.busyService.getState();
+    console.log('🔍 BusyService Current State:', state);
+    console.log('🔍 Component isLoading:', this.isLoading);
+  }
+
+  // DEBUG: Loading'i manuel olarak sıfırla
+  resetLoading() {
+    console.log('🔧 Manual loading reset triggered');
+    this.busyService.resetLoadingState();
+    this.isLoading = false;
+    console.log('✅ Loading reset completed');
   }
 }

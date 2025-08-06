@@ -366,3 +366,4 @@ FodyWeavers.xsd
 ECommerceClient/ECommerceClient/src/environments/environment.development.ts
 ECommerceClient/ECommerceClient/src/environments/environment.development.ts
 ECommerceClient/ECommerceClient/src/environments/environment.ts
+ECommerceClient/ECommerceClient/proxy.conf.json

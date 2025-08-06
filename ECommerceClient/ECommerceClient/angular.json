@@ -67,12 +67,13 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-            "options": {
-    "ssl": true,
-    "sslKey": "ssl/localhost-key.pem",
-    "sslCert": "ssl/localhost.pem"
-  },
           "builder": "@angular/build:dev-server",
+          "options": {
+            "ssl": true,
+            "sslKey": "ssl/localhost-key.pem",
+            "sslCert": "ssl/localhost.pem",
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "ECommerceClient:build:production"
@@ -91,9 +92,6 @@
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-                  "ssl": true,
-                  "sslCert": "ssl/cert.pem",
-                  "sslKey": "ssl/key.pem",
             "assets": [
               {
                 "glob": "**/*",

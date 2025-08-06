@@ -5,14 +5,14 @@ import { Product } from '../../shared/models/product';
 import { Brand } from '../../shared/models/brands';
 import { ShopParams } from '../../shared/models/productParam';
 import { Pagination } from '../../shared/models/pagination';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  baseURL = 'https://localhost:7091/api/';
+  baseURL = environment.apiUrl;
   private http = inject(HttpClient);
-  types: string[] = [];
   brands: Brand[] = [];
 
   getProducts(shopParams: ShopParams): Observable<Pagination<Product>> {
@@ -23,7 +23,7 @@ export class ProductService {
     let params = new HttpParams();
     
     if (shopParams.brands && shopParams.brands.length > 0) {
-      const brandNames = shopParams.brands
+      const brandNames = [...new Set(shopParams.brands
         .map(brand => {
           if (typeof brand === 'object' && brand !== null && 'name' in brand) {
             return (brand as any).name;
@@ -33,7 +33,7 @@ export class ProductService {
           }
           return null;
         })
-        .filter(Boolean); 
+        .filter(Boolean))]; 
       
       if (brandNames.length > 0) {
         params = params.append('brands', brandNames.join(','));
@@ -88,7 +88,7 @@ getProduct(id: string): Observable<Product> {
   getBrands(): void {
     if (this.brands.length > 0) return;
     
-    this.http.get<Brand[]>(this.baseURL + 'brands').pipe(
+    this.http.get<Brand[]>(this.baseURL + 'Brands').pipe(
       catchError(error => {
         console.error('❌ getBrands Error:', error);
         return throwError(() => error);
@@ -100,25 +100,6 @@ getProduct(id: string): Observable<Product> {
       },
       error: error => {
         console.error('❌ Brands yüklenemedi:', error);
-      }
-    });
-  }
-
-  getTypes(): void {
-    if (this.types.length > 0) return;
-    
-    this.http.get<string[]>(this.baseURL + 'products/type').pipe(
-      catchError(error => {
-        console.error('❌ getTypes Error:', error);
-        return throwError(() => error);
-      })
-    ).subscribe({
-      next: response => {
-        this.types = response;
-        console.log('✅ Types yüklendi:', this.types);
-      },
-      error: error => {
-        console.error('❌ Types yüklenemedi:', error);
       }
     });
   }

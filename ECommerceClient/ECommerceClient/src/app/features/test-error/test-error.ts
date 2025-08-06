@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 export class TestError {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
+  validationErrors?: string[];
 
 
   get404Error() {
@@ -46,7 +47,7 @@ export class TestError {
     get400ValidationError() {
     this.http.post(this.baseUrl + 'error/validationerror', {}).subscribe({
       next: response => console.log(response),
-      error: error => console.log(error)
+      error: error => this.validationErrors = error
     });
   }
 
