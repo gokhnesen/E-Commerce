@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnInit } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { Product } from '../../shared/models/product';
 import { Brand } from '../../shared/models/brands';
@@ -11,9 +11,19 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class ProductService {
+
   baseURL = environment.apiUrl;
   private http = inject(HttpClient);
   brands: Brand[] = [];
+  route: any;
+  shopParams: any;
+
+
+
+
+  initializeProduct() {
+    throw new Error('Method not implemented.');
+  }
 
   getProducts(shopParams: ShopParams): Observable<Pagination<Product>> {
     console.log('🚀 Service getProducts çağrıldı');
@@ -77,6 +87,8 @@ export class ProductService {
       })
     );
   }
+
+
 
 
 getProduct(id: string): Observable<Product> {

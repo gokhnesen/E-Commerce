@@ -29,6 +29,9 @@ namespace ECommerceAPI.Application.Features.Categories.Commands.Update
             await _categoryWriteRepository.SaveAsync();
 
             UpdateCategoryResponse response = _mapper.Map<UpdateCategoryResponse>(category);
+            response.ParentCategoryName = request.ParentCategoryId.HasValue 
+                ? (await _categoryReadRepository.GetByIdAsync(request.ParentCategoryId.Value))?.Name 
+                : null;
             return response;
         }
     }

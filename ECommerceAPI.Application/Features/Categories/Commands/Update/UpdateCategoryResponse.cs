@@ -4,5 +4,7 @@ namespace ECommerceAPI.Application.Features.Categories.Commands.Update
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public Guid? ParentCategoryId { get; set; }
+        public string? ParentCategoryName { get; set; }
     }
 } 

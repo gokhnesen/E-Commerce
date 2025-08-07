@@ -1,8 +1,8 @@
 @if(products$){
-<div class="flex flex-col gap-3">
-   <div class="flex justify-between gap-3">
+<div class="container mx-auto p-4">
+   <div class="flex justify-between gap-3 mb-4">
       <mat-paginator
-      class="bg-white" 
+      class="bg-white flex-grow" 
       (page)="handlePageEvent($event)"
       [length]="totalCount"
       [pageSize]="shopParams.pageSize"
@@ -12,43 +12,33 @@
       aria-label="Select page"
       >
       </mat-paginator>
-      <form 
-      #searchForm="ngForm" 
-      (ngSubmit)="onSearchChange()"
-      class="relative flex items-center w-full max-w-md mx-4"
-   
-   >
-   <input 
-   type="search" 
-   class="block w-full p4 text-sm text-gray-900 border border-gray-300 rounded-lg"
-   placeholder="Search"
-   name="search"
-   [(ngModel)]="shopParams.search"
-   >
-   <button mat-icon-button type="submit" class="absolute inset-y-0 right-8 top-2 flex items-center pl-3">
-      <mat-icon>search</mat-icon>
-     
-   </button>
-</form>
+
       <div class="flex gap-3">
-               <button class="match-input-height" mat-stroked-button (click)="openFiltersDialog()">
-         <mat-icon>filter_lists</mat-icon>
-         Filtrele
-      </button>
-            <button class="match-input-height" mat-stroked-button [matMenuTriggerFor]="sortMenu">
-         <mat-icon>swap_vert</mat-icon>
-         Sırala
-      </button>
-
+         <button class="match-input-height" mat-stroked-button (click)="openFiltersDialog()">
+            <mat-icon>filter_list</mat-icon>
+            Filtrele
+         </button>
+         <button class="match-input-height" mat-stroked-button [matMenuTriggerFor]="sortMenu">
+            <mat-icon>swap_vert</mat-icon>
+            Sırala
+         </button>
       </div>
-
    </div>
-   <div class="grid grid-cols-5 gap-4">
-    @for (product of (products$ | async); track product.id)
-     {
-        <app-product-item [product]="product"></app-product-item>
-     }
-</div>
+   
+   <div class="flex gap-6">
+      <!-- Sidebar Filter -->
+      <div class="w-1/4">
+      </div>
+      
+      <!-- Products Grid -->
+      <div class="w-3/4">
+         <div class="grid grid-cols-3 gap-4">
+            @for (product of (products$ | async); track product.id) {
+               <app-product-item [product]="product"></app-product-item>
+            }
+         </div>
+      </div>
+   </div>
 </div>
 
 <mat-menu #sortMenu="matMenu">

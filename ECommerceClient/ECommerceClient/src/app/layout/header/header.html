@@ -1,39 +1,75 @@
-<header class="border-b shadow-md p-3 w-full max-h-20 fixed top-0 z-50 bg-white">
-    <div class="flex align-middle items-center justify-between max-w-screen-2xl mx-auto">
-        <img src="/images/logo.png" alt="app logo" class="max-h-16">
-<nav class="flex gap-3 my-2 uppercase text-2xl">
-    <a routerLink="/" 
-    routerLinkActive="active" 
-    [routerLinkActiveOptions]="{exact: true}">
-    Anasayfa
-    </a>
-    <a routerLink="/product" 
-       routerLinkActive="active">
-       Ürünler
-    </a>
-        <a *appIsAdmin routerLink="/admin" 
-       routerLinkActive="active">
-       Admin
-    </a>
-    <a routerLink="/test-error" routerLinkActive="active">Contact</a>
-</nav>
-        <div class="flex gap-3 align-middle">
-            <a matBadge="{{itemCount()}}" matBadgeSize="large" class="custom-badge mt-2 mr-2" routerLink="/cart" routerLinkActive="active">
+<header class="border-b shadow-md w-full fixed top-0 z-50 bg-white">
+    <!-- Üst Kısım: Logo, Search, Sepet, Hesap -->
+    <div class="border-b p-3">
+        <div class="container mx-auto px-4">
+            <div class="flex align-middle items-center justify-between">
+                <!-- Logo -->
+                <img src="/images/logo.png" alt="app logo" class="max-h-16">
                 
-                <mat-icon>shopping_cart</mat-icon>
+                <!-- Search Bar (Ortada) -->
+                <div class="flex-1 max-w-md mx-8">
+                    <div class="relative">
+                        <input 
+                           type="search" 
+                           class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg pr-12"
+                           placeholder="Ürün ara..."
+                           name="search"
+                           [(ngModel)]="searchTerm"
+                           (keypress)="onSearchKeyPress($event)">
+                        <button 
+                           type="button"
+                           class="absolute inset-y-0 right-0 top-0 flex items-center pr-3"
+                           (click)="onSearch()">
+                            <mat-icon>search</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sağ Taraf: Sepet ve Hesap -->
+                <div class="flex gap-3 align-middle">
+                    <a matBadge="{{itemCount()}}" matBadgeSize="large" class="custom-badge mt-2 mr-2" routerLink="/cart" routerLinkActive="active">
+                        <mat-icon>shopping_cart</mat-icon>
+                    </a>
+                    @if (accountService.currentUser()) {
+                        <button mat-button [matMenuTriggerFor]="menu">
+                            <mat-icon>arrow_drop_down</mat-icon>
+                            <span>{{ accountService.currentUser()?.email }}</span>
+                        </button>
+                    } @else {
+                        <button routerLink="/account/login" mat-stroked-button>Login</button>
+                        <button routerLink="/account/register" mat-stroked-button>Register</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
-            </a>
-            @if (accountService.currentUser())
-             {
-                <button mat-button [matMenuTriggerFor]="menu">
-                    <mat-icon>arrow_drop_down</mat-icon>
-                    <span>{{ accountService.currentUser()?.email }}</span>
-                </button>
-             } @else {
-                <button routerLink="/account/login" mat-stroked-button>Login</button>
-                <button routerLink="/account/register" mat-stroked-button>Register</button>
-            }
-
+    <!-- Alt Kısım: Menü İtemleri -->
+    <div class="p-2">
+        <div class="container mx-auto px-4">
+            <nav class="flex gap-6 justify-center uppercase text-lg">
+                <a routerLink="/" 
+                   routerLinkActive="active" 
+                   [routerLinkActiveOptions]="{exact: true}"
+                   class="py-2 px-4 hover:bg-gray-100 rounded">
+                   Anasayfa
+                </a>
+                <a routerLink="/product" 
+                   routerLinkActive="active"
+                   class="py-2 px-4 hover:bg-gray-100 rounded">
+                   Ürünler
+                </a>
+                <a *appIsAdmin routerLink="/admin" 
+                   routerLinkActive="active"
+                   class="py-2 px-4 hover:bg-gray-100 rounded">
+                   Admin
+                </a>
+                <a routerLink="/test-error" 
+                   routerLinkActive="active"
+                   class="py-2 px-4 hover:bg-gray-100 rounded">
+                   Contact
+                </a>
+            </nav>
         </div>
     </div>
 </header>
@@ -55,6 +91,6 @@
         </button>
 </mat-menu>
 
-@if(busyService.loading) {
+@if(busyService.loading$ | async) {
     <mat-progress-bar mode="indeterminate" class="fixed top-20 z-50"></mat-progress-bar>
 }

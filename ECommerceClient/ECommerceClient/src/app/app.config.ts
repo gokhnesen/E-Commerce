@@ -18,9 +18,8 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withEnabledBlockingInitialNavigation()), 
-    // SSR sadece production'da aktif - development'ta SSL sorunları var
     ...(environment.production ? [provideClientHydration(withEventReplay())] : []),
-    provideHttpClient(withFetch(), withInterceptors([
+    provideHttpClient(withInterceptors([
       authInterceptor, errorInterceptor,
        loadingInterceptor
     ])),

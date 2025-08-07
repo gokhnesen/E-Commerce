@@ -17,6 +17,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Pagination } from '../../shared/models/pagination';
 import { FormsModule } from '@angular/forms';
 import { BusyService } from '../../core/services/busyService';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-products',
@@ -39,6 +40,7 @@ export class Products implements OnInit {
   private productService = inject(ProductService);
   private dialogService = inject(MatDialog);
   private busyService = inject(BusyService);
+    private route = inject(ActivatedRoute);
   products$: Observable<Pagination<Product>> = of({} as Pagination<Product>);
   sortOptions = [
     {name: 'Alphabetical', value: 'name'},
@@ -47,7 +49,7 @@ export class Products implements OnInit {
   ]
   totalCount = 0;
   shopParams = new ShopParams();
-  pageSizeOptions= [5,10,15,20]
+  pageSizeOptions = [5, 10, 15, 20]
   private isLoading = false; // Request debouncing flag
 
   constructor() {
@@ -55,7 +57,12 @@ export class Products implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initializeProduct();
+       
+      this.route.queryParams.subscribe(params => {
+      this.shopParams.search = params['search'] || '';
+      this.initializeProduct();
+    });
+  
   }
 
   initializeProduct() {

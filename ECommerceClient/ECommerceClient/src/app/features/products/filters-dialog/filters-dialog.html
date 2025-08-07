@@ -1,30 +1,38 @@
 <div>
-    <h3 class="text-3xl text-center pt-6 mb-3">
-        Filtreler
-        <mat-divider></mat-divider>
-        <div class="flex p-4">
-            <div class="w-1/2">
-                <h4 class="font-semibold text-xl text-primary">Brands</h4>
-                <mat-selection-list [(ngModel)]="selectedBrands" [multiple]="true">
-                    @for (brand of productService.brands; track $index){
-                        <mat-list-option [value]="brand">{{brand.name}}</mat-list-option>
-                    }
-                </mat-selection-list>
+    <h3 class="text-3xl text-center pt-6 mb-3">Filtreler</h3>
+    <mat-divider></mat-divider>
+    
+    <div class="p-4">
+        <!-- Brands -->
+        <div class="mb-6">
+            <h4 class="font-semibold text-xl text-primary mb-4">Brands</h4>
+            <mat-selection-list [(ngModel)]="selectedBrands" [multiple]="true">
+                @for (brand of productService.brands; track $index){
+                    <mat-list-option [value]="brand">{{brand.name}}</mat-list-option>
+                }
+            </mat-selection-list>
+        </div>
+
+        <!-- Price Range -->
+        <div class="mb-6">
+            <h4 class="font-semibold text-xl text-primary mb-4">Fiyat Aralığı</h4>
+            <div class="flex gap-4 items-center">
+                <mat-form-field>
+                    <mat-label>Min Fiyat</mat-label>
+                    <input matInput type="number" [(ngModel)]="minPrice" placeholder="0">
+                </mat-form-field>
+                <span>-</span>
+                <mat-form-field>
+                    <mat-label>Max Fiyat</mat-label>
+                    <input matInput type="number" [(ngModel)]="maxPrice" placeholder="1000">
+                </mat-form-field>
             </div>
-
-                <!-- <div class="w-1/2">
-                <h4 class="font-semibold text-xl text-primary">Types</h4>
-                <mat-selection-list [(ngModel)]="selectedBrands" [multiple]="true">
-                    @for (type of productService.types; track $index){
-                        <mat-list-option></mat-list-option>
-                    }
-                </mat-selection-list>
-            </div> -->
         </div>
-        <div class="flex justify-end p-4">
-            <button mat-flat-button (click)="applyFilters()">Filtreyi Uygula</button>
+    </div>
 
-        </div>
-        
-    </h3>
+    <!-- Action Buttons -->
+    <div class="flex justify-between p-4">
+        <button mat-stroked-button (click)="clearFilters()">Temizle</button>
+        <button mat-flat-button color="primary" (click)="applyFilters()">Filtreyi Uygula</button>
+    </div>
 </div>

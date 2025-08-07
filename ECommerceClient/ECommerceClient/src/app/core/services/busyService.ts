@@ -1,22 +1,25 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BusyService {
-  loading = false;
-  busyRequestCount = 0;
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
+  
+  private busyRequestCount = 0;
 
-  busy(){
+  busy() {
     this.busyRequestCount++;
-    this.loading = true;
+    this.loadingSubject.next(true);
   }
-  idle(){
+
+  idle() {
     this.busyRequestCount--;
     if (this.busyRequestCount <= 0) {
       this.busyRequestCount = 0;
-      this.loading = false;
+      this.loadingSubject.next(false);
     }
   }
 }
