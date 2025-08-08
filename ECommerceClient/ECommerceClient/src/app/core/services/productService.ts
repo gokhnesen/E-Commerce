@@ -18,84 +18,63 @@ export class ProductService {
   route: any;
   shopParams: any;
 
-
-
-
-  initializeProduct() {
-    throw new Error('Method not implemented.');
-  }
-
   getProducts(shopParams: ShopParams): Observable<Pagination<Product>> {
     console.log('🚀 Service getProducts çağrıldı');
-    console.log('🌐 API URL:', this.baseURL + 'Product');
     console.log('📦 ShopParams:', shopParams);
-    
+
     let params = new HttpParams();
-    
-    if (shopParams.brands && shopParams.brands.length > 0) {
-      const brandNames = [...new Set(shopParams.brands
-        .map(brand => {
-          if (typeof brand === 'object' && brand !== null && 'name' in brand) {
-            return (brand as any).name;
-          }
-          if (typeof brand === 'string') {
-            return brand;
-          }
-          return null;
-        })
-        .filter(Boolean))]; 
-      
-      if (brandNames.length > 0) {
+
+    if (shopParams.brands?.length) {
+      const brandNames = [...new Set(
+        shopParams.brands
+          .map(b => typeof b === 'object' && b && 'name' in b ? (b as any).name : b)
+          .filter(Boolean) as string[]
+      )];
+      if (brandNames.length) {
         params = params.append('brands', brandNames.join(','));
-        console.log('🏷️ Brand filtresi eklendi:', brandNames);
-        console.log('🏷️ Brand string:', brandNames.join(','));
       }
     }
-    
 
-    if (shopParams.categories && shopParams.categories.length > 0) {
-      params = params.append('categories', shopParams.categories.join(','));
-      console.log('📝 Category filtresi eklendi:', shopParams.categories.join(','));
+    if (shopParams.categories?.length) {
+       params = params.append('categories', shopParams.categories.join(','));
     }
-    
-    if (shopParams.sort && shopParams.sort.trim() !== '') {
-      params = params.append('Sort', shopParams.sort.trim());
-      console.log('🔄 Sort filtresi eklendi:', shopParams.sort);
+
+    if (shopParams.sort?.trim()) {
+      params = params.append('sort', shopParams.sort.trim());
     }
-    
+
     if (shopParams.pageNumber > 0) {
-      params = params.append('pageNumber', shopParams.pageNumber.toString());
-      console.log('📄 Page Number:', shopParams.pageNumber);
+      params = params.append('pageNumber', shopParams.pageNumber);
     }
-    
+
     if (shopParams.pageSize > 0) {
-      params = params.append('pageSize', shopParams.pageSize.toString());
-      console.log('📊 Page Size:', shopParams.pageSize);
+      params = params.append('pageSize', shopParams.pageSize);
     }
-    if(shopParams.search){
-      params = params.append('search',shopParams.search)
+
+    if (shopParams.search) {
+      params = params.append('search', shopParams.search);
     }
-    
+
     const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
     console.log('🔗 Final URL:', finalUrl);
-    
+
     return this.http.get<Pagination<Product>>(this.baseURL + 'Product', { params }).pipe(
-      tap(response => console.log('✅ API Response:', response)),
-      catchError(error => {
-        console.error('❌ getProducts Error:', error);
-        return throwError(() => error);
+      tap(r => {
+        console.log('✅ API Response RAW:', r);
+        console.log('🧩 Keys:', Object.keys(r || {}));
+      }),
+      catchError(err => {
+        console.error('❌ getProducts Error:', err);
+        return throwError(() => err);
       })
     );
   }
 
-
-
-
-getProduct(id: string): Observable<Product> {
-  const finalUrl = `${this.baseURL}Product/${id}`;
-  console.log('🔗 Final URL:', finalUrl);
-  return this.http.get<Product>(finalUrl);
-}
+  getProduct(id: string): Observable<Product> {
+    const finalUrl = `${this.baseURL}Product/${id}`;
+    console.log('🔗 Final URL:', finalUrl);
+    return this.http.get<Product>(finalUrl);
+  }
 
   getBrands(): void {
     if (this.brands.length > 0) return;
@@ -114,5 +93,17 @@ getProduct(id: string): Observable<Product> {
         console.error('❌ Brands yüklenemedi:', error);
       }
     });
+  }
+    getProductsByCategory(slug: string, current?: Partial<ShopParams>): Observable<Pagination<Product>> {
+    const merged: ShopParams = {
+      brands: current?.brands ?? [],
+      categories: slug ? [slug] : [],
+      sort: current?.sort ?? 'name',
+      pageNumber: current?.pageNumber ?? 1,
+      pageSize: current?.pageSize ?? 9,
+      search: current?.search ?? ''
+    };
+    console.log('📂 getProductsByCategory', slug, merged);
+    return this.getProducts(merged);
   }
 }

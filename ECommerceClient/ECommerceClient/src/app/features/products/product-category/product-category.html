@@ -1,0 +1,54 @@
+@if (products$) {
+<div class="container mx-auto p-4">
+  <h2 class="text-xl font-semibold mb-4">{{ slug | titlecase }}</h2>
+
+  <div class="flex justify-between gap-3 mb-4">
+    <mat-paginator
+      class="bg-white flex-grow"
+      (page)="handlePageEvent($event)"
+      [length]="totalCount"
+      [pageSize]="shopParams.pageSize"
+      [showFirstLastButtons]="true"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="shopParams.pageNumber - 1"
+      aria-label="Select page">
+    </mat-paginator>
+
+    <div class="flex gap-3">
+      <button class="match-input-height" mat-stroked-button (click)="openFiltersDialog()">
+        <mat-icon>filter_list</mat-icon>
+        Filtrele
+      </button>
+      <button class="match-input-height" mat-stroked-button [matMenuTriggerFor]="sortMenu">
+        <mat-icon>swap_vert</mat-icon>
+        Sırala
+      </button>
+    </div>
+  </div>
+
+  <div class="flex gap-6">
+    <div class="w-3/4">
+      <div *ngIf="loading" class="p-8 text-center text-gray-500">Yükleniyor...</div>
+      <div *ngIf="!loading && (products$ | async)?.length === 0" class="p-8 text-center text-gray-500">
+        Bu kategoriye ait ürün bulunamadı.
+      </div>
+
+      <div class="grid grid-cols-3 gap-4" *ngIf="!loading && (products$ | async)?.length">
+        @for (product of (products$ | async); track product.id) {
+          <app-product-item [product]="product"></app-product-item>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<mat-menu #sortMenu="matMenu">
+  <mat-selection-list [multiple]="false" (selectionChange)="onSortChange($event)">
+    @for (sort of sortOptions; track $index) {
+      <mat-list-option [value]="sort.value" [selected]="shopParams.sort == sort.value">
+        {{ sort.name }}
+      </mat-list-option>
+    }
+  </mat-selection-list>
+</mat-menu>
+}

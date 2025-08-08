@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ECommerceAPI.Application.Features.Orders.OrderSpecs;
-using ECommerceAPI.Application.Features.Products.ProductSpecs;
 using ECommerceAPI.Application.Features.Products.Queries.GetList;
 using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;

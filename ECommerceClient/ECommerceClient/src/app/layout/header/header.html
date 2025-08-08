@@ -1,4 +1,4 @@
-<header class="border-b shadow-md w-full fixed top-0 z-50 bg-white">
+<header class="border-b shadow-md w-full z-50 bg-white">
     <!-- Üst Kısım: Logo, Search, Sepet, Hesap -->
     <div class="border-b p-3">
         <div class="container mx-auto px-4">
@@ -15,7 +15,7 @@
                            placeholder="Ürün ara..."
                            name="search"
                            [(ngModel)]="searchTerm"
-                           (keypress)="onSearchKeyPress($event)">
+                           >
                         <button 
                            type="button"
                            class="absolute inset-y-0 right-0 top-0 flex items-center pr-3"
@@ -54,20 +54,21 @@
                    class="py-2 px-4 hover:bg-gray-100 rounded">
                    Anasayfa
                 </a>
-                <a routerLink="/product" 
+                  <a [routerLink]="['/products/category','elektronik']"
+     routerLinkActive="active"
+     class="py-2 px-4 hover:bg-gray-100 rounded">
+     Elektronik
+  </a>
+
+                 <a routerLink="/product" 
                    routerLinkActive="active"
                    class="py-2 px-4 hover:bg-gray-100 rounded">
-                   Ürünler
+                   Giyim
                 </a>
                 <a *appIsAdmin routerLink="/admin" 
                    routerLinkActive="active"
                    class="py-2 px-4 hover:bg-gray-100 rounded">
-                   Admin
-                </a>
-                <a routerLink="/test-error" 
-                   routerLinkActive="active"
-                   class="py-2 px-4 hover:bg-gray-100 rounded">
-                   Contact
+                   Giyim
                 </a>
             </nav>
         </div>
@@ -83,6 +84,12 @@
         <button mat-menu-item class="px-3" routerLink="/orders">
         <mat-icon>history</mat-icon>
         my orders
+    </button>
+        <button mat-menu-item class="px-3" *appIsAdmin routerLink="/admin" 
+                   routerLinkActive="active"
+                   class="py-2 px-4 hover:bg-gray-100 rounded">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Admin Panel
     </button>
     <mat-divider></mat-divider>
     <button mat-menu-item class="px-3" (click)="logOut()">

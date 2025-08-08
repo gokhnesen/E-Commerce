@@ -1,3 +1,4 @@
+using ECommerceAPI.Application.Features.Products;
 using ECommerceAPI.Application.Features.Products.ProductSpecs;
 using MediatR;
 

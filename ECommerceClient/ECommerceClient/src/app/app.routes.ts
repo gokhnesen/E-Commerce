@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Home } from './features/home/home';
 import { Products } from './features/products/products';
 import { ProductDetails } from './features/products/product-details/product-details';
 import { Cart } from './features/cart/cart';
@@ -10,9 +9,10 @@ import { NotFound } from './shared/components/not-found/not-found';
 import { ServerError } from './shared/components/server-error/server-error';
 
 export const routes: Routes = [
-    {path: '', component: Home},
-    {path: 'product', component: Products},
+    {path: '', component: Products},
     {path: 'product/:id', component: ProductDetails},
+    { path: 'products/category/:slug', loadComponent: () => import('./features/products/product-category/product-category').then(m => m.ProductCategory) },
+
     {path: 'cart', component: Cart},
     {path: 'checkout', loadChildren: () => import('./features/checkout/routes').then(m => m.checkoutRoutes)},
     {path: 'order', loadChildren: () => import('./features/orders/routes').then(m => m.orderRoutes)},

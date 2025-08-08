@@ -1,5 +1,4 @@
 using ECommerceAPI.Application.Features.Admin.Queries.GetById;
-using ECommerceAPI.Application.Features.Products.ProductSpecs;
 using MediatR;
 
 namespace ECommerceAPI.Application.Features.Admin.Queries.GetOrders

@@ -10,10 +10,14 @@ namespace ECommerceAPI.Application.Features.Products.ProductSpecs
 {
     public class ProductSpecification : BaseSpecification<Product>
     {
-        public ProductSpecification(ProductSpecParams specParams) : base(x => 
+        public ProductSpecification(ProductSpecParams specParams, List<string> allCategoryNames = null) : base(x => 
         (string.IsNullOrEmpty(specParams.Search) || x.Name.ToLower().Contains(specParams.Search)) &&
         (specParams.Brands.Count == 0 || specParams.Brands.Contains(x.Brand.Name)) &&
-        (specParams.Categories.Count == 0 || specParams.Categories.Contains(x.Category.Name))
+        (specParams.Categories.Count == 0 || 
+            // If allCategoryNames is provided (includes parent and all children), use it for filtering
+            (allCategoryNames != null && allCategoryNames.Contains(x.Category.Name)) || 
+            // Otherwise use only the specified categories
+            (allCategoryNames == null && specParams.Categories.Contains(x.Category.Name)))
         )
 
         {
