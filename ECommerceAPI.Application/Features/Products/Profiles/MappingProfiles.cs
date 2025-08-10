@@ -5,11 +5,6 @@ using ECommerceAPI.Application.Features.Products.Commands.Update;
 using ECommerceAPI.Application.Features.Products.Queries.GetById;
 using ECommerceAPI.Application.Features.Products.Queries.GetList;
 using ECommerceAPI.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Products.Profiles
 {
@@ -17,7 +12,14 @@ namespace ECommerceAPI.Application.Features.Products.Profiles
     {
         public MappingProfiles()
         {
-            CreateMap<Product, CreateProductCommand>().ReverseMap();
+            CreateMap<CreateProductCommand, Product>()
+                .ForMember(dest => dest.CategoryId, opt => opt.Ignore())
+                .ForMember(dest => dest.BrandId, opt => opt.Ignore())
+                .ForMember(dest => dest.Category, opt => opt.Ignore())
+                .ForMember(dest => dest.Brand, opt => opt.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+
+           
             CreateMap<Product, CreateProductResponse>().ReverseMap();
 
             CreateMap<Product, DeleteProductCommand>().ReverseMap();

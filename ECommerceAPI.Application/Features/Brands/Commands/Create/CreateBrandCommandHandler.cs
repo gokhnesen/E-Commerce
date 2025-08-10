@@ -8,19 +8,30 @@ namespace ECommerceAPI.Application.Features.Brands.Commands.Create
     public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, CreateBrandResponse>
     {
         private readonly IBrandWriteRepository _brandWriteRepository;
+        private readonly IBrandReadRepository _brandReadRepository;
         private readonly IMapper _mapper;
 
-        public CreateBrandCommandHandler(IBrandWriteRepository brandWriteRepository, IMapper mapper)
+        public CreateBrandCommandHandler(
+            IBrandWriteRepository brandWriteRepository,
+            IBrandReadRepository brandReadRepository,
+            IMapper mapper)
         {
             _brandWriteRepository = brandWriteRepository;
+            _brandReadRepository = brandReadRepository;
             _mapper = mapper;
         }
 
         public async Task<CreateBrandResponse> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {
+            var existingBrand = await _brandReadRepository.GetSingleAsync(b => b.Name == request.Name);
+            if (existingBrand != null)
+            {
+                throw new Exception($"'{request.Name}' isimli marka zaten mevcut.");
+            }
+
             Brand brand = _mapper.Map<Brand>(request);
             brand.Id = Guid.NewGuid();
-            
+
             await _brandWriteRepository.AddAsync(brand);
             await _brandWriteRepository.SaveAsync();
 
@@ -28,4 +39,4 @@ namespace ECommerceAPI.Application.Features.Brands.Commands.Create
             return response;
         }
     }
-} 
+}

@@ -25,7 +25,6 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
 
         public async Task<List<GetListProductQueryResponse>> Handle(GetListProductQuery request, CancellationToken cancellationToken)
         {
-            // If we have category filters, gather all child categories
             List<string> allCategoryNames = null;
             if (request.SpecParams.Categories.Count > 0)
             {
@@ -35,7 +34,6 @@ namespace ECommerceAPI.Application.Features.Products.Queries.GetList
                     var categoriesWithChildren = await _categoryReadRepository.GetCategoryWithChildrenAsync(categoryName);
                     allCategoryNames.AddRange(categoriesWithChildren.Select(c => c.Name));
                 }
-                // Remove duplicates
                 allCategoryNames = allCategoryNames.Distinct().ToList();
             }
 

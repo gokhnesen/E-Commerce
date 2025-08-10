@@ -29,6 +29,7 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Delete
             product = _mapper.Map(request, product);
             
             _productWriteRepository.Remove(product);
+            _productWriteRepository.SaveAsync();
 
             DeleteProductResponse response = _mapper.Map<DeleteProductResponse>(product);
             return response;
