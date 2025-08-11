@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { ProductItem } from "../product-item/product-item";
+import { SidebarFilter } from "./sidebar-filter/sidebar-filter";
 
 @Component({
   selector: 'app-product-category',
@@ -27,7 +28,8 @@ import { ProductItem } from "../product-item/product-item";
     MatMenuModule,
     MatListModule,
     FormsModule,
-    ProductItem
+    ProductItem,
+    SidebarFilter
 ]
 })
 export class ProductCategory implements OnInit {
@@ -140,4 +142,23 @@ export class ProductCategory implements OnInit {
   openFiltersDialog() {
     this.router.navigate(['products/category', this.slug], { queryParams: { ...this.shopParams } });
   }
+    // ...existing code...
+
+onFilterChange(filters: any) {
+  console.log('Filtreler değişti:', filters);
+  
+  // Marka filtrelerini ayarla
+  if (filters.brands?.length) {
+    this.shopParams.brands = filters.brands;
+  } else {
+    this.shopParams.brands = [];
+  }
+  
+  // Sayfa numarasını sıfırla
+  this.shopParams.pageNumber = 1;
+  
+  // Ürünleri yeniden getir
+  this.fetchProducts().subscribe();
+}
+
 }

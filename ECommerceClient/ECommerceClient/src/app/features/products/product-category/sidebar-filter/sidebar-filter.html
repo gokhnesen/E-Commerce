@@ -1,1 +1,156 @@
-<p>sidebar-filter works!</p>
+<aside class="bg-white border rounded-md shadow-sm p-4 w-full">
+  <h3 class="text-lg font-semibold mb-4">Kategoriler</h3>
+  
+  <!-- Ana kategori (Elektronik) -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between cursor-pointer" (click)="toggleCategory('elektronik')">
+      <span class="font-medium">Elektronik</span>
+      <mat-icon>{{ isExpanded('elektronik') ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </div>
+
+    <!-- Alt kategoriler -->
+    @if (isExpanded('elektronik')) {
+      <div class="ml-4 mt-2 space-y-3">
+        <!-- Bilgisayar alt kategorisi -->
+        <div>
+          <div class="flex items-center justify-between cursor-pointer" (click)="toggleSubcategory('bilgisayar')">
+            <a [routerLink]="['/products/category', 'bilgisayar']" 
+               [class.font-medium]="isActiveCategory('bilgisayar')"
+               class="block py-1 hover:text-blue-600">
+              Bilgisayarlar
+            </a>
+            <mat-icon>{{ isExpanded('bilgisayar') ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </div>
+
+          <!-- Bilgisayar markaları -->
+          @if (isExpanded('bilgisayar')) {
+            <div class="ml-4 mt-2 space-y-2">
+              @if (loading.bilgisayar) {
+                <div class="p-2 text-sm text-gray-500">Markalar yükleniyor...</div>
+              } @else if (getBilgisayarBrands().length === 0) {
+                <div class="p-2 text-sm text-gray-500">Marka bulunamadı</div>
+              } @else {
+                @for (brand of getBilgisayarBrands(); track brand.id) {
+                  <div class="flex items-center">
+                    <mat-checkbox 
+                      [checked]="isSelectedBrand(brand.name)" 
+                      (change)="toggleBrand(brand.name, 'bilgisayar')">
+                      {{ brand.name }}
+                    </mat-checkbox>
+                    <span class="text-xs text-gray-500 ml-1">({{ getBrandCount(brand.name) || '0' }})</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Telefon alt kategorisi -->
+        <div>
+          <div class="flex items-center justify-between cursor-pointer" (click)="toggleSubcategory('telefon')">
+            <a [routerLink]="['/products/category', 'telefon']" 
+               [class.font-medium]="isActiveCategory('telefon')"
+               class="block py-1 hover:text-blue-600">
+              Telefonlar
+            </a>
+            <mat-icon>{{ isExpanded('telefon') ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </div>
+
+          <!-- Telefon markaları -->
+          @if (isExpanded('telefon')) {
+            <div class="ml-4 mt-2 space-y-2">
+              @if (loading.telefon) {
+                <div class="loading">Markalar yükleniyor</div>
+              } @else if (getTelefonBrands().length === 0) {
+                <div class="text-sm text-gray-500">Marka bulunamadı</div>
+              } @else {
+                @for (brand of getTelefonBrands(); track brand.id) {
+                  <div class="flex items-center">
+                    <mat-checkbox 
+                      [checked]="isSelectedBrand(brand.name)" 
+                      (change)="toggleBrand(brand.name, 'telefon')">
+                      {{ brand.name }}
+                    </mat-checkbox>
+                    <span class="text-xs text-gray-500 ml-1">({{ getBrandCount(brand.name) || '0' }})</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Konsol alt kategorisi -->
+        <div>
+          <div class="flex items-center justify-between cursor-pointer" (click)="toggleSubcategory('konsol')">
+            <a [routerLink]="['/products/category', 'konsol']" 
+               [class.font-medium]="isActiveCategory('konsol')"
+               class="block py-1 hover:text-blue-600">
+              Oyun Konsolları
+            </a>
+            <mat-icon>{{ isExpanded('konsol') ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </div>
+
+          <!-- Konsol markaları -->
+          @if (isExpanded('konsol')) {
+            <div class="ml-4 mt-2 space-y-2">
+              @if (loading.konsol) {
+                <div class="loading">Markalar yükleniyor</div>
+              } @else if (getKonsolBrands().length === 0) {
+                <div class="text-sm text-gray-500">Marka bulunamadı</div>
+              } @else {
+                @for (brand of getKonsolBrands(); track brand.id) {
+                  <div class="flex items-center">
+                    <mat-checkbox 
+                      [checked]="isSelectedBrand(brand.name)" 
+                      (change)="toggleBrand(brand.name, 'konsol')">
+                      {{ brand.name }}
+                    </mat-checkbox>
+                    <span class="text-xs text-gray-500 ml-1">({{ getBrandCount(brand.name) || '0' }})</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Fiyat Aralığı Filtresi -->
+  <div class="mb-6">
+    <h3 class="text-md font-semibold mb-3">Fiyat Aralığı</h3>
+    <div class="flex space-x-2 mb-3">
+      <input 
+        type="number" 
+        [(ngModel)]="priceRange.min" 
+        placeholder="Min" 
+        class="w-full p-2 border rounded text-sm">
+      <span class="self-center">-</span>
+      <input 
+        type="number" 
+        [(ngModel)]="priceRange.max" 
+        placeholder="Max" 
+        class="w-full p-2 border rounded text-sm">
+    </div>
+    <button 
+      mat-stroked-button 
+      color="primary" 
+      class="w-full" 
+      (click)="applyPriceFilter()">
+      Uygula
+    </button>
+  </div>
+
+  <!-- Seçili filtreleri temizle -->
+  @if (hasActiveFilters()) {
+    <div class="mt-4 pt-4 border-t">
+      <button 
+        mat-stroked-button 
+        color="warn" 
+        class="w-full" 
+        (click)="clearAllFilters()">
+        Filtreleri Temizle
+      </button>
+    </div>
+  }
+</aside>

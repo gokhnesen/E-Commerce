@@ -25,7 +25,16 @@ namespace ECommerceAPI.Application.Features.Products.Profiles
             CreateMap<Product, DeleteProductCommand>().ReverseMap();
             CreateMap<Product, DeleteProductResponse>().ReverseMap();
 
-            CreateMap<Product, UpdateProductCommand>().ReverseMap();
+            CreateMap<UpdateProductCommand, Product>()
+                           .ForMember(dest => dest.CategoryId, opt => opt.Ignore())
+                           .ForMember(dest => dest.BrandId, opt => opt.Ignore())
+                           .ForMember(dest => dest.Category, opt => opt.Ignore())
+                           .ForMember(dest => dest.Brand, opt => opt.Ignore())
+                           .ForMember(dest => dest.Name, opt => opt.Condition(src => src.Name != null))
+                           .ForMember(dest => dest.Description, opt => opt.Condition(src => src.Description != null))
+                           .ForMember(dest => dest.Price, opt => opt.Condition(src => src.Price.HasValue))
+                           .ForMember(dest => dest.Stock, opt => opt.Condition(src => src.Stock.HasValue))
+                           .ForMember(dest => dest.PictureUrl, opt => opt.Condition(src => src.PictureUrl != null));
             CreateMap<Product, UpdateProductResponse>().ReverseMap();
 
             CreateMap<Product, GetByIdProductQuery>().ReverseMap();

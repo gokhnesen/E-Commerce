@@ -1,18 +1,30 @@
 @if (product) {
-       <mat-card appearance="raised" routerLink="/product/{{product.id}}" class="product-card">
-            <img src="{{product.pictureUrl}}" alt="image of {{product.name}}">
-            <mat-card-content class="mt-2">
-                <h2 class="text-sm font-semibold uppercase">{{product.name}}</h2>
-                <p class="font-light">{{product.price | currency}}</p>    
-            </mat-card-content>
-            <mat-card-actions (click)="$event.stopPropagation()">
-                <button mat-stroked-button class="w-full" (click)="cartService.addItemToCart(product)">
+    <mat-card appearance="outlined" routerLink="/product/{{product.id}}" class="product-card h-full">
+        <!-- Ürün görseli için kare konteyner -->
+        <div class="image-container">
+            <img src="{{product.pictureUrl}}" alt="{{product.name}}" class="product-image">
+            <!-- İsteğe bağlı: İndirim veya özel etiketler için -->
+            <!-- <span class="product-badge" *ngIf="product.discount">%{{product.discount}}</span> -->
+        </div>
+        
+        <!-- Ürün bilgileri -->
+        <mat-card-content>
+            <!-- Marka adı -->
+            <span class="text-xs text-gray-600">{{product.brand}}</span>
+            
+            <!-- Ürün adı - iki satırla sınırlı -->
+            <h2 class="text-sm font-semibold line-clamp-2">{{product.name}}</h2>
+            
+            <!-- Fiyat bilgisi -->
+            <p class="font-light">{{product.price | currency:'₺':'symbol':'1.2-2'}}</p>    
+        </mat-card-content>
+        
+        <!-- Sepete ekle düğmesi -->
+        <mat-card-actions (click)="$event.stopPropagation()">
+            <button mat-stroked-button color="primary" class="w-full" (click)="cartService.addItemToCart(product)">
                 <mat-icon>add_shopping_cart</mat-icon>
                 Sepete Ekle
-                </button>
-
-            </mat-card-actions>
-        </mat-card>
-}        
-        
- 
+            </button>
+        </mat-card-actions>
+    </mat-card>
+}

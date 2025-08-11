@@ -11,7 +11,7 @@ import { ServerError } from './shared/components/server-error/server-error';
 export const routes: Routes = [
     {path: '', component: Products},
     {path: 'product/:id', component: ProductDetails},
-    { path: 'products/category/:slug', loadComponent: () => import('./features/products/product-category/product-category').then(m => m.ProductCategory) },
+    {path: 'products/category/:slug', loadComponent: () => import('./features/products/product-category/product-category').then(m => m.ProductCategory)},
 
     {path: 'cart', component: Cart},
     {path: 'checkout', loadChildren: () => import('./features/checkout/routes').then(m => m.checkoutRoutes)},

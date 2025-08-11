@@ -27,17 +27,39 @@
   </div>
 
   <div class="flex gap-6">
-    <div class="w-3/4">
-      <div *ngIf="loading" class="p-8 text-center text-gray-500">Yükleniyor...</div>
-      <div *ngIf="!loading && (products$ | async)?.length === 0" class="p-8 text-center text-gray-500">
-        Bu kategoriye ait ürün bulunamadı.
-      </div>
+    <!-- Sidebar Filtresi -->
+    <div class="hidden md:block w-1/4">
+      <app-sidebar-filter 
+        [currentCategory]="slug"
+        (filterChange)="onFilterChange($event)">
+      </app-sidebar-filter>
+    </div>
+    
+    <!-- Ürün Listesi -->
+    <div class="w-full md:w-3/4">
+      @if (loading) {
+        <div class="p-8 text-center text-gray-500">Yükleniyor...</div>
+      }
+      
+      @if (!loading && (products$ | async)?.length === 0) {
+        <div class="p-8 text-center text-gray-500">
+          Bu kategoriye ait ürün bulunamadı.
+        </div>
+      }
 
-      <div class="grid grid-cols-3 gap-4" *ngIf="!loading && (products$ | async)?.length">
-        @for (product of (products$ | async); track product.id) {
-          <app-product-item [product]="product"></app-product-item>
-        }
-      </div>
+      @if (!loading && (products$ | async)?.length) {
+        <!-- Grid 4 sütunlu, sabit yükseklikli kartlar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (product of (products$ | async); track product.id) {
+            <div class="flex flex-col h-full">
+              <app-product-item 
+                [product]="product" 
+                class="flex-1 h-full flex flex-col bg-white rounded-md overflow-hidden shadow-sm border border-gray-200">
+              </app-product-item>
+            </div>
+          }
+        </div>
+      }
     </div>
   </div>
 </div>

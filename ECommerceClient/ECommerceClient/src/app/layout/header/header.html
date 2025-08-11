@@ -53,14 +53,14 @@
                    [routerLinkActiveOptions]="{exact: true}"
                    class="py-2 px-4 hover:bg-gray-100 rounded">
                    Anasayfa
-                </a>
+                  </a>
                   <a [routerLink]="['/products/category','elektronik']"
-     routerLinkActive="active"
-     class="py-2 px-4 hover:bg-gray-100 rounded">
-     Elektronik
-  </a>
+                  routerLinkActive="active"
+                  class="py-2 px-4 hover:bg-gray-100 rounded">
+                  Elektronik
+                  </a>
 
-                 <a routerLink="/product" 
+                 <a [routerLink]="['/products/category','giyim']"
                    routerLinkActive="active"
                    class="py-2 px-4 hover:bg-gray-100 rounded">
                    Giyim
@@ -68,7 +68,7 @@
                 <a *appIsAdmin routerLink="/admin" 
                    routerLinkActive="active"
                    class="py-2 px-4 hover:bg-gray-100 rounded">
-                   Giyim
+                   Admin
                 </a>
             </nav>
         </div>
