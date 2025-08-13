@@ -2,6 +2,10 @@ using AutoMapper;
 using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Categories.Commands.Create
 {
@@ -20,6 +24,14 @@ namespace ECommerceAPI.Application.Features.Categories.Commands.Create
 
         public async Task<CreateCategoryResponse> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {
+            var existingCategory = await _categoryReadRepository.GetWhere(c => c.Name == request.Name, tracking: false)
+                                                               .FirstOrDefaultAsync(cancellationToken);
+            
+            if (existingCategory != null)
+            {
+                throw new Exception($"Kategori zaten mevcut: '{request.Name}'");
+            }
+
             Category category = _mapper.Map<Category>(request);
             category.Id = Guid.NewGuid();
             
@@ -33,4 +45,4 @@ namespace ECommerceAPI.Application.Features.Categories.Commands.Create
             return response;
         }
     }
-} 
+}

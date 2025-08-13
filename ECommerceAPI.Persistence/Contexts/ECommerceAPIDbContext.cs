@@ -19,6 +19,7 @@ namespace ECommerceAPI.Persistence.Contexts
         public DbSet<DeliveryMethod> DeliveryMethods { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<CategoryBrand> CategoryBrands { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

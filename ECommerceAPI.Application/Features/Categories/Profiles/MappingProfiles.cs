@@ -1,4 +1,5 @@
 using AutoMapper;
+using ECommerceAPI.Application.Features.Categories.CategoryBrands.Queries.GetById;
 using ECommerceAPI.Application.Features.Categories.Commands.Create;
 using ECommerceAPI.Application.Features.Categories.Commands.Delete;
 using ECommerceAPI.Application.Features.Categories.Commands.Update;
@@ -25,6 +26,13 @@ namespace ECommerceAPI.Application.Features.Categories.Profiles
             CreateMap<Category, GetByIdCategoryResponse>().ReverseMap();
 
             CreateMap<Category, GetListCategoryResponse>().ReverseMap();
+
+
+            // Map Category to GetByIdCategoryBrandResponse
+            CreateMap<Category, GetByIdCategoryBrandResponse>()
+                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Brands, opt => opt.Ignore()); // Brands are populated separately
         }
     }
 } 

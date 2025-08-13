@@ -1,5 +1,6 @@
 ﻿using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Application.Interfaces.Brand;
+using ECommerceAPI.Application.Interfaces.BrandCategory;
 using ECommerceAPI.Application.Interfaces.Cache;
 using ECommerceAPI.Application.Interfaces.Cart;
 using ECommerceAPI.Application.Interfaces.DeliveryMethod;
@@ -11,6 +12,7 @@ using ECommerceAPI.Persistence.Repositories;
 using ECommerceAPI.Persistence.Repositories.Brand;
 using ECommerceAPI.Persistence.Repositories.Cache;
 using ECommerceAPI.Persistence.Repositories.Cart;
+using ECommerceAPI.Persistence.Repositories.CategoryBrand;
 using ECommerceAPI.Persistence.Repositories.DeliveryMethod;
 using ECommerceAPI.Persistence.Repositories.Order;
 using ECommerceAPI.Persistence.Repositories.Payment;
@@ -46,6 +48,8 @@ namespace ECommerceAPI.Persistence
             services.AddScoped<IOrderWriteRepository, OrderWriteRepository>();
             services.AddScoped<IDeliveryReadRepository, DeliveryReadRepository>();
             services.AddScoped<IDeliveryWriteRepository, DeliveryWriteRepository>();
+            services.AddScoped<ICategoryBrandReadRepository, CategoryBrandReadRepository>();
+            services.AddScoped<ICategoryBrandWriteRepository, CategoryBrandWriteRepository>();
             services.AddScoped<IResponseCacheService, ResponseCacheService>();
 
             services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));

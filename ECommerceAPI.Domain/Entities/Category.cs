@@ -9,5 +9,8 @@
         public ICollection<Category> SubCategories { get; set; } 
 
         public ICollection<Product> Products { get; set; }
+
+        public ICollection<CategoryBrand> CategoryBrands { get; set; }
+
     }
 }

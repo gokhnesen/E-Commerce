@@ -109,6 +109,30 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.CategoryBrand", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BrandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CategoryId", "BrandId");
+
+                    b.HasIndex("BrandId");
+
+                    b.ToTable("CategoryBrands", (string)null);
+                });
+
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.DeliveryMethod", b =>
                 {
                     b.Property<Guid>("Id")
@@ -485,6 +509,25 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.Navigation("ParentCategory");
                 });
 
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.CategoryBrand", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Brand", "Brand")
+                        .WithMany("CategoryBrands")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerceAPI.Domain.Entities.Category", "Category")
+                        .WithMany("CategoryBrands")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order.Order", b =>
                 {
                     b.HasOne("ECommerceAPI.Domain.Entities.DeliveryMethod", "DeliveryMethod")
@@ -683,8 +726,15 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Brand", b =>
+                {
+                    b.Navigation("CategoryBrands");
+                });
+
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Category", b =>
                 {
+                    b.Navigation("CategoryBrands");
+
                     b.Navigation("Products");
 
                     b.Navigation("SubCategories");

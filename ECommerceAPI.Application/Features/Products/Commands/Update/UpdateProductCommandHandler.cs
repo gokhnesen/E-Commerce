@@ -74,8 +74,6 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Update
                 // Save changes
                 _productWriteRepository.Update(product);
                 await _productWriteRepository.SaveAsync();
-                
-                
                 // Create response
                 var response = _mapper.Map<UpdateProductResponse>(product);
                 

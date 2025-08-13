@@ -1,3 +1,4 @@
+using ECommerceAPI.Application.Features.Categories.CategoryBrands.Queries.GetById;
 using ECommerceAPI.Application.Features.Categories.Commands.Create;
 using ECommerceAPI.Application.Features.Categories.Commands.Delete;
 using ECommerceAPI.Application.Features.Categories.Commands.Update;
@@ -45,6 +46,14 @@ namespace ECommerceAPI.Controllers
         public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand updateCategoryCommand)
         {
             UpdateCategoryResponse response = await Mediator.Send(updateCategoryCommand);
+            return Ok(response);
+        }
+
+        [HttpGet("{id}/brands")]
+        public async Task<IActionResult> GetCategoryBrands([FromRoute] Guid id)
+        {
+            var query = new GetByIdCategoryBrandQuery { CategoryId = id };
+            var response = await Mediator.Send(query);
             return Ok(response);
         }
     }
