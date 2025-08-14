@@ -107,50 +107,6 @@ export class ProductService {
     console.log('📂 getProductsByCategory', slug, merged);
     return this.getProducts(merged);
   }
-  
-  // Kategori bazlı markalar için yeni metot (mevcut servisi bozmadan ekleyin)
-  getCategoryBrands(categorySlug: string): Observable<Brand[]> {
-    console.log(`getCategoryBrands başladı - kategori: ${categorySlug}`);
-    
-    return this.getProductsByCategory(categorySlug, {pageSize: 100}).pipe(
-      tap(response => console.log(`✅ ${categorySlug} ürünleri alındı:`, response)),
-      map(response => {
-        if (!response || !response.data || !Array.isArray(response.data)) {
-          console.warn(`❌ ${categorySlug} için geçersiz ürün yanıtı`);
-          return [];
-        }
-        
-        // Benzersiz marka isimlerini bul
-        const uniqueBrands = new Map<string, {count: number}>();
-        
-        response.data.forEach(product => {
-          if (product.brand) {
-            if (uniqueBrands.has(product.brand)) {  
-              uniqueBrands.get(product.brand)!.count++;
-            } else {
-              uniqueBrands.set(product.brand, { count: 1 });
-            }
-          }
-        });
-        
-        // Markalar dizisini oluştur ve ID değerlerini string'e dönüştür
-        const brandList: Brand[] = Array.from(uniqueBrands.entries()).map(([name, data], index) => {
-          return {
-            id: (index + 1).toString(), // Number yerine string kullanın
-            name: name,
-            description: '',
-            pictureUrl: ''
-          };
-        });
-        
-        console.log(`✅ ${categorySlug} kategorisi markaları:`, brandList);
-        return brandList;
-      }),
-      catchError(err => {
-        console.error(`❌ ${categorySlug} için markalar alınamadı:`, err);
-        return of([]);
-      })
-    );
-  }
+
   
 }

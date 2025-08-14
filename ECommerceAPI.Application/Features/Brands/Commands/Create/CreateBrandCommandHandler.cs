@@ -23,11 +23,6 @@ namespace ECommerceAPI.Application.Features.Brands.Commands.Create
 
         public async Task<CreateBrandResponse> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {
-            var existingBrand = await _brandReadRepository.GetSingleAsync(b => b.Name == request.Name);
-            if (existingBrand != null)
-            {
-                throw new Exception($"'{request.Name}' isimli marka zaten mevcut.");
-            }
 
             Brand brand = _mapper.Map<Brand>(request);
             brand.Id = Guid.NewGuid();
