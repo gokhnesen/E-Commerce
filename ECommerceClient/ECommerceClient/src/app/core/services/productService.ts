@@ -6,6 +6,7 @@ import { Brand } from '../../shared/models/brands';
 import { ShopParams } from '../../shared/models/productParam';
 import { Pagination } from '../../shared/models/pagination';
 import { environment } from '../../../environments/environment';
+import { Category, SubCategory } from '../../shared/models/category';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class ProductService {
   baseURL = environment.apiUrl;
   private http = inject(HttpClient);
   brands: Brand[] = [];
+  categories: Category[] = [];
   route: any;
   shopParams: any;
 
@@ -76,23 +78,18 @@ export class ProductService {
     return this.http.get<Product>(finalUrl);
   }
 
-  getBrands(): void {
-    if (this.brands.length > 0) return;
-    
-    this.http.get<Brand[]>(this.baseURL + 'Brands').pipe(
+  getBrands(): Observable<Brand[]> {
+    console.log('🔍 getBrands çağrıldı');
+    return this.http.get<Brand[]>(this.baseURL + 'Brands').pipe(
+      tap(brands => {
+        this.brands = brands;
+        console.log('✅ Brands yüklendi:', brands);
+      }),
       catchError(error => {
         console.error('❌ getBrands Error:', error);
         return throwError(() => error);
       })
-    ).subscribe({
-      next: response => {
-        this.brands = response;
-        console.log('✅ Brands yüklendi:', this.brands);
-      },
-      error: error => {
-        console.error('❌ Brands yüklenemedi:', error);
-      }
-    });
+    );
   }
 
   getProductsByCategory(slug: string, current?: Partial<ShopParams>): Observable<Pagination<Product>> {
@@ -108,5 +105,125 @@ export class ProductService {
     return this.getProducts(merged);
   }
 
+  // Sidebar filter için yeni metodlar
+  getCategories(): Observable<Category[]> {
+    console.log('🔍 getCategories çağrıldı');
+    
+    if (this.categories.length > 0) {
+      console.log('✅ Cached kategoriler kullanılıyor:', this.categories);
+      return of(this.categories);
+    }
+    
+    return this.http.get<Category[]>(this.baseURL + 'Category').pipe(
+      tap(categories => {
+        this.categories = categories;
+        console.log('✅ Kategoriler yüklendi:', categories);
+      }),
+      catchError(error => {
+        console.error('❌ getCategories Error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getFilteredProducts(filters: any): Observable<Pagination<Product>> {
+    console.log('🔍 getFilteredProducts çağrıldı, filters:', filters);
+    
+    const shopParams: ShopParams = {
+      brands: filters.brands || [],
+      categories: filters.categories || [],
+      sort: 'name',
+      pageNumber: 1,
+      pageSize: 9,
+      search: ''
+    };
+    
+    return this.getProducts(shopParams);
+  }
+
+
+// product.service.ts
+getCategoryWithSubcategories(categoryId: string): Observable<Category> {
+  console.log('🔍 getCategoryWithSubcategories çağrıldı, categoryId:', categoryId);
   
+  const finalUrl = `${this.baseURL}Category/${categoryId}`;
+  console.log('🔗 Final URL:', finalUrl);
+  
+  return this.http.get<Category>(finalUrl).pipe(
+    tap(category => {
+      console.log('✅ Kategori ve alt kategorileri yüklendi:', category);
+      
+      // Update the cached category with subcategories if it exists
+      const existingCategoryIndex = this.categories.findIndex(c => c.id === categoryId);
+      if (existingCategoryIndex !== -1) {
+        this.categories[existingCategoryIndex] = {
+          ...this.categories[existingCategoryIndex],
+          subCategories: category.subCategories
+        };
+      }
+    }),
+    catchError(error => {
+      console.error(`❌ getCategoryWithSubcategories Error for ID ${categoryId}:`, error);
+      return throwError(() => error);
+    })
+  );
+}
+
+getCategoryBrands(categoryId: string): Observable<Brand[]> {
+  console.log('🔍 getCategoryBrands çağrıldı, categoryId:', categoryId);
+  
+  const category = this.categories.find(c => c.id === categoryId);
+  if (category?.brands?.length) {
+    console.log('✅ Cached brands kullanılıyor:', category.brands);
+    return of(category.brands);
+  }
+  
+  const finalUrl = `${this.baseURL}Category/${categoryId}/brands`;
+  console.log('🔗 Final URL:', finalUrl);
+  
+  return this.http.get<any>(finalUrl).pipe(
+    map(response => response.brands || []),
+    tap(brands => {
+      if (category) {
+        category.brands = brands;
+      }
+    }),
+    catchError(error => {
+      console.error(`❌ getCategoryBrands Error for ID ${categoryId}:`, error);
+      return throwError(() => error);
+    })
+  );
+}
+
+getSubcategoryBrands(subcategoryId: string): Observable<Brand[]> {
+  console.log('🔍 getSubcategoryBrands çağrıldı, subcategoryId:', subcategoryId);
+  
+  const finalUrl = `${this.baseURL}Category/subcategory/${subcategoryId}/brands`;
+  console.log('🔗 Final URL:', finalUrl);
+  
+  return this.http.get<Brand[]>(finalUrl).pipe(
+    tap(brands => {
+      console.log('✅ Alt kategori markaları yüklendi:', brands);
+    }),
+    catchError(error => {
+      console.error(`❌ getSubcategoryBrands Error for ID ${subcategoryId}:`, error);
+      return throwError(() => error);
+    })
+  );
+}
+
+getCategoryByName(categoryName: string): Observable<Category> {
+  const finalUrl = `${this.baseURL}Category/name/${categoryName}`;
+  console.log('🔗 GetCategoryByName URL:', finalUrl);
+  
+  return this.http.get<Category>(finalUrl).pipe(
+    tap(category => {
+      console.log('✅ Kategori ve alt kategorileri yüklendi:', category);
+    }),
+    catchError(error => {
+      console.error(`❌ getCategoryByName Error for name ${categoryName}:`, error);
+      return throwError(() => error);
+    })
+  );
+}
 }

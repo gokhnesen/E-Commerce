@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ECommerceAPI.Persistence.Repositories
@@ -20,7 +19,6 @@ namespace ECommerceAPI.Persistence.Repositories
         {
             List<Domain.Entities.Category> result = new();
 
-            // Find the parent category
             var parentCategory = await GetWhere(c => c.Name.ToLower() == categoryName.ToLower(), false)
                 .Include(c => c.SubCategories)
                 .FirstOrDefaultAsync();
@@ -28,10 +26,8 @@ namespace ECommerceAPI.Persistence.Repositories
             if (parentCategory == null)
                 return result;
 
-            // Add the parent category itself
             result.Add(parentCategory);
 
-            // Helper function to recursively get all subcategories
             void AddChildCategories(Domain.Entities.Category category)
             {
                 if (category.SubCategories != null)
@@ -44,10 +40,17 @@ namespace ECommerceAPI.Persistence.Repositories
                 }
             }
 
-            // Get all subcategories
             AddChildCategories(parentCategory);
 
             return result;
+        }
+
+        public async Task<Category> GetCategoryWithDirectChildrenAsync(Guid categoryId)
+        {
+            return await GetWhere(c => c.Id == categoryId, false)
+                .Include(c => c.SubCategories)
+                .Include(c => c.ParentCategory)
+                .FirstOrDefaultAsync();
         }
     }
 }

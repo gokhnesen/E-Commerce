@@ -2,6 +2,9 @@ using AutoMapper;
 using ECommerceAPI.Application.Interfaces;
 using ECommerceAPI.Domain.Entities;
 using MediatR;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Categories.Queries.GetById
 {
@@ -18,12 +21,14 @@ namespace ECommerceAPI.Application.Features.Categories.Queries.GetById
 
         public async Task<GetByIdCategoryResponse> Handle(GetByIdCategoryQuery request, CancellationToken cancellationToken)
         {
-            Category category = await _categoryReadRepository.GetByIdAsync(request.Id);
+            var category = await _categoryReadRepository.GetCategoryWithDirectChildrenAsync(request.Id);
+            
             if (category == null)
                 throw new Exception("Category not found");
 
-            GetByIdCategoryResponse response = _mapper.Map<GetByIdCategoryResponse>(category);
+            var response = _mapper.Map<GetByIdCategoryResponse>(category);
+            
             return response;
         }
     }
-} 
+}

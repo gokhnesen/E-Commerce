@@ -1,0 +1,47 @@
+
+<div class="sidebar-filter">
+  <h3>Filtreleme</h3>
+  
+  <div class="filter-section" *ngIf="!isLoading; else loading">
+    <button mat-button (click)="resetFilters()" class="reset-button">
+      <mat-icon>refresh</mat-icon> Filtreleri Sıfırla
+    </button>
+    
+    <div *ngFor="let category of categories" class="category-item">
+      <div class="category-header" (click)="toggleCategory(category)">
+        <span class="category-name">{{ category.name }}</span>
+        <mat-icon>{{ category.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </div>
+      
+      <div *ngIf="category.isExpanded" class="brand-container">
+        <!-- Kategori yüklenirken -->
+        <div *ngIf="!category.brands" class="loading-indicator">
+          <mat-icon>sync</mat-icon> Markalar yükleniyor...
+        </div>
+        
+        <!-- Kategori markaları -->
+        <div *ngIf="category.brands && category.brands.length > 0">
+          <div *ngFor="let brand of category.brands" class="brand-item">
+            <mat-checkbox 
+              [checked]="isBrandSelected(brand)" 
+              (change)="toggleBrand(brand, category)">
+              {{ brand.name }}
+            </mat-checkbox>
+          </div>
+        </div>
+        
+        <!-- Marka yoksa -->
+        <div *ngIf="category.brands && category.brands.length === 0" class="no-brands">
+          Bu kategoride marka bulunamadı.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <mat-icon class="loading-icon">sync</mat-icon>
+    <p>Kategoriler yükleniyor...</p>
+  </div>
+</ng-template>

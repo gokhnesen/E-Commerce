@@ -3,6 +3,7 @@ using ECommerceAPI.Application.Features.Categories.Commands.Create;
 using ECommerceAPI.Application.Features.Categories.Commands.Delete;
 using ECommerceAPI.Application.Features.Categories.Commands.Update;
 using ECommerceAPI.Application.Features.Categories.Queries.GetById;
+using ECommerceAPI.Application.Features.Categories.Queries.GetByName;
 using ECommerceAPI.Application.Features.Categories.Queries.GetList;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,10 +21,17 @@ namespace ECommerceAPI.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("id/{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var query = new GetByIdCategoryQuery { Id = id };
+            var response = await Mediator.Send(query);
+            return Ok(response);
+        }
+        [HttpGet("name/{categoryName}")]
+        public async Task<IActionResult> GetByName([FromRoute] string categoryName)
+        {
+            var query = new GetByNameCategoryQuery { Name = categoryName };
             var response = await Mediator.Send(query);
             return Ok(response);
         }
@@ -35,7 +43,7 @@ namespace ECommerceAPI.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             DeleteCategoryResponse response = await Mediator.Send(new DeleteCategoryCommand { Id = id });
@@ -49,7 +57,7 @@ namespace ECommerceAPI.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id}/brands")]
+        [HttpGet("{id:guid}/brands")]
         public async Task<IActionResult> GetCategoryBrands([FromRoute] Guid id)
         {
             var query = new GetByIdCategoryBrandQuery { CategoryId = id };

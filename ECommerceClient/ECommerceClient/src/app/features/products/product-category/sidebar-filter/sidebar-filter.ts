@@ -5,16 +5,11 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
-import { Brand } from '../../../../shared/models/brands';
-import { ProductService } from '../../../../core/services/productService';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
+import { Brand } from '../../../../shared/models/brands';
+import { Category } from '../../../../shared/models/category';
+import { ProductService } from '../../../../core/services/productService';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar-filter',
@@ -31,10 +26,158 @@ interface Category {
   styleUrls: ['./sidebar-filter.scss']
 })
 export class SidebarFilter implements OnInit {
+  @Input() activeCategory: string = '';
+  @Output() filterChange = new EventEmitter<any>();
+  
+  private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
+  private productService = inject(ProductService);
+  
+  categories: Category[] = [];
+  isLoading = true;
+  selectedBrands: Record<string, boolean> = {};
 
-
-    ngOnInit(): void {
-    throw new Error('Method not implemented.');
+  ngOnInit(): void {
+    this.route.params.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(params => {
+      const slug = params['slug'];
+      
+      if (slug) {
+        this.activeCategory = slug;
+        this.loadCategoryWithSubcategories();
+      } else {
+        this.loadAllCategories();
+      }
+    });
   }
 
+  loadCategoryWithSubcategories(): void {
+    this.isLoading = true;
+    
+    this.productService.getCategoryByName(this.activeCategory).subscribe({
+      next: (category) => {
+        if (category.subCategories?.length) {
+          // Sadece alt kategorileri göster
+          this.categories = category.subCategories.map(sub => ({
+            id: sub.id,
+            name: sub.name,
+            isExpanded: false
+          } as Category));
+          
+          // Alt kategoriler için markaları yükle
+          this.categories.forEach(cat => this.loadCategoryBrands(cat));
+        } else {
+          // Alt kategori yoksa ana kategoriyi göster
+          this.categories = [{
+            id: category.id,
+            name: category.name,
+            isExpanded: false
+          }];
+        }
+        this.isLoading = false;
+      },
+      error: () => {
+        this.loadAllCategories();
+      }
+    });
+  }
+
+  loadAllCategories(): void {
+    this.isLoading = true;
+    
+    this.productService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.isLoading = false;
+        this.expandActiveCategory();
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadCategoryBrands(category: Category): void {
+    if (category.brands?.length) return;
+
+    this.productService.getCategoryBrands(category.id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (brands) => {
+        category.brands = brands;
+        category.selectedBrands = [];
+      }
+    });
+  }
+
+  expandActiveCategory(): void {
+    if (!this.categories.length || !this.activeCategory) return;
+
+    const category = this.categories.find(c => 
+      c.name.toLowerCase() === this.activeCategory.toLowerCase());
+    
+    if (category) {
+      category.isExpanded = true;
+      this.loadCategoryBrands(category);
+    }
+  }
+
+  toggleCategory(category: Category): void {
+    category.isExpanded = !category.isExpanded;
+    
+    if (category.isExpanded && !category.brands) {
+      this.loadCategoryBrands(category);
+    }
+  }
+
+  toggleBrand(brand: Brand, category: Category): void {
+    const brandKey = brand.id;
+    this.selectedBrands[brandKey] = !this.selectedBrands[brandKey];
+    
+    if (!category.selectedBrands) {
+      category.selectedBrands = [];
+    }
+    
+    if (this.selectedBrands[brandKey]) {
+      if (!category.selectedBrands.find(b => b.id === brand.id)) {
+        category.selectedBrands.push(brand);
+      }
+    } else {
+      category.selectedBrands = category.selectedBrands.filter(b => b.id !== brand.id);
+    }
+    
+    this.updateFilters();
+  }
+
+  isBrandSelected(brand: Brand): boolean {
+    return !!this.selectedBrands[brand.id];
+  }
+
+  updateFilters(): void {
+    this.filterChange.emit({ brands: this.getSelectedBrands() });
+  }
+
+  getSelectedBrands(): Brand[] {
+    const selectedBrands: Brand[] = [];
+    
+    this.categories.forEach(category => {
+      if (category.selectedBrands?.length) {
+        selectedBrands.push(...category.selectedBrands);
+      }
+    });
+    
+    return selectedBrands;
+  }
+
+  resetFilters(): void {
+    this.selectedBrands = {};
+    
+    this.categories.forEach(category => {
+      category.selectedBrands = [];
+    });
+    
+    this.updateFilters();
+  }
 }
+

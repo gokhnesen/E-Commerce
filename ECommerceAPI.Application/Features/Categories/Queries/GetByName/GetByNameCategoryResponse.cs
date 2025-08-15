@@ -1,9 +1,10 @@
+using ECommerceAPI.Application.Features.Categories.Queries.GetById;
 using System;
 using System.Collections.Generic;
 
-namespace ECommerceAPI.Application.Features.Categories.Queries.GetById
+namespace ECommerceAPI.Application.Features.Categories.Queries.GetByName
 {
-    public class GetByIdCategoryResponse
+    public class GetByNameCategoryResponse
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -12,9 +13,5 @@ namespace ECommerceAPI.Application.Features.Categories.Queries.GetById
         public List<ChildCategoryDto> SubCategories { get; set; } = new List<ChildCategoryDto>();
     }
 
-    public class ChildCategoryDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
+
 }
