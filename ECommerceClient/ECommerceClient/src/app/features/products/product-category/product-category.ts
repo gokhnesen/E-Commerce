@@ -1,4 +1,5 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, switchMap, tap } from 'rxjs';
 import { ProductService } from '../../../core/services/productService';
@@ -6,7 +7,6 @@ import { Product } from '../../../shared/models/product';
 import { Pagination } from '../../../shared/models/pagination';
 import { ShopParams } from '../../../shared/models/productParam';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,9 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { ProductItem } from "../product-item/product-item";
 import { SidebarFilter } from "./sidebar-filter/sidebar-filter";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { Brand } from '../../../shared/models/brands';
 
 @Component({
   selector: 'app-product-category',
@@ -29,7 +32,9 @@ import { SidebarFilter } from "./sidebar-filter/sidebar-filter";
     MatListModule,
     FormsModule,
     ProductItem,
-    SidebarFilter
+    SidebarFilter,
+    MatProgressSpinnerModule,
+    InfiniteScrollModule
 ]
 })
 export class ProductCategory implements OnInit {
@@ -37,11 +42,14 @@ export class ProductCategory implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
-  private destroyRef = inject(DestroyRef);
 
   slug = '';
+  products: Product[] = []; // Array yerine observable kullanıyoruz
   products$ = new BehaviorSubject<Product[]>([]);
   totalCount = 0;
+  loading = false;
+  noMoreProducts = false;
+  loadingMore = false;
 
   shopParams: ShopParams = {
     brands: [],
@@ -62,16 +70,17 @@ export class ProductCategory implements OnInit {
     { name: 'Yeni Eklenen', value: 'newest' }
   ];
 
-  loading = false;
-
     ngOnInit(): void {
     this.route.paramMap
       .pipe(
         tap(pm => {
           const newSlug = pm.get('slug') ?? '';
           if (newSlug !== this.slug) {
+            // Yeni bir kategoriye geçiş yapıldığında tüm değişkenleri sıfırla
             this.slug = newSlug;
             this.shopParams.pageNumber = 1;
+            this.noMoreProducts = false; // Sıfırla
+            this.products$.next([]); // Ürünleri temizle
           }
         }),
         switchMap(() => this.fetchProducts())
@@ -101,30 +110,98 @@ export class ProductCategory implements OnInit {
     if (!this.slug) {
       this.products$.next([]);
       this.totalCount = 0;
+      this.noMoreProducts = true; // Kategori yoksa daha fazla ürün yok
       return this.productService.getProductsByCategory('', this.shopParams);
     }
+    
     this.loading = true;
+    this.noMoreProducts = false; // Her yeni yüklemede sıfırla
+    
     return this.productService.getProductsByCategory(this.slug, this.shopParams).pipe(
       tap({
         next: (res: Pagination<Product> | any) => {
-          console.log('🛠 map before ->', res);
-            const list = this.mapResponse(res);
-            const total = this.resolveTotal(res);
-            console.log('📦 mapped list length:', list.length, 'total:', total);
+          console.log('🛠 API yanıtı:', res);
+          const list = this.mapResponse(res);
+          const total = this.resolveTotal(res);
+          console.log('📦 Ürün sayısı:', list.length, 'Toplam:', total);
+          
+          // Sayfa 1'den büyükse ve sonsuz kaydırma için kullanılıyorsa, ürünleri ekle
+          if (this.shopParams.pageNumber > 1 && !this.loading) {
+            const currentProducts = this.products$.getValue() || [];
+            this.products$.next([...currentProducts, ...list]);
+          } else {
+            // İlk yükleme veya filtre değişikliği için ürünleri sıfırla
             this.products$.next(list);
-            this.totalCount = total;
-            this.loading = false;
+          }
+          
+          this.totalCount = total;
+          
+          // Daha fazla ürün olup olmadığını kontrol et
+          if (list.length < this.shopParams.pageSize) {
+            this.noMoreProducts = true;
+            console.log('Tüm ürünler yüklendi (son sayfada az ürün var)');
+          }
+          
+          this.loading = false;
         },
         error: (err) => {
           console.error('❌ fetchProducts error:', err);
           this.products$.next([]);
           this.totalCount = 0;
           this.loading = false;
+          this.noMoreProducts = true;
         }
       })
     );
   }
 
+  loadProducts() {
+    if (this.loading) {
+      return;
+    }
+    
+    this.loading = true;
+    
+    this.productService.getProducts(this.shopParams).subscribe({
+      next: (response) => {
+        if (Array.isArray(response)) {
+          // Gelen verileri kontrol et
+          if (response.length > 0) {
+            // IDs of existing products
+            const existingIds = new Set(this.products.map(p => p.id));
+            
+            // Sadece yeni ürünleri ekle (tekrarlayanları filtrele)
+            const newProducts = response.filter(p => !existingIds.has(p.id));
+            
+            if (this.shopParams.pageNumber === 1) {
+              // İlk sayfa ise, önceki ürünleri temizle
+              this.products = [...response];
+            } else if (newProducts.length > 0) {
+              // Diğer sayfalarda, sadece yeni ürünleri ekle
+              this.products = [...this.products, ...newProducts];
+            }
+            
+            // Eğer hiç yeni ürün gelmediyse veya beklenen sayıdan az ürün geldiyse, tüm ürünler yüklenmiştir
+            if (newProducts.length === 0 || response.length < this.shopParams.pageSize) {
+              this.noMoreProducts = true;
+            }
+          } else {
+            if (this.shopParams.pageNumber === 1) {
+              this.products = [];
+            }
+            this.noMoreProducts = true;
+          }
+        }
+        
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Ürünler yüklenirken hata:', error);
+        this.loading = false;
+      }
+    });
+  }
+  
   handlePageEvent(e: PageEvent) {
     this.shopParams.pageNumber = e.pageIndex + 1;
     this.shopParams.pageSize = e.pageSize;
@@ -144,21 +221,71 @@ export class ProductCategory implements OnInit {
   }
     // ...existing code...
 
-onFilterChange(filters: any) {
-  console.log('Filtreler değişti:', filters);
+onFilterChange(event: any) {
+  console.log('Filtre değişikliği:', event);
   
-  // Marka filtrelerini ayarla
-  if (filters.brands?.length) {
-    this.shopParams.brands = filters.brands;
-  } else {
-    this.shopParams.brands = [];
+  if (event.brands) {
+    // Gelen veri doğrudan ID'ler olmalı
+    this.shopParams.brands = event.brands;
+    console.log('Filtrelenecek marka ID\'leri:', this.shopParams.brands);
+    
+    // Sayfalama ve ürünleri sıfırla
+    this.shopParams.pageNumber = 1;
+    this.products$.next([]); // BehaviorSubject kullanıyorsanız
+    this.noMoreProducts = false;
+    
+    // Yeni filtrelere göre yükle
+    this.fetchProducts().subscribe();
   }
-  
-  // Sayfa numarasını sıfırla
-  this.shopParams.pageNumber = 1;
-  
-  // Ürünleri yeniden getir
-  this.fetchProducts().subscribe();
 }
 
+// onScroll metodunu düzelt - getProducts yerine getProductsByCategory kullan
+onScroll() {
+  // Eğer daha fazla ürün yoksa veya zaten yükleme yapıyorsa, işlem yapma
+  if (this.noMoreProducts || this.loadingMore || this.loading) {
+    console.log('Kaydırma işlemi atlandı:', 
+      this.noMoreProducts ? 'Tüm ürünler görüntülendi' : 'Yükleme zaten devam ediyor');
+    return;
+  }
+  
+  console.log(`Sayfa kaydırıldı, yeni sayfa: ${this.shopParams.pageNumber + 1}`);
+  this.loadingMore = true;
+  
+  // Sayfa numarasını artır
+  this.shopParams.pageNumber++;
+  
+  // Yeni sayfadaki ürünleri yükle - doğru metodu kullan
+  this.productService.getProductsByCategory(this.slug, this.shopParams).subscribe({
+    next: (response: any) => {
+      // Mevcut ürünleri al
+      const currentProducts = this.products$.getValue() || [];
+      
+      // Yeni ürünleri map et
+      const newProducts = this.mapResponse(response);
+      
+      // Tekrar eden ürünleri filtrele
+      const existingIds = new Set(currentProducts.map(p => p.id));
+      const uniqueNewProducts = newProducts.filter(p => !existingIds.has(p.id));
+      
+      console.log('Yeni ürünler:', uniqueNewProducts.length, 'Toplam gelen:', newProducts.length);
+      
+      // Yeni ürün yoksa veya beklenen sayıdan az ürün geldiyse, daha fazla ürün olmadığını işaretle
+      if (uniqueNewProducts.length === 0 || newProducts.length < this.shopParams.pageSize) {
+        this.noMoreProducts = true;
+        console.log('Tüm ürünler yüklendi, başka ürün kalmadı.');
+      }
+      
+      // Yeni ürünleri mevcut ürünlere ekle
+      if (uniqueNewProducts.length > 0) {
+        this.products$.next([...currentProducts, ...uniqueNewProducts]);
+      }
+      
+      this.loadingMore = false;
+    },
+    error: (error) => {
+      console.error('Daha fazla ürün yüklenirken hata:', error);
+      this.loadingMore = false;
+    }
+  });
+}
 }

@@ -1,7 +1,7 @@
 import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, Router, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Brand } from '../../../../shared/models/brands';
 import { Category } from '../../../../shared/models/category';
 import { ProductService } from '../../../../core/services/productService';
-import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar-filter',
@@ -27,7 +26,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class SidebarFilter implements OnInit {
   @Input() activeCategory: string = '';
-  @Output() filterChange = new EventEmitter<any>();
+  @Output() filterChange = new EventEmitter<{brands: string[]}>();
   
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
@@ -38,18 +37,18 @@ export class SidebarFilter implements OnInit {
   selectedBrands: Record<string, boolean> = {};
 
   ngOnInit(): void {
-    this.route.params.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(params => {
-      const slug = params['slug'];
-      
-      if (slug) {
-        this.activeCategory = slug;
-        this.loadCategoryWithSubcategories();
-      } else {
-        this.loadAllCategories();
-      }
-    });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const slug = params['slug'];
+        this.activeCategory = slug || '';
+        
+        if (slug) {
+          this.loadCategoryWithSubcategories();
+        } else {
+          this.loadAllCategories();
+        }
+      });
   }
 
   loadCategoryWithSubcategories(): void {
@@ -58,28 +57,23 @@ export class SidebarFilter implements OnInit {
     this.productService.getCategoryByName(this.activeCategory).subscribe({
       next: (category) => {
         if (category.subCategories?.length) {
-          // Sadece alt kategorileri göster
           this.categories = category.subCategories.map(sub => ({
             id: sub.id,
             name: sub.name,
             isExpanded: false
           } as Category));
-          
-          // Alt kategoriler için markaları yükle
           this.categories.forEach(cat => this.loadCategoryBrands(cat));
         } else {
-          // Alt kategori yoksa ana kategoriyi göster
           this.categories = [{
             id: category.id,
             name: category.name,
             isExpanded: false
           }];
+          this.loadCategoryBrands(this.categories[0]);
         }
         this.isLoading = false;
       },
-      error: () => {
-        this.loadAllCategories();
-      }
+      error: () => this.loadAllCategories()
     });
   }
 
@@ -89,26 +83,22 @@ export class SidebarFilter implements OnInit {
     this.productService.getCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
-        this.isLoading = false;
         this.expandActiveCategory();
-      },
-      error: () => {
         this.isLoading = false;
-      }
+      },
+      error: () => this.isLoading = false
     });
   }
 
   loadCategoryBrands(category: Category): void {
     if (category.brands?.length) return;
 
-    this.productService.getCategoryBrands(category.id).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (brands) => {
+    this.productService.getCategoryBrands(category.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(brands => {
         category.brands = brands;
         category.selectedBrands = [];
-      }
-    });
+      });
   }
 
   expandActiveCategory(): void {
@@ -155,7 +145,10 @@ export class SidebarFilter implements OnInit {
   }
 
   updateFilters(): void {
-    this.filterChange.emit({ brands: this.getSelectedBrands() });
+    const selectedBrands = this.getSelectedBrands();
+    const brandNames = selectedBrands.map(brand => brand.name);
+    
+    this.filterChange.emit({ brands: brandNames });
   }
 
   getSelectedBrands(): Brand[] {
@@ -168,16 +161,6 @@ export class SidebarFilter implements OnInit {
     });
     
     return selectedBrands;
-  }
-
-  resetFilters(): void {
-    this.selectedBrands = {};
-    
-    this.categories.forEach(category => {
-      category.selectedBrands = [];
-    });
-    
-    this.updateFilters();
   }
 }
 

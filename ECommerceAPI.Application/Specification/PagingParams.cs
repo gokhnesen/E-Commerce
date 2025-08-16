@@ -8,10 +8,10 @@ namespace ECommerceAPI.Application.Specification
 {
     public class PagingParams
     {
-        private const int MaxPageSize = 50;
+        private const int MaxPageSize = 500;
         public int PageIndex { get; set; } = 1;
 
-        public int _pageSize = 6;
+        public int _pageSize = 8;
 
         public int PageSize
         {

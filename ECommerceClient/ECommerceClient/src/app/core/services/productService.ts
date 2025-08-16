@@ -20,57 +20,51 @@ export class ProductService {
   route: any;
   shopParams: any;
 
-  getProducts(shopParams: ShopParams): Observable<Pagination<Product>> {
-    console.log('🚀 Service getProducts çağrıldı');
-    console.log('📦 ShopParams:', shopParams);
-
-    let params = new HttpParams();
-
-    if (shopParams.brands?.length) {
-      const brandNames = [...new Set(
-        shopParams.brands
-          .map(b => typeof b === 'object' && b && 'name' in b ? (b as any).name : b)
-          .filter(Boolean) as string[]
-      )];
-      if (brandNames.length) {
-        params = params.append('brands', brandNames.join(','));
-      }
-    }
-
-    if (shopParams.categories?.length) {
-       params = params.append('categories', shopParams.categories.join(','));
-    }
-
-    if (shopParams.sort?.trim()) {
-      params = params.append('sort', shopParams.sort.trim());
-    }
-
-    if (shopParams.pageNumber > 0) {
-      params = params.append('pageNumber', shopParams.pageNumber);
-    }
-
-    if (shopParams.pageSize > 0) {
-      params = params.append('pageSize', shopParams.pageSize);
-    }
-
-    if (shopParams.search) {
-      params = params.append('search', shopParams.search);
-    }
-
-    const finalUrl = this.baseURL + 'Product' + (params.toString() ? '?' + params.toString() : '');
-    console.log('🔗 Final URL:', finalUrl);
-
-    return this.http.get<Pagination<Product>>(this.baseURL + 'Product', { params }).pipe(
-      tap(r => {
-        console.log('✅ API Response RAW:', r);
-        console.log('🧩 Keys:', Object.keys(r || {}));
-      }),
-      catchError(err => {
-        console.error('❌ getProducts Error:', err);
-        return throwError(() => err);
-      })
-    );
+getProducts(shopParams: ShopParams): Observable<any> {
+  let params = new HttpParams();
+  
+  // Backend PageIndex ve PageSize kullanıyor
+  params = params.append('PageIndex', shopParams.pageNumber.toString());
+  params = params.append('PageSize', shopParams.pageSize.toString());
+  
+  if (shopParams.sort) {
+    params = params.append('sort', shopParams.sort);
   }
+  
+  if (shopParams.search) {
+    params = params.append('search', shopParams.search);
+  }
+  
+  // Marka parametresi - Her bir marka için ayrı bir Brands parametresi ekle
+  if (shopParams.brands && shopParams.brands.length > 0) {
+    // ID yerine marka adını gönderme ihtimalini kontrol edin
+    // Eğer brands dizisinde ID'ler yerine marka adları varsa:
+    shopParams.brands.forEach(brand => {
+      params = params.append('Brands', brand);
+    });
+    
+    console.log('Gönderilen marka filtresi:', shopParams.brands);
+  }
+  
+  // Kategori parametresi - Her bir kategori için ayrı bir Categories parametresi ekle
+  if (shopParams.categories && shopParams.categories.length > 0) {
+    shopParams.categories.forEach(category => {
+      params = params.append('Categories', category);
+    });
+  }
+  
+  console.log('API isteği URL parametreleri:', params.toString());
+  
+  return this.http.get<any>(`${this.baseURL}product`, { params }).pipe(
+    tap(response => {
+      console.log('API Yanıtı:', response);
+    }),
+    catchError(error => {
+      console.error('API Hatası:', error);
+      return throwError(() => error);
+    })
+  );
+}
 
   getProduct(id: string): Observable<Product> {
     const finalUrl = `${this.baseURL}Product/${id}`;
@@ -93,6 +87,9 @@ export class ProductService {
   }
 
   getProductsByCategory(slug: string, current?: Partial<ShopParams>): Observable<Pagination<Product>> {
+    console.log('📂 getProductsByCategory', slug, current);
+    
+    // Kategoriye göre ShopParams oluştur
     const merged: ShopParams = {
       brands: current?.brands ?? [],
       categories: slug ? [slug] : [],
@@ -101,7 +98,10 @@ export class ProductService {
       pageSize: current?.pageSize ?? 9,
       search: current?.search ?? ''
     };
-    console.log('📂 getProductsByCategory', slug, merged);
+    
+    // Marka ID'leri yerine marka adları gönderiliyor olabilir
+    // Eğer marka listesini kontrol etmeniz gerekiyorsa, burada yapabilirsiniz
+    
     return this.getProducts(merged);
   }
 
@@ -226,4 +226,6 @@ getCategoryByName(categoryName: string): Observable<Category> {
     })
   );
 }
+
+
 }

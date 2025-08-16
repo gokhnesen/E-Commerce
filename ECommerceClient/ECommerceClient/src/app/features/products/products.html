@@ -1,23 +1,8 @@
-@if(products$){
+@if(products && products.length > 0){
 <div class="container mx-auto p-4">
    <div class="flex justify-between gap-3 mb-4">
-      <mat-paginator
-      class="bg-white flex-grow" 
-      (page)="handlePageEvent($event)"
-      [length]="totalCount"
-      [pageSize]="shopParams.pageSize"
-      [showFirstLastButtons]="true"
-      [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="shopParams.pageNumber - 1"
-      aria-label="Select page"
-      >
-      </mat-paginator>
 
       <div class="flex gap-3">
-         <button class="match-input-height" mat-stroked-button (click)="openFiltersDialog()">
-            <mat-icon>filter_list</mat-icon>
-            Filtrele
-         </button>
          <button class="match-input-height" mat-stroked-button [matMenuTriggerFor]="sortMenu">
             <mat-icon>swap_vert</mat-icon>
             Sırala
@@ -26,13 +11,26 @@
    </div>
    
    <div class="flex gap-6">
-      
-      <!-- Products Grid -->
-      <div class="w-3/4">
-         <div class="grid grid-cols-3 gap-4">
-            @for (product of (products$ | async); track product.id) {
+      <!-- Products Grid with Infinite Scroll -->
+      <div class="w-full"
+           infiniteScroll
+           [infiniteScrollDistance]="2"
+           [infiniteScrollThrottle]="50"
+           (scrolled)="onScroll()">
+         <div class="grid grid-cols-4 gap-4">
+            @for (product of products; track product.id) {
                <app-product-item [product]="product"></app-product-item>
             }
+         </div>
+         
+         <!-- Loading indicator -->
+         <div *ngIf="loading" class="flex justify-center my-8">
+            <mat-spinner [diameter]="40"></mat-spinner>
+         </div>
+         
+         <!-- End of products message -->
+         <div *ngIf="!loading && noMoreProducts" class="text-center my-8 text-gray-500">
+            Tüm ürünleri gördünüz
          </div>
       </div>
    </div>
@@ -47,5 +45,12 @@
       }
    </mat-selection-list>
 </mat-menu>
+} @else if(loading) {
+<div class="flex justify-center my-8">
+   <mat-spinner [diameter]="40"></mat-spinner>
+</div>
+} @else {
+<div class="text-center my-8">
+   <p class="text-gray-500">Ürün bulunamadı.</p>
+</div>
 }
-

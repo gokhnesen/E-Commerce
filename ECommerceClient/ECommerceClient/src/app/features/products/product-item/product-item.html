@@ -1,5 +1,5 @@
 @if (product) {
-    <mat-card appearance="outlined" routerLink="/product/{{product.id}}" class="product-card h-full">
+    <mat-card appearance="outlined" routerLink="/product/{{product.id}}" class="product-card h-full relative group">
         <!-- Ürün görseli için kare konteyner -->
         <div class="image-container">
             <img src="{{product.pictureUrl}}" alt="{{product.name}}" class="product-image">
@@ -19,12 +19,12 @@
             <p class="font-light">{{product.price | currency:'₺':'symbol':'1.2-2'}}</p>    
         </mat-card-content>
         
-        <!-- Sepete ekle düğmesi -->
-        <mat-card-actions (click)="$event.stopPropagation()">
-            <button mat-stroked-button color="primary" class="w-full" (click)="cartService.addItemToCart(product)">
+        <!-- Sepete ekle düğmesi - hover olduğunda görünür -->
+        <div class="absolute bottom-0 left-0 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-3 bg-white bg-opacity-95">
+            <button mat-stroked-button color="primary" class="w-full" (click)="$event.stopPropagation(); cartService.addItemToCart(product)">
                 <mat-icon>add_shopping_cart</mat-icon>
                 Sepete Ekle
             </button>
-        </mat-card-actions>
+        </div>
     </mat-card>
 }

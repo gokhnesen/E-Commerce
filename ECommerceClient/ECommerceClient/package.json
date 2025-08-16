@@ -25,6 +25,7 @@
     "@tailwindcss/postcss": "^4.1.9",
     "express": "^5.1.0",
     "nanoid": "^5.1.5",
+    "ngx-infinite-scroll": "^20.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

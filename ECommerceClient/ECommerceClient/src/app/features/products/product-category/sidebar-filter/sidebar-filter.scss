@@ -105,3 +105,26 @@
   color: #666;
   font-style: italic;
 }
+
+/* product-category.scss */
+
+/* Sabit sidebar için */
+.sticky {
+  position: sticky;
+  top: 1rem; /* En üstten uzaklık */
+}
+
+/* Sayfa boyunca sidebarın görünür kalması için */
+.max-h-screen {
+  max-height: calc(100vh - 2rem); /* Ekran yüksekliği - top değeri */
+}
+
+/* Sidebar içeriği ekran yüksekliğinden uzunsa kaydırma çubuğu ekle */
+.overflow-auto {
+  overflow: auto;
+}
+
+/* Kaydırılabilir alanlar için padding-bottom ekle */
+.pb-4 {
+  padding-bottom: 1rem;
+}

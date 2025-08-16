@@ -2,41 +2,21 @@
 <div class="container mx-auto p-4">
   <h2 class="text-xl font-semibold mb-4">{{ slug | titlecase }}</h2>
 
-  <div class="flex justify-between gap-3 mb-4">
-    <mat-paginator
-      class="bg-white flex-grow"
-      (page)="handlePageEvent($event)"
-      [length]="totalCount"
-      [pageSize]="shopParams.pageSize"
-      [showFirstLastButtons]="true"
-      [pageSizeOptions]="pageSizeOptions"
-      [pageIndex]="shopParams.pageNumber - 1"
-      aria-label="Select page">
-    </mat-paginator>
-
-    <div class="flex gap-3">
-      <button class="match-input-height" mat-stroked-button (click)="openFiltersDialog()">
-        <mat-icon>filter_list</mat-icon>
-        Filtrele
-      </button>
-      <button class="match-input-height" mat-stroked-button [matMenuTriggerFor]="sortMenu">
-        <mat-icon>swap_vert</mat-icon>
-        Sırala
-      </button>
-    </div>
-  </div>
-
   <div class="flex gap-6">
-    <!-- Sidebar Filtresi -->
-    <div class="hidden md:block w-1/4">
+    <!-- Sidebar Filtresi - Yapışkan hale getirildi -->
+    <div class="hidden md:block w-1/4 sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-auto">
       <app-sidebar-filter 
         (filterChange)="onFilterChange($event)">
       </app-sidebar-filter>
     </div>
     
-    <!-- Ürün Listesi -->
-    <div class="w-full md:w-3/4">
-      @if (loading) {
+    <!-- Ürün Listesi - Sonsuz kaydırma eklendi -->
+    <div class="w-full md:w-3/4"
+         infiniteScroll
+         [infiniteScrollDistance]="2"
+         [infiniteScrollThrottle]="50"
+         (scrolled)="onScroll()">
+      @if (loading && !(products$ | async)?.length) {
         <div class="p-8 text-center text-gray-500">Yükleniyor...</div>
       }
       
@@ -46,7 +26,7 @@
         </div>
       }
 
-      @if (!loading && (products$ | async)?.length) {
+      @if ((products$ | async)?.length) {
         <!-- Grid 4 sütunlu, sabit yükseklikli kartlar -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (product of (products$ | async); track product.id) {
@@ -58,6 +38,20 @@
             </div>
           }
         </div>
+        
+        <!-- Daha fazla içerik yüklenirken gösterilecek spinner -->
+        @if (loadingMore) {
+          <div class="flex justify-center my-8">
+            <mat-spinner [diameter]="40"></mat-spinner>
+          </div>
+        }
+        
+        <!-- Tüm ürünler yüklendiğinde gösterilecek mesaj -->
+        @if (!loadingMore && noMoreProducts) {
+          <div class="text-center my-8 text-gray-500">
+            Tüm ürünleri gördünüz
+          </div>
+        }
       }
     </div>
   </div>
