@@ -6,7 +6,9 @@
     <!-- Sidebar Filtresi - Yapışkan hale getirildi -->
     <div class="hidden md:block w-1/4 sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-auto">
       <app-sidebar-filter 
-        (filterChange)="onFilterChange($event)">
+        [activeCategory]="slug" 
+        (filterChange)="onFilterChange($event)"
+        [selectedBrands]="shopParams.brands">
       </app-sidebar-filter>
     </div>
     

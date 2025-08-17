@@ -13,6 +13,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink } from '@angular/router';
 import { DialogService } from '../../core/services/dialogService';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ProductService } from '../../core/services/productService';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-admin',
@@ -27,14 +32,16 @@ import { DialogService } from '../../core/services/dialogService';
     MatLabel,
     MatTooltipModule,
     MatTabsModule,
-    RouterLink
-
+    RouterLink,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule
   ],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
 })
 export class Admin implements OnInit {
-
   displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status','action'];
   dataSource = new MatTableDataSource<Order>([]);
   private adminService = inject(AdminService); 
@@ -44,6 +51,21 @@ export class Admin implements OnInit {
   totalItems = 0;
   statusOptions = ['All', 'PaymentReceived', 'PaymentMismatch', 'Refunded', 'Pending'];
   loading = true;
+  productForm: FormGroup;
+  addProductSuccess = false;
+  addProductError = false;
+  private productService = inject(ProductService);
+
+  constructor(private fb: FormBuilder) {
+    this.productForm = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      price: [null, Validators.required],
+      categoryId: ['', Validators.required],
+      brandId: ['', Validators.required]
+    });
+  }
+
   ngOnInit(): void {
     this.loadOrders();
   }
@@ -97,6 +119,21 @@ export class Admin implements OnInit {
     this.adminService.refundOrder(id).subscribe({
       next: order =>{
         this.dataSource.data = this.dataSource.data.map(o => o.id === order.id ? order : o);
+      }
+    });
+  }
+
+  addProduct() {
+    if (this.productForm.invalid) return;
+    this.productService.addProduct(this.productForm.value).subscribe({
+      next: () => {
+        this.addProductSuccess = true;
+        this.addProductError = false;
+        this.productForm.reset();
+      },
+      error: () => {
+        this.addProductSuccess = false;
+        this.addProductError = true;
       }
     });
   }

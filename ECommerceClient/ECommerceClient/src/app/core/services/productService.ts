@@ -227,5 +227,7 @@ getCategoryByName(categoryName: string): Observable<Category> {
   );
 }
 
-
+addProduct(product: any) {
+  return this.http.post('/api/product', product);
+}
 }

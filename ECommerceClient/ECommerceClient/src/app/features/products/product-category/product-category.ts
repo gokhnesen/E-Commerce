@@ -71,22 +71,29 @@ export class ProductCategory implements OnInit {
   ];
 
     ngOnInit(): void {
-    this.route.paramMap
-      .pipe(
-        tap(pm => {
-          const newSlug = pm.get('slug') ?? '';
-          if (newSlug !== this.slug) {
-            // Yeni bir kategoriye geçiş yapıldığında tüm değişkenleri sıfırla
-            this.slug = newSlug;
-            this.shopParams.pageNumber = 1;
-            this.noMoreProducts = false; // Sıfırla
-            this.products$.next([]); // Ürünleri temizle
-          }
-        }),
-        switchMap(() => this.fetchProducts())
-      )
-      .subscribe();
-  }
+  this.route.paramMap
+    .pipe(
+      tap(pm => {
+        const newSlug = pm.get('slug') ?? '';
+        if (newSlug !== this.slug) {
+          // Yeni bir kategoriye geçiş yapıldığında tüm değişkenleri sıfırla
+          this.slug = newSlug;
+          this.shopParams = {
+            brands: [],
+            categories: [],
+            sort: 'name',
+            pageNumber: 1,
+            pageSize: 9,
+            search: ''
+          }; // Reset all filters completely when changing categories
+          this.noMoreProducts = false;
+          this.products$.next([]);
+        }
+      }),
+      switchMap(() => this.fetchProducts())
+    )
+    .subscribe();
+}
 
   private mapResponse(res: any): Product[] {
     if (!res) return [];

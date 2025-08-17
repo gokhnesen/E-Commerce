@@ -1,4 +1,3 @@
-
 <div class="sidebar-filter">
 
   
@@ -18,7 +17,7 @@
         <div *ngIf="category.brands && category.brands.length > 0">
           <div *ngFor="let brand of category.brands" class="brand-item">
             <mat-checkbox 
-              [checked]="isBrandSelected(brand)" 
+              [checked]="selectedBrandMap[brand.id]" 
               (change)="toggleBrand(brand, category)">
               {{ brand.name }}
             </mat-checkbox>
