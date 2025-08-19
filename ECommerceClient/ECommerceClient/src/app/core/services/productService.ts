@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable, OnInit } from '@angular/core';
 import { Observable, tap, catchError, throwError, of, map } from 'rxjs';
 import { Product } from '../../shared/models/product';
@@ -12,6 +12,12 @@ import { Category, SubCategory } from '../../shared/models/category';
   providedIn: 'root'
 })
 export class ProductService {
+  uploadImage(formData: FormData) {
+    throw new Error('Method not implemented.');
+  }
+  addProduct(productData: any) {
+    throw new Error('Method not implemented.');
+  }
 
   baseURL = environment.apiUrl;
   private http = inject(HttpClient);
@@ -225,9 +231,5 @@ getCategoryByName(categoryName: string): Observable<Category> {
       return throwError(() => error);
     })
   );
-}
-
-addProduct(product: any) {
-  return this.http.post('/api/product', product);
 }
 }

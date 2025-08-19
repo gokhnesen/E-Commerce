@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import {MatTableDataSource, MatTableModule} from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Order } from '../../shared/models/order';
 import { AdminService } from '../../core/services/adminService';
 import { OrderParams } from '../../shared/models/orderParams';
@@ -42,9 +42,10 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './admin.scss'
 })
 export class Admin implements OnInit {
-  displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status','action'];
+[x: string]: any;
+  displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status', 'action'];
   dataSource = new MatTableDataSource<Order>([]);
-  private adminService = inject(AdminService); 
+  private adminService = inject(AdminService);
   private dialogService = inject(DialogService)
   private cdr = inject(ChangeDetectorRef);
   orderParams = new OrderParams();
@@ -56,13 +57,19 @@ export class Admin implements OnInit {
   addProductError = false;
   private productService = inject(ProductService);
 
+
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
+
+
   constructor(private fb: FormBuilder) {
-    this.productForm = this.fb.group({
+this.productForm = this.fb.group({
       name: ['', Validators.required],
       description: [''],
       price: [null, Validators.required],
-      categoryId: ['', Validators.required],
-      brandId: ['', Validators.required]
+      stock: [0, Validators.required],
+      categoryName: ['', Validators.required],
+      brandName: ['', Validators.required]
     });
   }
 
@@ -75,7 +82,7 @@ export class Admin implements OnInit {
     this.adminService.getOrders(this.orderParams).subscribe({
       next: response => {
         console.log('Admin orders response:', response);
-        if(response.data){
+        if (response.data) {
           this.dataSource.data = response.data;
           this.totalItems = response.count;
           console.log('Orders loaded:', response.data);
@@ -101,41 +108,92 @@ export class Admin implements OnInit {
     this.loadOrders();
   }
 
-  onFilterSelect(event: MatSelectChange){
+  onFilterSelect(event: MatSelectChange) {
     this.orderParams.filter = event.value;
     this.orderParams.pageNumber = 1;
     this.loadOrders();
   }
 
-  async openConfirmDialog(id: string){
+  async openConfirmDialog(id: string) {
     const confirmed = await this.dialogService.confirm(
       'Confirm Refund',
       'Are you sure you want to refund this order?'
     )
-    if(confirmed) this.refundOrder(id);
+    if (confirmed) this.refundOrder(id);
   }
 
-  refundOrder(id: string){
+  refundOrder(id: string) {
     this.adminService.refundOrder(id).subscribe({
-      next: order =>{
+      next: order => {
         this.dataSource.data = this.dataSource.data.map(o => o.id === order.id ? order : o);
       }
     });
   }
 
-  addProduct() {
-    if (this.productForm.invalid) return;
-    this.productService.addProduct(this.productForm.value).subscribe({
-      next: () => {
-        this.addProductSuccess = true;
-        this.addProductError = false;
-        this.productForm.reset();
-      },
-      error: () => {
-        this.addProductSuccess = false;
-        this.addProductError = true;
-      }
-    });
-  }
-}
+  onFileSelected(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.selectedFile = input.files[0];
 
+    // 👇 küçük önizleme için
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(this.selectedFile);
+  }
+  }
+
+ addProduct() {
+  if (this.productForm.invalid) {
+    console.log('Form geçersiz:', this.productForm.errors);
+    this.markFormGroupTouched();
+    return;
+  }
+  if (!this.selectedFile) {
+    console.log('Dosya seçilmedi');
+    return;
+  }
+
+  console.log('Form değerleri:', this.productForm.value);
+
+  const formData = new FormData();
+  formData.append('Image', this.selectedFile);
+
+  this.adminService.uploadImage(formData).subscribe({
+    next: (response: any) => {
+      const pictureUrl = response.pictureUrl;
+      const productData = {
+        ...this.productForm.value,
+        pictureUrl,
+      };
+
+      this.adminService.addProduct(productData).subscribe({
+        next: () => {
+          this.addProductSuccess = true;
+          this.addProductError = false;
+          this.productForm.reset();
+          this.selectedFile = null;
+          this.previewUrl = null;
+        },
+        error: (error) => {
+          console.error('Ürün ekleme hatası:', error);
+          this.addProductSuccess = false;
+          this.addProductError = true;
+        }
+      });
+    },
+    error: (error) => {
+      console.error('Resim yükleme hatası:', error);
+      this.addProductSuccess = false;
+      this.addProductError = true;
+    }
+  });
+}
+private markFormGroupTouched() {
+  Object.keys(this.productForm.controls).forEach(key => {
+    const control = this.productForm.get(key);
+    control?.markAsTouched();
+  });
+}
+}

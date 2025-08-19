@@ -58,5 +58,34 @@ namespace ECommerceAPI.API.Controllers
             UpdateProductResponse response = await Mediator.Send(updateProductCommand);
             return Ok(response);
         }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadImage([FromForm] UploadImageDto dto)
+        {
+            var image = dto.Image;
+            if (image == null || image.Length == 0)
+                return BadRequest("Resim dosyası seçilmedi.");
+
+            // wwwroot/images/products klasörü
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            // Benzersiz dosya adı
+            var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            // ✅ Tam URL (Angular tarafında <img> ile direkt kullanılır)
+            var imageUrl = $"{Request.Scheme}://{Request.Host}/images/products/{fileName}";
+            return Ok(new { pictureUrl = imageUrl });
+        }
     }
 }

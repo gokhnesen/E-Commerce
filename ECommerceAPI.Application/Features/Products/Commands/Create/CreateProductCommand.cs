@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,10 @@ namespace ECommerceAPI.Application.Features.Products.Commands.Create
         public string? BrandName { get; set; }
         public string CategoryName { get; set; }
 
+    }
+
+    public class UploadImageDto
+    {
+        public IFormFile Image { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { OrderParams } from '../../shared/models/orderParams';
 import { Pagination } from '../../shared/models/pagination';
 import { Order } from '../../shared/models/order';
@@ -29,5 +29,13 @@ export class AdminService {
 
   refundOrder(id: string) {
     return this.http.post<Order>(this.baseUrl + 'admin/orders/refund/' + id, {});
+  }
+
+  addProduct(product: any) {
+    return this.http.post(this.baseUrl + 'product/add', product);
+  }
+
+  uploadImage(formData: FormData) {
+    return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/upload-image', formData);
   }
   }

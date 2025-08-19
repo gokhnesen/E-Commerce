@@ -101,6 +101,7 @@ namespace ECommerceAPI
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<ExceptionMiddleware>();
+            app.UseStaticFiles();
             app.MapControllers();
             app.MapGroup("api").MapIdentityApi<User>();
             app.MapHub<NotificationHub>("/hub/notifications");
