@@ -47,7 +47,7 @@ export class Header {
 
   onSearch() {
     if (this.searchTerm.trim()) {
-      this.router.navigate(['/products'], { 
+      this.router.navigate(['/'], { 
         queryParams: { search: this.searchTerm.trim() } 
       }).then(() => {
         window.location.reload();

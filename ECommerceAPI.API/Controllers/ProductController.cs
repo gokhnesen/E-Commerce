@@ -87,5 +87,38 @@ namespace ECommerceAPI.API.Controllers
             var imageUrl = $"{Request.Scheme}://{Request.Host}/images/products/{fileName}";
             return Ok(new { pictureUrl = imageUrl });
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("update-image/{id}")]
+        public async Task<IActionResult> UpdateImage([FromRoute] Guid id, [FromForm] UploadImageDto dto)
+        {
+            var image = dto.Image;
+            if (image == null || image.Length == 0)
+                return BadRequest("Resim dosyası seçilmedi.");
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            var imageUrl = $"{Request.Scheme}://{Request.Host}/images/products/{fileName}";
+
+            // Update product's PictureUrl
+            var updateCommand = new UpdateProductCommand
+            {
+                Id = id,
+                PictureUrl = imageUrl
+            };
+            var response = await Mediator.Send(updateCommand);
+
+            return Ok(new { pictureUrl = imageUrl, product = response });
+        }
     }
 }

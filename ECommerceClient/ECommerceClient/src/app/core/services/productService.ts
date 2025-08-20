@@ -12,13 +12,6 @@ import { Category, SubCategory } from '../../shared/models/category';
   providedIn: 'root'
 })
 export class ProductService {
-  uploadImage(formData: FormData) {
-    throw new Error('Method not implemented.');
-  }
-  addProduct(productData: any) {
-    throw new Error('Method not implemented.');
-  }
-
   baseURL = environment.apiUrl;
   private http = inject(HttpClient);
   brands: Brand[] = [];

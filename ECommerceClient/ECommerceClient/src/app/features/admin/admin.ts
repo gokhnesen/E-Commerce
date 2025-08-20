@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../core/services/productService';
+import { Product } from '../../shared/models/product';
 import { MatInputModule } from '@angular/material/input';
 
 @Component({
@@ -42,7 +43,6 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './admin.scss'
 })
 export class Admin implements OnInit {
-[x: string]: any;
   displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status', 'action'];
   dataSource = new MatTableDataSource<Order>([]);
   private adminService = inject(AdminService);
@@ -60,21 +60,54 @@ export class Admin implements OnInit {
 
   selectedFile: File | null = null;
   previewUrl: string | null = null;
+  updatePreviewUrl: string | null = null;
+  updateSelectedFile: File | null = null;
 
+  categories: any[] = [];
+  brands: any[] = [];
 
-  constructor(private fb: FormBuilder) {
-this.productForm = this.fb.group({
-      name: ['', Validators.required],
-      description: [''],
-      price: [null, Validators.required],
-      stock: [0, Validators.required],
-      categoryName: ['', Validators.required],
-      brandName: ['', Validators.required]
-    });
-  }
+  categoryForm: FormGroup;
+  brandForm: FormGroup;
+
+  products: Product[] = [];
+  filteredProducts: Product[] = [];
+  productSearchTerm: string = '';
+  showUpdateForm = false;
+  updateForm: FormGroup;
+  selectedProductId: string | null = null;
+
+constructor(private fb: FormBuilder) {
+  this.productForm = this.fb.group({
+    name: ['', Validators.required],
+    description: [''],
+    price: [null, Validators.required],
+    stock: [0, Validators.required],
+    categoryName: ['', Validators.required],
+    brandName: ['', Validators.required]
+  });
+  this.categoryForm = this.fb.group({
+    name: ['', Validators.required]
+  });
+  this.brandForm = this.fb.group({
+    name: ['', Validators.required]
+  });
+  this.updateForm = this.fb.group({
+    name: ['', Validators.required],
+    description: [''],
+    price: [0, Validators.required],
+    stock: [0, Validators.required]
+  });
+}
 
   ngOnInit(): void {
     this.loadOrders();
+
+    // Kategorileri getir
+    this.productService.getCategories().subscribe({
+      next: (data) => this.categories = data,
+      error: (err) => console.error(err)
+    });
+    this.loadProducts();
   }
 
   loadOrders() {
@@ -99,6 +132,22 @@ this.productForm = this.fb.group({
         this.loading = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  loadProducts() {
+    this.productService.getProducts({
+      pageNumber: 1, pageSize: 50,
+      brands: [],
+      categories: [],
+      sort: '',
+      search: ''
+    }).subscribe({
+      next: (res) => {
+        this.products = res.data || res;
+        this.filteredProducts = this.products;
+      },
+      error: (err) => console.error('Ürünler yüklenemedi:', err)
     });
   }
 
@@ -145,29 +194,23 @@ this.productForm = this.fb.group({
   }
 
  addProduct() {
-  if (this.productForm.invalid) {
-    console.log('Form geçersiz:', this.productForm.errors);
-    this.markFormGroupTouched();
-    return;
-  }
-  if (!this.selectedFile) {
-    console.log('Dosya seçilmedi');
-    return;
-  }
+  if (this.productForm.invalid || !this.selectedFile) return;
 
-  console.log('Form değerleri:', this.productForm.value);
+  const formValue = this.productForm.value;
+  // ID'den kategori adını bul
+  const selectedCategory = this.categories.find(cat => cat.id === formValue.categoryName);
+  const categoryName = selectedCategory ? selectedCategory.name : '';
 
   const formData = new FormData();
   formData.append('Image', this.selectedFile);
 
   this.adminService.uploadImage(formData).subscribe({
     next: (response: any) => {
-      const pictureUrl = response.pictureUrl;
       const productData = {
-        ...this.productForm.value,
-        pictureUrl,
+        ...formValue,
+        categoryName, // Artık name gönderiliyor!
+        pictureUrl: response.pictureUrl
       };
-
       this.adminService.addProduct(productData).subscribe({
         next: () => {
           this.addProductSuccess = true;
@@ -176,15 +219,13 @@ this.productForm = this.fb.group({
           this.selectedFile = null;
           this.previewUrl = null;
         },
-        error: (error) => {
-          console.error('Ürün ekleme hatası:', error);
+        error: (error: any) => {
           this.addProductSuccess = false;
           this.addProductError = true;
         }
       });
     },
-    error: (error) => {
-      console.error('Resim yükleme hatası:', error);
+    error: (error: any) => {
       this.addProductSuccess = false;
       this.addProductError = true;
     }
@@ -195,5 +236,122 @@ private markFormGroupTouched() {
     const control = this.productForm.get(key);
     control?.markAsTouched();
   });
+}
+
+onCategoryChange(event: any) {
+    const categoryId = event.value;
+    this.productForm.patchValue({ brandName: null }); // Marka seçimini sıfırla
+    this.productService.getCategoryBrands(categoryId).subscribe({
+      next: (data) => this.brands = data,
+      error: (err) => console.error(err)
+    });
+  }
+
+  addCategory() {
+  if (this.categoryForm.invalid) return;
+  const categoryName = this.categoryForm.value.name;
+  // Servis ile kategori ekle (örnek)
+  this.adminService.addCategory({ name: categoryName }).subscribe({
+    next: (cat) => {
+      this.categories.push(cat);
+      this.categoryForm.reset();
+    },
+    error: (err) => console.error('Kategori ekleme hatası:', err)
+  });
+}
+
+addBrand() {
+  if (this.brandForm.invalid) return;
+  const brandName = this.brandForm.value.name;
+  // Servis ile marka ekle (örnek)
+  this.adminService.addBrand({ name: brandName }).subscribe({
+    next: (brand) => {
+      this.brands.push(brand);
+      this.brandForm.reset();
+    },
+    error: (err) => console.error('Marka ekleme hatası:', err)
+  });
+}
+
+deleteProduct(id: string) {
+    this.adminService.deleteProduct(id).subscribe({
+      next: () => {
+        this.products = this.products.filter(p => p.id !== id);
+      },
+      error: (err) => console.error('Silme hatası:', err)
+    });
+  }
+
+  openUpdateForm(product: Product) {
+    this.showUpdateForm = true;
+    this.selectedProductId = product.id;
+    this.updateForm.patchValue({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock
+    });
+    this.updatePreviewUrl = product.pictureUrl;
+    this.updateSelectedFile = null;
+  }
+
+  closeUpdateForm() {
+    this.showUpdateForm = false;
+    this.selectedProductId = null;
+    this.updateForm.reset();
+  }
+
+  onUpdateFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.updateSelectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => this.updatePreviewUrl = e.target.result;
+      reader.readAsDataURL(file);
+    }
+  }
+
+  updateProduct() {
+  if (this.updateForm.invalid) return;
+  const updated = {
+    ...this.updateForm.value,
+    id: this.selectedProductId
+  };
+
+  // Eğer yeni fotoğraf seçildiyse önce upload et
+  if (this.updateSelectedFile) {
+    const formData = new FormData();
+    formData.append('Image', this.updateSelectedFile);
+    this.adminService.updateProductImage(this.selectedProductId!, formData).subscribe({
+      next: (res) => {
+        updated.pictureUrl = res.pictureUrl;
+        this.sendUpdateProduct(updated);
+      },
+      error: (err) => { /* hata yönetimi */ }
+    });
+  } else {
+    this.sendUpdateProduct(updated);
+  }
+}
+
+sendUpdateProduct(updated: any) {
+  this.adminService.updateProduct(updated).subscribe({
+    next: (res) => {
+      // ürün listeni güncelle
+      this.closeUpdateForm();
+    },
+    error: (err) => { /* hata yönetimi */ }
+  });
+}
+
+onProductSearch() {
+  const term = this.productSearchTerm.trim().toLowerCase();
+  if (!term) {
+    this.filteredProducts = this.products;
+    return;
+  }
+  this.filteredProducts = this.products.filter(p =>
+    p.name.toLowerCase().includes(term)
+  );
 }
 }

@@ -4,11 +4,21 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { OrderParams } from '../../shared/models/orderParams';
 import { Pagination } from '../../shared/models/pagination';
 import { Order } from '../../shared/models/order';
+import { Brand } from '../../shared/models/brands';
+import { Category } from '../../shared/models/category';
+import { Observable } from 'rxjs/internal/Observable';
+import { Product } from '../../shared/models/product';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
+  getCategories() {
+    throw new Error('Method not implemented.');
+  }
+  getCategoryBrands(categoryId: any) {
+    throw new Error('Method not implemented.');
+  }
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
@@ -38,4 +48,24 @@ export class AdminService {
   uploadImage(formData: FormData) {
     return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/upload-image', formData);
   }
+
+  addCategory(category: { name: string }) { 
+    return this.http.post<Category>(this.baseUrl + 'category', category); 
   }
+
+  addBrand(brand: { name: string }) { 
+  return this.http.post<Brand>(this.baseUrl + 'brands', brand); 
+}
+deleteProduct(id: string): Observable<any> {
+  return this.http.delete(this.baseUrl + 'Product/' + id);
+}
+
+updateProduct(product: any): Observable<Product> {
+  
+  return this.http.put<Product>(this.baseUrl + 'product', product);
+}
+updateProductImage(productId: string, formData: FormData): Observable<{ pictureUrl: string }> {
+  
+  return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/update-image/' + productId, formData);
+}
+}
