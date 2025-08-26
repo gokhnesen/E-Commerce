@@ -1,11 +1,9 @@
 @if (product) {
     <mat-card appearance="outlined" routerLink="/product/{{product.id}}" class="product-card h-full relative group">
-        <!-- Ürün görseli için kare konteyner -->
+        
         <div class="image-container">
-            <img [src]="product.pictureUrl" alt="{{product.name}}" />
+            <img class="product-image" [src]="product.pictureUrl" alt="{{product.name}}" />
 
-            <!-- İsteğe bağlı: İndirim veya özel etiketler için -->
-            <!-- <span class="product-badge" *ngIf="product.discount">%{{product.discount}}</span> -->
         </div>
         
         <!-- Ürün bilgileri -->

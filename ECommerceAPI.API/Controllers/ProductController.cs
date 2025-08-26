@@ -9,6 +9,9 @@ using ECommerceAPI.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png; // or Jpeg
 
 namespace ECommerceAPI.API.Controllers
 {
@@ -68,22 +71,26 @@ namespace ECommerceAPI.API.Controllers
             if (image == null || image.Length == 0)
                 return BadRequest("Resim dosyası seçilmedi.");
 
-            // wwwroot/images/products klasörü
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            // Benzersiz dosya adı
             var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
 
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            // Resize image to 800x800 px
+            using (var inputStream = image.OpenReadStream())
+            using (var img = await Image.LoadAsync(inputStream))
             {
-                await image.CopyToAsync(stream);
+                img.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(1920, 1024),
+                    Mode = ResizeMode.Crop // or ResizeMode.Pad for padding
+                }));
+
+                await img.SaveAsync(filePath); // auto format based on extension
             }
 
-            // ✅ Tam URL (Angular tarafında <img> ile direkt kullanılır)
             var imageUrl = $"{Request.Scheme}://{Request.Host}/images/products/{fileName}";
             return Ok(new { pictureUrl = imageUrl });
         }
@@ -110,7 +117,7 @@ namespace ECommerceAPI.API.Controllers
 
             var imageUrl = $"{Request.Scheme}://{Request.Host}/images/products/{fileName}";
 
-            // Update product's PictureUrl
+            
             var updateCommand = new UpdateProductCommand
             {
                 Id = id,

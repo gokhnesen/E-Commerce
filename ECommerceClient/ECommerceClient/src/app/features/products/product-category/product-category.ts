@@ -226,29 +226,23 @@ export class ProductCategory implements OnInit {
   openFiltersDialog() {
     this.router.navigate(['products/category', this.slug], { queryParams: { ...this.shopParams } });
   }
-    // ...existing code...
 
 onFilterChange(event: any) {
   console.log('Filtre değişikliği:', event);
   
   if (event.brands) {
-    // Gelen veri doğrudan ID'ler olmalı
     this.shopParams.brands = event.brands;
     console.log('Filtrelenecek marka ID\'leri:', this.shopParams.brands);
     
-    // Sayfalama ve ürünleri sıfırla
     this.shopParams.pageNumber = 1;
-    this.products$.next([]); // BehaviorSubject kullanıyorsanız
+    this.products$.next([]); 
     this.noMoreProducts = false;
     
-    // Yeni filtrelere göre yükle
     this.fetchProducts().subscribe();
   }
 }
 
-// onScroll metodunu düzelt - getProducts yerine getProductsByCategory kullan
 onScroll() {
-  // Eğer daha fazla ürün yoksa veya zaten yükleme yapıyorsa, işlem yapma
   if (this.noMoreProducts || this.loadingMore || this.loading) {
     console.log('Kaydırma işlemi atlandı:', 
       this.noMoreProducts ? 'Tüm ürünler görüntülendi' : 'Yükleme zaten devam ediyor');
@@ -258,31 +252,24 @@ onScroll() {
   console.log(`Sayfa kaydırıldı, yeni sayfa: ${this.shopParams.pageNumber + 1}`);
   this.loadingMore = true;
   
-  // Sayfa numarasını artır
   this.shopParams.pageNumber++;
   
-  // Yeni sayfadaki ürünleri yükle - doğru metodu kullan
   this.productService.getProductsByCategory(this.slug, this.shopParams).subscribe({
     next: (response: any) => {
-      // Mevcut ürünleri al
       const currentProducts = this.products$.getValue() || [];
       
-      // Yeni ürünleri map et
       const newProducts = this.mapResponse(response);
       
-      // Tekrar eden ürünleri filtrele
       const existingIds = new Set(currentProducts.map(p => p.id));
       const uniqueNewProducts = newProducts.filter(p => !existingIds.has(p.id));
       
       console.log('Yeni ürünler:', uniqueNewProducts.length, 'Toplam gelen:', newProducts.length);
       
-      // Yeni ürün yoksa veya beklenen sayıdan az ürün geldiyse, daha fazla ürün olmadığını işaretle
       if (uniqueNewProducts.length === 0 || newProducts.length < this.shopParams.pageSize) {
         this.noMoreProducts = true;
         console.log('Tüm ürünler yüklendi, başka ürün kalmadı.');
       }
       
-      // Yeni ürünleri mevcut ürünlere ekle
       if (uniqueNewProducts.length > 0) {
         this.products$.next([...currentProducts, ...uniqueNewProducts]);
       }

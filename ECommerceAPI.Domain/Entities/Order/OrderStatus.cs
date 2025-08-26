@@ -8,15 +8,15 @@ namespace ECommerceAPI.Domain.Entities.Order
 {
     public enum OrderStatus
     {
-        Pending,
+        Beklemede,
 
-        PaymentReceived,
+        Başarılı,
 
-        PaymentFailed,
+        Başarısız,
 
-        PaymentMismatch,
+        ÖdemeUyuşmadı,
 
-        Refunded
+        İade
 
     }
 }

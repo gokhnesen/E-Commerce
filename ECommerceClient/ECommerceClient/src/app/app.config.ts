@@ -1,6 +1,7 @@
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, PLATFORM_ID } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, PLATFORM_ID, LOCALE_ID } from '@angular/core';
 import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, registerLocaleData } from '@angular/common';
+import localeTr from '@angular/common/locales/tr';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
@@ -13,16 +14,25 @@ import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { loadingInterceptor } from './core/interceptors/loading-interceptor';
 import { environment } from '../environments/environment';
 
+// Türkçe locale verilerini kaydet
+registerLocaleData(localeTr);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withEnabledBlockingInitialNavigation()), 
     ...(environment.production ? [provideClientHydration(withEventReplay())] : []),
-    provideHttpClient(withInterceptors([
-      authInterceptor, errorInterceptor,
-       loadingInterceptor
-    ])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([
+        authInterceptor, 
+        errorInterceptor,
+        loadingInterceptor
+      ])
+    ),
+    // Türkçe locale provider'ı ekleyin
+    { provide: LOCALE_ID, useValue: 'tr' },
     provideAppInitializer(() => {
       const platformId = inject(PLATFORM_ID);
              

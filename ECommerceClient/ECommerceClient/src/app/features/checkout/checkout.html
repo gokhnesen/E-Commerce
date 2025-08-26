@@ -11,7 +11,7 @@
                     <mat-checkbox
                     [checked]="saveAddress"
                     (change)="onSaveAddressCheckboxChange($event)"
-                    >Save as a default address
+                    >Adresi kaydet
                 </mat-checkbox>
                 </div>
                     <div class="flex justify-between mt-6">
@@ -51,7 +51,7 @@
                         @if (loading) {
                             <mat-spinner diameter="20"></mat-spinner>
                         } @else {
-                            <span>Öde {{cartService.totals()?.total | currency}}</span>
+                            <span>Öde {{cartService.totals()?.total | currency:'₺':'symbol':'1.2-2'}}</span>
                         }
 
                     </button>

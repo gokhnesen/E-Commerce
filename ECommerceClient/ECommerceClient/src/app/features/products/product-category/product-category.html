@@ -3,7 +3,6 @@
   <h2 class="text-xl font-semibold mb-4">{{ slug | titlecase }}</h2>
 
   <div class="flex gap-6">
-    <!-- Sidebar Filtresi - Yapışkan hale getirildi -->
     <div class="hidden md:block w-1/4 sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-auto">
       <app-sidebar-filter 
         [activeCategory]="slug" 
@@ -12,7 +11,6 @@
       </app-sidebar-filter>
     </div>
     
-    <!-- Ürün Listesi - Sonsuz kaydırma eklendi -->
     <div class="w-full md:w-3/4"
          infiniteScroll
          [infiniteScrollDistance]="2"
@@ -29,7 +27,6 @@
       }
 
       @if ((products$ | async)?.length) {
-        <!-- Grid 4 sütunlu, sabit yükseklikli kartlar -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (product of (products$ | async); track product.id) {
             <div class="flex flex-col h-full">
@@ -41,14 +38,12 @@
           }
         </div>
         
-        <!-- Daha fazla içerik yüklenirken gösterilecek spinner -->
         @if (loadingMore) {
           <div class="flex justify-center my-8">
             <mat-spinner [diameter]="40"></mat-spinner>
           </div>
         }
         
-        <!-- Tüm ürünler yüklendiğinde gösterilecek mesaj -->
         @if (!loadingMore && noMoreProducts) {
           <div class="text-center my-8 text-gray-500">
             Tüm ürünleri gördünüz

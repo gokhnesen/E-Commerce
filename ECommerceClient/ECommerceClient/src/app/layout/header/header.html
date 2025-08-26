@@ -44,7 +44,7 @@
         </div>
     </div>
 
-    <!-- Alt Kısım: Menü İtemleri -->
+
     <div class="p-2">
         <div class="container mx-auto px-4">
             <nav class="flex gap-6 justify-center uppercase text-lg">
@@ -79,22 +79,22 @@
 <mat-menu #menu="matMenu" class="px-5">
     <button mat-menu-item class="px-3" routerLink="/cart">
         <mat-icon>shopping_cart</mat-icon>
-        My cart
+        Sepetim
     </button>
-        <button mat-menu-item class="px-3" routerLink="/orders">
+        <button mat-menu-item class="px-3" routerLink="/order">
         <mat-icon>history</mat-icon>
-        my orders
+        Siparişlerim
     </button>
         <button mat-menu-item class="px-3" *appIsAdmin routerLink="/admin" 
                    routerLinkActive="active"
                    class="py-2 px-4 hover:bg-gray-100 rounded">
         <mat-icon>admin_panel_settings</mat-icon>
-        Admin Panel
+        Admin Paneli
     </button>
     <mat-divider></mat-divider>
     <button mat-menu-item class="px-3" (click)="logOut()">
         <mat-icon>logout</mat-icon>
-        Logout
+        Çıkış Yap
         </button>
 </mat-menu>
 
