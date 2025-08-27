@@ -17,7 +17,7 @@ namespace ECommerceAPI.Domain.Entities.Order
         public List<OrderItem> OrderItems { get; set; } = [];
 
         public decimal Subtotal { get; set; }
-        public OrderStatus Status { get; set; } = OrderStatus.Pending;
+        public OrderStatus Status { get; set; } = OrderStatus.Beklemede;
 
         public required string PaymentIntentId { get; set; }
 

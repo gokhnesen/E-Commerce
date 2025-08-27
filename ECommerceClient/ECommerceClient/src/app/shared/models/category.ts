@@ -3,7 +3,7 @@ import { Brand } from './brands';
 export interface Category {
   id: string;
   name: string;
-  slug?: string; // URL slug'ı için
+  slug?: string;
   description?: string;
   isExpanded?: boolean;
   subCategories?: SubCategory[];
@@ -14,7 +14,7 @@ export interface Category {
 export interface SubCategory {
   id: string;
   name: string;
-  slug?: string; // URL slug'ı için
+  slug?: string;
   description?: string;
   isExpanded?: boolean;
   categoryId?: string;

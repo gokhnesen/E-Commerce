@@ -18,7 +18,7 @@ namespace ECommerceAPI.Application.Features.Orders.Profiles
             CreateMap<CreateOrderCommand, Order>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
                 .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Pending))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Beklemede))
                 .ForMember(dest => dest.DeliveryMethod, opt => opt.Ignore())
                 .ForMember(dest => dest.OrderItems, opt => opt.Ignore())     
                 .ForMember(dest => dest.ShippingAddress, opt => opt.MapFrom(src => src.ShippingAddress))

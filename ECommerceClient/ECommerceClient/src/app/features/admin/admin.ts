@@ -50,7 +50,7 @@ export class Admin implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   orderParams = new OrderParams();
   totalItems = 0;
-  statusOptions = ['All', 'PaymentReceived', 'PaymentMismatch', 'Refunded', 'Pending'];
+  statusOptions = ['Hepsi', 'Basarili', 'Odenmedi', 'Iade', 'Beklemede'];
   loading = true;
   productForm: FormGroup;
   addProductSuccess = false;
@@ -158,15 +158,21 @@ constructor(private fb: FormBuilder) {
   }
 
   onFilterSelect(event: MatSelectChange) {
-    this.orderParams.filter = event.value;
+    const val = event.value;
+    // "Hepsi" seçildiğinde filtreyi temizle (sunucu tarafı filtre uygulanmasın)
+    if (!val || val === 'Hepsi') {
+      this.orderParams.filter = '';
+    } else {
+      this.orderParams.filter = val;
+    }
     this.orderParams.pageNumber = 1;
     this.loadOrders();
   }
 
   async openConfirmDialog(id: string) {
     const confirmed = await this.dialogService.confirm(
-      'Confirm Refund',
-      'Are you sure you want to refund this order?'
+      'İade et',
+      'Bu siparişi iade etmek istediğinizden emin misiniz?'
     )
     if (confirmed) this.refundOrder(id);
   }
@@ -208,7 +214,7 @@ constructor(private fb: FormBuilder) {
     next: (response: any) => {
       const productData = {
         ...formValue,
-        categoryName, // Artık name gönderiliyor!
+        categoryName,
         pictureUrl: response.pictureUrl
       };
       this.adminService.addProduct(productData).subscribe({

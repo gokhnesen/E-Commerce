@@ -14,7 +14,7 @@ import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { loadingInterceptor } from './core/interceptors/loading-interceptor';
 import { environment } from '../environments/environment';
 
-// Türkçe locale verilerini kaydet
+
 registerLocaleData(localeTr);
 
 export const appConfig: ApplicationConfig = {
@@ -31,7 +31,6 @@ export const appConfig: ApplicationConfig = {
         loadingInterceptor
       ])
     ),
-    // Türkçe locale provider'ı ekleyin
     { provide: LOCALE_ID, useValue: 'tr' },
     provideAppInitializer(() => {
       const platformId = inject(PLATFORM_ID);

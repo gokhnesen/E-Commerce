@@ -42,14 +42,14 @@ namespace ECommerceAPI.API.Controllers
             var spec = new OrderSpecification(id);
             var order = await orderReadRepository.GetEntityWithSpec(spec);
             if (order == null) return NotFound();
-            if (order.Status != OrderStatus.Pending)
+            if (order.Status != OrderStatus.Beklemede)
             {
                 return BadRequest("Ödeme alınamadı");
             }
             var result = await paymentService.RefundPayment(order.PaymentIntentId);
             if (result == "succeeded")
             {
-                order.Status = OrderStatus.Refunded;
+                order.Status = OrderStatus.Iade;
 
                 await orderWriteRepository.UpdateAsync(order);
                 await orderWriteRepository.SaveAsync();

@@ -112,13 +112,13 @@ namespace ECommerceAPI.API.Controllers
 
                     if ((long)order.GetTotal() * 100 != intent.Amount)
                     {
-                        order.Status = Domain.Entities.Order.OrderStatus.PaymentMismatch;
+                        order.Status = Domain.Entities.Order.OrderStatus.Odenmedi;
                         logger.LogWarning("Payment amount mismatch for Order: {OrderId}. Expected: {Expected}, Received: {Received}",
                             order.Id, (long)order.GetTotal() * 100, intent.Amount);
                     }
                     else
                     {
-                        order.Status = Domain.Entities.Order.OrderStatus.PaymentReceived;
+                        order.Status = Domain.Entities.Order.OrderStatus.Basarili;
                         logger.LogInformation("Payment succeeded for Order: {OrderId}", order.Id);
                     }
 
@@ -153,7 +153,7 @@ namespace ECommerceAPI.API.Controllers
                     return;
                 }
 
-                order.Status = Domain.Entities.Order.OrderStatus.PaymentFailed;
+                order.Status = Domain.Entities.Order.OrderStatus.Basarisiz;
                 await _orderWriteRepository.UpdateAsync(order);
 
                 logger.LogInformation("Payment failed for Order: {OrderId}", order.Id);

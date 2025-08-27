@@ -10,13 +10,13 @@ namespace ECommerceAPI.Domain.Entities.Order
     {
         Beklemede,
 
-        Başarılı,
+        Basarili,
 
-        Başarısız,
+        Basarisiz,
 
-        ÖdemeUyuşmadı,
+        Odenmedi,
 
-        İade
+        Iade
 
     }
 }
