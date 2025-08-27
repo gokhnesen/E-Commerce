@@ -13,12 +13,6 @@ import { Product } from '../../shared/models/product';
   providedIn: 'root'
 })
 export class AdminService {
-  getCategories() {
-    throw new Error('Method not implemented.');
-  }
-  getCategoryBrands(categoryId: any) {
-    throw new Error('Method not implemented.');
-  }
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
@@ -60,6 +54,14 @@ deleteProduct(id: string): Observable<any> {
   return this.http.delete(this.baseUrl + 'Product/' + id);
 }
 
+deleteCategory(id: string) {
+  return this.http.delete(this.baseUrl + 'category/' + id);
+}
+
+deleteBrand(id: string) {
+  return this.http.delete(this.baseUrl + 'brands/' + id);
+}
+
 updateProduct(product: any): Observable<Product> {
   
   return this.http.put<Product>(this.baseUrl + 'product', product);
@@ -67,5 +69,11 @@ updateProduct(product: any): Observable<Product> {
 updateProductImage(productId: string, formData: FormData): Observable<{ pictureUrl: string }> {
   
   return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/update-image/' + productId, formData);
+}
+addBrandsToCategory(categoryId: string, brandIds: string[]) {
+  return this.http.post(
+    `${this.baseUrl}category/${categoryId}/brands`,
+    brandIds
+  );
 }
 }

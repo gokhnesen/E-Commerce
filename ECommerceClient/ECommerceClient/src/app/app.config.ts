@@ -42,8 +42,10 @@ export const appConfig: ApplicationConfig = {
           await lastValueFrom(initService.init());
           await accountService.loadUserFromStorage();
           const splash = document.getElementById('initial-splash');
+          const appRoot = document.querySelector('app-root') as HTMLElement;
           if (splash) {
             splash.remove();
+            if (appRoot) appRoot.style.display = '';
           }
         })();
       }

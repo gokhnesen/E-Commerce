@@ -24,38 +24,38 @@
             </ng-container>
 
             <ng-container matColumnDef="buyerEmail">
-              <th mat-header-cell *matHeaderCellDef> Buyer email </th>
+              <th mat-header-cell *matHeaderCellDef> E-mail </th>
               <td mat-cell *matCellDef="let order"> {{order.buyerEmail}} </td>
             </ng-container>
 
             <ng-container matColumnDef="orderDate">
-              <th mat-header-cell *matHeaderCellDef> Date </th>
+              <th mat-header-cell *matHeaderCellDef> Tarih </th>
               <td mat-cell *matCellDef="let order"> {{order.orderDate | date: 'short'}} </td>
             </ng-container>
 
             <ng-container matColumnDef="total">
-              <th mat-header-cell *matHeaderCellDef> Total </th>
+              <th mat-header-cell *matHeaderCellDef> Toplam </th>
               <td mat-cell *matCellDef="let order"> {{order.total | currency:'₺':'symbol':'1.2-2'}} </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <th mat-header-cell *matHeaderCellDef> Durum </th>
               <td mat-cell *matCellDef="let order"> {{order.status}} </td>
             </ng-container>
 
             <ng-container matColumnDef="action">
-              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <th mat-header-cell *matHeaderCellDef> İşlemler </th>
               <td mat-cell *matCellDef="let order">
                 <div class="flex gap-2">
-                  <button matTooltip="View" mat-icon-button [routerLink]="['/order', order.id]">
+                  <button matTooltip="Görüntüle" mat-icon-button [routerLink]="['/order', order.id]">
                     <mat-icon color="primary">visibility</mat-icon>
                   </button>
                   <button 
-                    matTooltip="Refund" 
+                    matTooltip="İade" 
                     mat-icon-button
                     [disabled]="order.status === 'Refunded'"
                     (click)="openConfirmDialog(order.id)">
-                    <mat-icon color="warn">refund</mat-icon>
+                    <mat-icon color="warn">undo</mat-icon>
                   </button>
                 </div>
               </td>
@@ -76,97 +76,15 @@
       </div>
     </mat-tab>
 
-    <!-- Catalog Tab -->
-    <mat-tab label="Ürün Ekleme İşlemleri">
-      <div class="max-w-lg mx-auto p-6">
-        <div class="flex justify-end gap-4 mb-6">
-          <!-- Kategori Ekleme -->
-          <form [formGroup]="categoryForm" (ngSubmit)="addCategory()" class="flex items-center gap-2">
-            <mat-form-field appearance="outline" class="w-40">
-              <mat-label>Yeni Kategori</mat-label>
-              <input matInput formControlName="name" placeholder="Kategori adı">
-            </mat-form-field>
-            <button mat-raised-button color="primary" type="submit" [disabled]="categoryForm.invalid">Ekle</button>
-          </form>
-          <!-- Marka Ekleme -->
-          <form [formGroup]="brandForm" (ngSubmit)="addBrand()" class="flex items-center gap-2">
-            <mat-form-field appearance="outline" class="w-40">
-              <mat-label>Yeni Marka</mat-label>
-              <input matInput formControlName="name" placeholder="Marka adı">
-            </mat-form-field>
-            <button mat-raised-button color="accent" type="submit" [disabled]="brandForm.invalid">Ekle</button>
-          </form>
-        </div>
-
-        <h2 class="text-2xl font-semibold mb-6">Yeni Ürün Ekle</h2>
-        <form [formGroup]="productForm" (ngSubmit)="addProduct()">
-          <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Ürün Adı</mat-label>
-            <input matInput formControlName="name" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Açıklama</mat-label>
-            <textarea matInput formControlName="description"></textarea>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Fiyat</mat-label>
-            <input matInput type="number" formControlName="price" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Stok</mat-label>
-            <input matInput type="number" formControlName="stock" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Kategori Adı</mat-label>
-            <mat-select formControlName="categoryName" required (selectionChange)="onCategoryChange($event)">
-              <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
-            </mat-select>
-            <mat-error *ngIf="productForm.get('categoryName')?.hasError('required')">
-              Kategori seçimi zorunludur
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Marka Adı</mat-label>
-            <mat-select formControlName="brandName" required>
-              <mat-option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</mat-option>
-            </mat-select>
-            <mat-error *ngIf="productForm.get('brandName')?.hasError('required')">
-              Marka seçimi zorunludur
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Resim Seçimi -->
-          <div class="mb-4">
-            <label class="block font-medium mb-1">Ürün Resmi</label>
-            <input type="file" (change)="onFileSelected($event)" accept="image/*">
-            <img *ngIf="selectedFile" [src]="previewUrl" class="mt-2 max-h-32 rounded border" />
-
-          </div>
-
-          <button mat-raised-button color="primary" type="submit" [disabled]="productForm.invalid || !selectedFile">
-            Ürünü Ekle
-          </button>
-        </form>
-
-        <!-- Durum mesajları -->
-        <div *ngIf="addProductSuccess" class="mt-4 text-green-600 font-medium">
-          ✅ Ürün başarıyla eklendi!
-        </div>
-        <div *ngIf="addProductError" class="mt-4 text-red-600 font-medium">
-          ❌ Ürün eklenirken hata oluştu. Lütfen tekrar deneyin.
-        </div>
-      </div>
-    </mat-tab>
 
     <mat-tab label="Ürünleri Yönet">
       <div class="p-4">
-        <div class="flex justify-end mb-4">
-          <mat-form-field appearance="outline" class="w-64">
+        <div class="flex mb-4 gap-2 items-center">
+          <!-- Yeni butonlar -->
+          <button mat-raised-button color="primary" (click)="showAddProductModal = true">Ürün Ekle</button>
+          <button mat-raised-button color="accent" (click)="showAddCategoryModal = true">Kategori Ekle</button>
+          <button mat-raised-button color="warn" (click)="showDeleteCategoryBrandModal = true">Kategori veya Marka Sil</button>
+          <mat-form-field appearance="outline" class="w-64 ml-auto">
             <mat-label>Ürün Ara</mat-label>
             <input matInput [(ngModel)]="productSearchTerm" (keyup.enter)="onProductSearch()" placeholder="Ürün adı ile ara">
             <button mat-icon-button matSuffix (click)="onProductSearch()">
@@ -174,6 +92,120 @@
             </button>
           </mat-form-field>
         </div>
+
+        <!-- Ürün Ekle Modalı -->
+        <div *ngIf="showAddProductModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow-lg w-full max-w-lg">
+            <h3 class="text-lg font-semibold mb-4">Yeni Ürün Ekle</h3>
+            <form [formGroup]="productForm" (ngSubmit)="addProduct(); showAddProductModal = false">
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Kategori Adı</mat-label>
+                <mat-select formControlName="categoryName" required (selectionChange)="onCategoryChange($event)">
+                  <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Marka Adı</mat-label>
+                <mat-select formControlName="brandName" required>
+                  <mat-option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Ürün Adı</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Açıklama</mat-label>
+                <textarea matInput formControlName="description"></textarea>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Fiyat</mat-label>
+                <input matInput type="number" formControlName="price" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Stok</mat-label>
+                <input matInput type="number" formControlName="stock" required>
+              </mat-form-field>
+              <div class="mb-4">
+                <label class="block font-medium mb-1">Ürün Resmi</label>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*">
+                <img *ngIf="selectedFile" [src]="previewUrl" class="mt-2 max-h-32 rounded border" />
+              </div>
+              <div class="flex gap-2 mt-4 justify-end">
+                <button mat-raised-button color="primary" type="submit" [disabled]="productForm.invalid || !selectedFile">Ekle</button>
+                <button mat-button type="button" (click)="showAddProductModal = false">Kapat</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Kategori Ekle Modalı -->
+        <div *ngIf="showAddCategoryModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+            <h3 class="text-lg font-semibold mb-4">Yeni Kategori Ekle</h3>
+            <form [formGroup]="categoryForm" (ngSubmit)="addCategory(); showAddCategoryModal = false">
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Yeni Kategori</mat-label>
+                <input matInput formControlName="name" placeholder="Kategori adı">
+              </mat-form-field>
+              <div class="flex gap-2 mt-4 justify-end">
+                <button mat-raised-button color="primary" type="submit" [disabled]="categoryForm.invalid">Ekle</button>
+                <button mat-button type="button" (click)="showAddCategoryModal = false">Kapat</button>
+              </div>
+            </form>
+
+            <hr class="my-6">
+
+            <h4 class="text-md font-semibold mb-2">Kategoriye Marka Ekle</h4>
+            <form [formGroup]="brandForm" (ngSubmit)="addBrand()" class="flex flex-col gap-2">
+              <mat-form-field appearance="outline" class="w-full mb-2">
+                <mat-label>Kategori Seç</mat-label>
+                <mat-select (selectionChange)="onCategoryForBrandChange($event)" [value]="categoryForBrand" required>
+                  <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="!categoryForBrand">Kategori seçimi zorunludur</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full mb-2">
+                <mat-label>Yeni Marka</mat-label>
+                <input matInput formControlName="name" placeholder="Marka adı">
+              </mat-form-field>
+              <div class="flex gap-2 justify-end">
+                <button mat-raised-button color="accent" type="submit" [disabled]="brandForm.invalid || !categoryForBrand">Marka Ekle</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Kategori veya Marka Sil Modalı -->
+        <div *ngIf="showDeleteCategoryBrandModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+            <h3 class="text-lg font-semibold mb-4">Kategori veya Marka Sil</h3>
+            <form>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Kategori Seç</mat-label>
+                <mat-select [(ngModel)]="selectedCategoryId" name="selectedCategoryId">
+                  <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="flex gap-2 mb-4">
+                <button mat-raised-button color="warn" type="button" [disabled]="!selectedCategoryId" (click)="deleteCategory(selectedCategoryId!)">Kategoriyi Sil</button>
+              </div>
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Marka Seç</mat-label>
+                <mat-select [(ngModel)]="selectedBrandId" name="selectedBrandId">
+                  <mat-option *ngFor="let brand of brands" [value]="brand.id">{{ brand.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="flex gap-2 mb-4">
+                <button mat-raised-button color="warn" type="button" [disabled]="!selectedBrandId" (click)="deleteBrand(selectedBrandId!)">Markayı Sil</button>
+              </div>
+              <div class="flex gap-2 justify-end">
+                <button mat-button type="button" (click)="showDeleteCategoryBrandModal = false">Kapat</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <div *ngFor="let product of filteredProducts" class="border rounded p-4 mb-4 flex flex-col gap-2">
           <div class="flex items-center gap-4">
             <img [src]="product.pictureUrl" alt="Ürün" class="w-20 h-20 object-cover rounded border" />
@@ -191,7 +223,7 @@
         </div>
 
         <!-- Güncelleme Formu Modalı -->
-        <div *ngIf="showUpdateForm" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div *ngIf="showUpdateForm" class="fixed bg-opacity-30 backdrop-blur-sm inset-0 flex items-center justify-center z-50">
           <div class="bg-white p-6 rounded shadow-lg w-full max-w-md">
             <h3 class="text-lg font-semibold mb-4">Ürün Güncelle</h3>
             <form [formGroup]="updateForm" (ngSubmit)="updateProduct()">
@@ -226,5 +258,7 @@
         </div>
       </div>
     </mat-tab>
+
+
   </mat-tab-group>
 </div>

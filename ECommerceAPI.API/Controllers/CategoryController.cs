@@ -1,3 +1,4 @@
+using ECommerceAPI.Application.Features.Categories.CategoryBrands.Commands.AddBrandsToCategory;
 using ECommerceAPI.Application.Features.Categories.CategoryBrands.Queries.GetById;
 using ECommerceAPI.Application.Features.Categories.Commands.Create;
 using ECommerceAPI.Application.Features.Categories.Commands.Delete;
@@ -64,5 +65,17 @@ namespace ECommerceAPI.Controllers
             var response = await Mediator.Send(query);
             return Ok(response);
         }
+
+        [HttpPost("{categoryId}/brands")]
+        public async Task<IActionResult> AddBrandsToCategory([FromRoute] Guid categoryId, [FromBody] List<Guid> brandIds)
+        {
+            var command = new AddBrandsToCategoryCommand
+            {
+                CategoryId = categoryId,
+                BrandIds = brandIds
+            };
+            var response = await Mediator.Send(command);
+            return Ok(response);
+        }
     }
-} 
+}

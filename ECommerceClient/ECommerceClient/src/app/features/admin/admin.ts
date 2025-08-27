@@ -57,7 +57,8 @@ export class Admin implements OnInit {
   addProductError = false;
   private productService = inject(ProductService);
 
-
+  showAddProductModal = false;
+  showAddCategoryModal = false;
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   updatePreviewUrl: string | null = null;
@@ -76,37 +77,46 @@ export class Admin implements OnInit {
   updateForm: FormGroup;
   selectedProductId: string | null = null;
 
-constructor(private fb: FormBuilder) {
-  this.productForm = this.fb.group({
-    name: ['', Validators.required],
-    description: [''],
-    price: [null, Validators.required],
-    stock: [0, Validators.required],
-    categoryName: ['', Validators.required],
-    brandName: ['', Validators.required]
-  });
-  this.categoryForm = this.fb.group({
-    name: ['', Validators.required]
-  });
-  this.brandForm = this.fb.group({
-    name: ['', Validators.required]
-  });
-  this.updateForm = this.fb.group({
-    name: ['', Validators.required],
-    description: [''],
-    price: [0, Validators.required],
-    stock: [0, Validators.required]
-  });
-}
+  categoryForBrand: string | null = null;
+
+  showDeleteCategoryBrandModal = false;
+  selectedCategoryId: string | null = null;
+  selectedBrandId: string | null = null;
+
+  constructor(private fb: FormBuilder) {
+    this.productForm = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      price: [null, Validators.required],
+      stock: [0, Validators.required],
+      categoryName: ['', Validators.required],
+      brandName: ['', Validators.required]
+    });
+    this.categoryForm = this.fb.group({
+      name: ['', Validators.required]
+    });
+    this.brandForm = this.fb.group({
+      name: ['', Validators.required]
+    });
+    this.updateForm = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      price: [0, Validators.required],
+      stock: [0, Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.loadOrders();
-
-    // Kategorileri getir
     this.productService.getCategories().subscribe({
       next: (data) => this.categories = data,
       error: (err) => console.error(err)
     });
+    this.productService.getBrands().subscribe({
+      next: (brands) => this.brands = brands,
+      error: (err) => console.error('Markalar yüklenemedi:', err)
+    });
+
     this.loadProducts();
   }
 
@@ -266,26 +276,39 @@ onCategoryChange(event: any) {
   });
 }
 
-addBrand() {
-  if (this.brandForm.invalid) return;
-  const brandName = this.brandForm.value.name;
-  // Servis ile marka ekle (örnek)
-  this.adminService.addBrand({ name: brandName }).subscribe({
-    next: (brand) => {
-      this.brands.push(brand);
-      this.brandForm.reset();
-    },
-    error: (err) => console.error('Marka ekleme hatası:', err)
-  });
+  onCategoryForBrandChange(event: any) {
+  this.categoryForBrand = event.value;
 }
 
-deleteProduct(id: string) {
-    this.adminService.deleteProduct(id).subscribe({
-      next: () => {
-        this.products = this.products.filter(p => p.id !== id);
+  // Marka ekleme fonksiyonu
+  addBrand() {
+    if (this.brandForm.invalid || !this.categoryForBrand) return;
+    const brandName = this.brandForm.value.name;
+
+    // Önce marka oluştur, sonra kategoriye ekle
+    this.adminService.addBrand({ name: brandName }).subscribe({
+      next: (brand) => {
+        // Marka başarıyla oluşturulduysa kategoriye ekle
+        this.adminService.addBrandsToCategory(this.categoryForBrand!, [brand.id]).subscribe({
+          next: () => {
+            this.brands.push(brand);
+            this.brandForm.reset();
+            this.categoryForBrand = null;
+          },
+          error: (err) => console.error('Marka kategoriye eklenemedi:', err)
+        });
       },
-      error: (err) => console.error('Silme hatası:', err)
+      error: (err) => console.error('Marka ekleme hatası:', err)
     });
+  }
+
+deleteProduct(id: string) {
+  this.adminService.deleteProduct(id).subscribe({
+    next: () => {
+      this.loadProducts(); // Ürünleri tekrar çek ve listeyi güncelle
+    },
+    error: (err) => console.error('Silme hatası:', err)
+  });
   }
 
   openUpdateForm(product: Product) {
@@ -343,7 +366,7 @@ deleteProduct(id: string) {
 sendUpdateProduct(updated: any) {
   this.adminService.updateProduct(updated).subscribe({
     next: (res) => {
-      // ürün listeni güncelle
+      this.loadProducts(); // Ürünleri tekrar çek ve listeyi güncelle
       this.closeUpdateForm();
     },
     error: (err) => { /* hata yönetimi */ }
@@ -359,5 +382,25 @@ onProductSearch() {
   this.filteredProducts = this.products.filter(p =>
     p.name.toLowerCase().includes(term)
   );
+}
+
+deleteCategory(id: string) {
+  this.adminService.deleteCategory(id).subscribe({
+    next: () => {
+      this.categories = this.categories.filter(c => c.id !== id);
+      this.selectedCategoryId = null;
+    },
+    error: err => console.error('Kategori silme hatası:', err)
+  });
+}
+
+deleteBrand(id: string) {
+  this.adminService.deleteBrand(id).subscribe({
+    next: () => {
+      this.brands = this.brands.filter(b => b.id !== id);
+      this.selectedBrandId = null;
+    },
+    error: err => console.error('Marka silme hatası:', err)
+  });
 }
 }

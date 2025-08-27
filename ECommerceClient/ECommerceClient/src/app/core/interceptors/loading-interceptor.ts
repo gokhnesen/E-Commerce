@@ -6,7 +6,7 @@ import { BusyService } from '../services/busyService';
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const busyService = inject(BusyService);
   
-  // WebSocket, SignalR hub isteklerini exclude et
+
   if (req.url.includes('/hub/') || 
       req.url.includes('signalr') || 
       req.url.includes('negotiate')) {  
