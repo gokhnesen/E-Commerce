@@ -23,8 +23,6 @@ namespace ECommerceAPI.API.Controllers
         private readonly string _whSecret = config["StripeSettings:WhSecret"];
 
 
-
-
         [Authorize]
         [HttpPost("{cartId}")]
         public async Task<ActionResult<Cart>> CreateOrUpdatePaymentIntent(string cartId)
@@ -44,6 +42,8 @@ namespace ECommerceAPI.API.Controllers
             return Ok(await dmRepo.GetAllAsync());
         }
 
+        // Webhook'un Stripe tarafından erişilebilir olması için AllowAnonymous ekleyin
+        [AllowAnonymous]
         [HttpPost("webhook")]
         public async Task<IActionResult> StripeWebhook()
         {
@@ -110,11 +110,18 @@ namespace ECommerceAPI.API.Controllers
                         return;
                     }
 
+
+                    if (order.Status == Domain.Entities.Order.OrderStatus.Basarili)
+                    {
+                        logger.LogInformation("Order {OrderId} already marked as Basarili, skipping.", order.Id);
+                        return;
+                    }
+
                     if ((long)order.GetTotal() * 100 != intent.Amount)
                     {
                         order.Status = Domain.Entities.Order.OrderStatus.Odenmedi;
                         logger.LogWarning("Payment amount mismatch for Order: {OrderId}. Expected: {Expected}, Received: {Received}",
-                            order.Id, (long)order.GetTotal() * 100, intent.Amount);
+                            order.Id, (long)order.GetTotal() * 100, intent.Amount); 
                     }
                     else
                     {
@@ -153,8 +160,16 @@ namespace ECommerceAPI.API.Controllers
                     return;
                 }
 
+                // İdempotency: zaten başarısız olarak işaretlendiyse tekrar işleme
+                if (order.Status == Domain.Entities.Order.OrderStatus.Basarisiz)
+                {
+                    logger.LogInformation("Order {OrderId} already marked as Basarisiz, skipping.", order.Id);
+                    return;
+                }
+
                 order.Status = Domain.Entities.Order.OrderStatus.Basarisiz;
                 await _orderWriteRepository.UpdateAsync(order);
+                await _orderWriteRepository.SaveAsync();
 
                 logger.LogInformation("Payment failed for Order: {OrderId}", order.Id);
             }

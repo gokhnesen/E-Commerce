@@ -2,7 +2,7 @@
     <mat-card class="bg-white py-8 shadow-md max-w-screen-lg mx-auto">
         <div class="px-4 w-full">
             <div class="flex justify-between items-center align-middle">
-            <h2 class="text-2xl text-center font-semibold">Sipariş özeti bu sipariş için#{{ order.id }}</h2>
+            <h2 class="text-2xl text-center font-semibold">Bu tarihli  {{ order.orderDate | date: 'medium'}} sipariş özeti</h2>
             <button (click)="onReturnClick()" mat-stroked-button>{{ buttonText }}</button>
             </div>
             <div class="mt-8 py-3 border-t border-gray-200 flex gap-16">
@@ -64,10 +64,10 @@
                     <dt class="font-medium text-gray-500">Ürün Fiyatları</dt>
                     <dd class="font-medium text-gray-900">{{order.subtotal | currency:'₺':'symbol':'1.2-2'}}</dd>
                 </dl>
-                     <dl class="flex items-center justify-between gap-4">
+                     <!-- <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">İndirim</dt>
                     <dd class="font-medium text-green-500">-0</dd>
-                </dl>
+                </dl> -->
                     <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">Kargo</dt>
                     <dd class="font-medium text-gray-900">{{order.deliveryMethod.price| currency:'₺':'symbol':'1.2-2'}}</dd>

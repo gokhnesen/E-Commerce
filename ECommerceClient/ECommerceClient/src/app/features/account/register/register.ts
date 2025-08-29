@@ -31,7 +31,7 @@ export class Register {
   private accountService = inject(AccountService);
   private router = inject(Router);
   private snack = inject(MatSnackBar);
-  validationErrors?: string[];
+  validationErrors: string[] | null = null;
 
   registerForm = this.fb.group({
     name: ['', Validators.required],
@@ -41,39 +41,51 @@ export class Register {
   });
 
   onSubmit() {
+    if (this.registerForm.invalid) return;
     this.accountService.register(this.registerForm.value).subscribe({
-      next: () => {
+      next: (res) => {
         this.snack.open('Registration successful', 'Close', { duration: 3000 });
         this.router.navigateByUrl('/account/login');
       },
-      error: err => {
-        console.log('API Error:', err);
-        console.log('Error Object:', err.error);
-        
+      error: (err) => {
+        console.log('Register error:', err);
+
         let errors: string[] = [];
-        
-        if (err.error?.errors) {
-          Object.entries(err.error.errors).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
-              errors.push(...value);
-            } else {
-              errors.push(value as string);
-            }
+        const payload = Array.isArray(err) ? err : (err?.error ?? err);
+
+        if (Array.isArray(payload)) {
+          errors = payload;
+        } else if (Array.isArray(payload?.errors)) {
+          errors = payload.errors;
+        } else if (payload?.errors && typeof payload.errors === 'object') {
+          Object.values(payload.errors).forEach(val => {
+            if (Array.isArray(val)) errors.push(...val);
+            else errors.push(String(val));
           });
-        } else if (err.error && typeof err.error === 'object') {
-          if (err.error.title) {
-            errors.push(err.error.title);
-          }
-          if (err.error.message) {
-            errors.push(err.error.message);
-          }
-        } else if (typeof err.error === 'string') {
-          errors.push(err.error);
+        } else if (payload?.message) {
+          errors.push(payload.message);
+        } else if (typeof payload === 'string') {
+          errors.push(payload);
         } else {
           errors.push('Bir hata oluştu');
         }
-                console.log('Final Errors:', errors);
-        this.validationErrors = errors;
+
+        const translate = (msg: string) => {
+          if (!msg) return msg;
+          // yaygın kurallar / kalıp eşleşmeleri
+          if (/non[\s-]*alphanumeric|special character/i.test(msg)) return 'Parola en az bir özel karakter içermelidir.';
+          if (/digit|0'-'9'|0-9/i.test(msg)) return 'Parola en az bir rakam (0-9) içermelidir.';
+          if (/uppercase|'A'-'Z'|büyük harf/i.test(msg)) return 'Parola en az bir büyük harf (A-Z) içermelidir.';
+          if (/lowercase|'a'-'z'|küçük harf/i.test(msg)) return 'Parola en az bir küçük harf (a-z) içermelidir.';
+          if (/minimum length|min length|length/i.test(msg)) return 'Parola uzunluğu yetersiz.';
+          // doğrudan eşlemeler (fallback)
+          return msg
+            .replace(/Passwords must have at least one non alphanumeric character\./i, 'Parola en az bir özel karakter içermelidir.')
+            .replace(/Passwords must have at least one digit \('0'-'9'\)\./i, 'Parola en az bir rakam (0-9) içermelidir.')
+            .replace(/Passwords must have at least one uppercase \('A'-'Z'\)\./i, 'Parola en az bir büyük harf (A-Z) içermelidir.');
+        };
+
+        this.validationErrors = errors.map(e => translate(String(e)));
       },
     });
   }

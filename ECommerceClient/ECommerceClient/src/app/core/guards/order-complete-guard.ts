@@ -10,7 +10,7 @@ export const orderCompleteGuard: CanActivateFn = (route, state) => {
   if(orderService.orderComplete) {
     return true;
   } else{
-    router.navigateByUrl('/product');
+    router.navigateByUrl('');
     return false;
   }
 };

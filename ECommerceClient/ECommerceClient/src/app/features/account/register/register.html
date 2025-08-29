@@ -1,12 +1,12 @@
 <mat-card class="max-w-lg mx-auto mt-32 p-8 bg-white">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <div class="text-center mb-6">
-            <h1 class="text-3xl font-semibold text-primary">Register</h1>
+            <h1 class="text-3xl font-semibold text-primary">Kullanıcı Kayıt</h1>
         </div>
-        <app-text-input label="Name" type="text" formControlName="name" />
-        <app-text-input label="Last Name" type="text" formControlName="lastName" />
-        <app-text-input label="Email address" type="text" formControlName="email" />
-        <app-text-input label="Password" type="password" formControlName="password" />
+        <app-text-input label="Ad" type="text" formControlName="name" />
+        <app-text-input label="Soyad " type="text" formControlName="lastName" />
+        <app-text-input label="Email adresi" type="text" formControlName="email" />
+        <app-text-input label="Şifre" type="password" formControlName="password" />
         
         @if (validationErrors) {
             <div class="mb-3 p-4 bg-red-100 text-red-600" >
@@ -19,7 +19,7 @@
         }
 
 
-        <button [disabled]="registerForm.invalid" mat-flat-button type="submit" class="w-full py-2">Register</button>
+        <button [disabled]="registerForm.invalid" mat-flat-button type="submit" class="w-full py-2">Kayıt Ol</button>
     </form>
 
 </mat-card>

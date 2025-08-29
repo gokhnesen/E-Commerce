@@ -129,8 +129,8 @@ async confirmPayment(confirmationToken: ConfirmationToken)
     const cart = this.cartService.cart();
     if (!cart) throw new Error('Cart is empty');
     return this.http.post<Cart>(this.baseUrl + 'payment/' + cart.id, {}).pipe(
-      map(cart => {
-        this.cartService.setCart(cart);
+      map(async cart => {
+        await firstValueFrom(this.cartService.setCart(cart));
         return cart;
       })
     );

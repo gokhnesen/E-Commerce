@@ -18,6 +18,7 @@ import { CurrencyPipe, JsonPipe } from '@angular/common';
 import { MatProgressSpinnerModule}  from '@angular/material/progress-spinner'
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/services/orderService';
+import { SignalrService } from '../../core/services/signalrService';
 
 @Component({
   selector: 'app-checkout',
@@ -43,6 +44,7 @@ export class Checkout implements OnInit, OnDestroy {
   private router = inject(Router)
   private accountService = inject(AccountService);
   private orderService = inject(OrderService);
+  private signalrService = inject(SignalrService);
   cartService = inject(CartService);
   addressElement?: StripeAddressElement;
   paymentElement?: StripePaymentElement;
@@ -134,6 +136,7 @@ handleDeliveryChange(event: boolean) {
           const orderToCreate = await this.createOrderModel();
           const orderResult = await firstValueFrom(this.orderService.createOrder(orderToCreate!));
           if(orderResult){
+            this.orderService.orderComplete = true;
             this.cartService.deleteCart();
             this.cartService.selectedDelivery.set(null);
             this.router.navigateByUrl('/checkout/success');
@@ -208,4 +211,16 @@ handleDeliveryChange(event: boolean) {
     this.stripeService.disposeElements();
   }
 
+  placeOrder(orderDto: any) {
+    this.orderService.createOrder(orderDto).subscribe({
+      next: (order) => {
+        // hemen sinyali set et ki checkout-success sayfası güncellensin
+        this.signalrService.orderSignal.set(order);
+        this.orderService.orderComplete = true;
+        // yönlendir
+        this.router.navigateByUrl('/checkout/success');
+      },
+      error: (err) => { /* hata yönetimi */ }
+    });
+  }
 }

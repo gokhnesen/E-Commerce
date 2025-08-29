@@ -7,11 +7,11 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const busyService = inject(BusyService);
   
 
-  if (req.url.includes('/hub/') || 
-      req.url.includes('signalr') || 
-      req.url.includes('negotiate')) {  
-    return next(req);
-  }
+  // if (req.url.includes('/hub/') || 
+  //     req.url.includes('signalr') || 
+  //     req.url.includes('negotiate')) {  
+  //   return next(req);
+  // }
   
   busyService.busy();
 

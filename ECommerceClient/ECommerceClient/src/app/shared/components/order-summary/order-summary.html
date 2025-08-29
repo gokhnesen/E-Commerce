@@ -7,10 +7,10 @@
                     <dt class="font-medium text-gray-500">Ara Toplam</dt>
                     <dd class="font-medium text-gray-900">{{cartService.totals()?.subtotal | currency:'₺':'symbol':'1.2-2'}}</dd>
                 </dl>
-                     <dl class="flex items-center justify-between gap-4">
+                     <!-- <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">İndirim</dt>
                     <dd class="font-medium text-green-500">-{{cartService.totals()?.discount | currency:'₺':'symbol':'1.2-2'}}</dd>
-                </dl>
+                </dl> -->
                     <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">Kargo</dt>
                     <dd class="font-medium text-gray-900">{{cartService.totals()?.shipping| currency:'₺':'symbol':'1.2-2'}}</dd>
@@ -29,7 +29,7 @@
         }
 
     </div>
-    <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+    <!-- <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
         <form class="space-y-2 flex flex-col p-2">
             <label class="mb-2 block text-sm font font-medium">İndirim Kuponu</label>
             <mat-form-field appearance="outline">
@@ -39,5 +39,5 @@
 
             <button mat-flat-button>Uygula</button>
         </form>
-    </div>
+    </div> -->
 </div>

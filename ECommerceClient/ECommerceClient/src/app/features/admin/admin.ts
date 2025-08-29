@@ -43,7 +43,7 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './admin.scss'
 })
 export class Admin implements OnInit {
-  displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status', 'action'];
+  displayedColumns: string[] = ['buyerEmail', 'orderDate', 'total', 'status', 'action'];
   dataSource = new MatTableDataSource<Order>([]);
   private adminService = inject(AdminService);
   private dialogService = inject(DialogService)

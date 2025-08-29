@@ -11,7 +11,7 @@ export const emptyCartGuard: CanActivateFn = async (route, state) => {
   const cart = cartService.cart();
 
   if (!cart || cart.items.length === 0) {
-    snack.open('Your cart is empty. Please add items to your cart before proceeding to checkout.');
+    snack.open('Sepetiniz boş işlem yapabilmek için ürün seçiniz.');
     await router.navigateByUrl('/cart');
     return false;
   }
