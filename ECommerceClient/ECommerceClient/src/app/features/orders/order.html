@@ -5,21 +5,20 @@
             <table class="min-w-full divide-y divide-gray-200 cursor-pointer">
                 <thead class="bg-gray-50">
                     <tr class="uppercase text-gray-600 text-sm">
-                        <th class="text-center px-6 py-3">Sipariş</th>
-                        <th class="text-left">Tarih</th>
-                        <th class="text-left">Toplam</th>
-                        <th class="text-left">Durum</th>
+                    
+                        <th class="text-center">Tarih</th>
+                        <th class="text-center">Toplam</th>
+                        <th class="text-center">Durum</th>
 
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @for (order of orders; track order.id) {
                         <tr routerLink="/order/{{order.id}}" class="hover:bg-gray-100">
-                            <th class="px-6 py-3"> {{order.id}}</th>
-                            <td>{{order.orderDate | date: 'medium' : '' : 'tr'}}</td>
-                            <td>{{order.total| currency:'₺':'symbol':'1.2-2' }}</td>
-                            <td>{{order.status}}</td>
-                            
+                            <th class="px-6 py-3">{{order.orderDate | date: 'medium' : '' : 'tr'}}</th>
+                            <th class="px-6 py-3">{{order.total| currency:'₺':'symbol':'1.2-2' }}</th>
+                            <th class="px-6 py-3">{{order.status}}</th>
+
                         </tr>
                     }
                 </tbody>

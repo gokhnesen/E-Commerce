@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { OrderParams } from '../../shared/models/orderParams';
 import { Pagination } from '../../shared/models/pagination';
 import { Order } from '../../shared/models/order';
 import { Brand } from '../../shared/models/brands';
 import { Category } from '../../shared/models/category';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 import { Product } from '../../shared/models/product';
 
 @Injectable({
@@ -16,10 +16,9 @@ export class AdminService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
-  getOrders(orderParams: OrderParams) {
+  getOrders(orderParams: OrderParams): Observable<Pagination<Order>> {
     let params = new HttpParams();
-    if(orderParams.filter && orderParams.filter !== 'All')
-    {
+    if (orderParams.filter && orderParams.filter !== 'All') {
       params = params.append('status', orderParams.filter);
     }
     params = params.append('pageNumber', orderParams.pageNumber.toString());
@@ -27,53 +26,51 @@ export class AdminService {
     return this.http.get<Pagination<Order>>(this.baseUrl + 'admin/orders', { params });
   }
 
-  getOrderDetails(id: string) {
+  getOrderDetails(id: string): Observable<Order> {
     return this.http.get<Order>(this.baseUrl + 'admin/orders/' + id);
   }
 
-  refundOrder(id: string) {
+  refundOrder(id: string): Observable<Order> {
     return this.http.post<Order>(this.baseUrl + 'admin/orders/refund/' + id, {});
   }
 
-  addProduct(product: any) {
+  addProduct(product: any): Observable<any> {
     return this.http.post(this.baseUrl + 'product/add', product);
   }
 
-  uploadImage(formData: FormData) {
+  uploadImage(formData: FormData): Observable<{ pictureUrl: string }> {
     return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/upload-image', formData);
   }
 
-  addCategory(category: { name: string }) { 
-    return this.http.post<Category>(this.baseUrl + 'category', category); 
+  addCategory(category: { name: string }): Observable<Category> {
+    return this.http.post<Category>(this.baseUrl + 'category', category);
   }
 
-  addBrand(brand: { name: string }) { 
-  return this.http.post<Brand>(this.baseUrl + 'brands', brand); 
-}
-deleteProduct(id: string): Observable<any> {
-  return this.http.delete(this.baseUrl + 'Product/' + id);
-}
+  addBrand(brand: { name: string }): Observable<Brand> {
+    return this.http.post<Brand>(this.baseUrl + 'brands', brand);
+  }
 
-deleteCategory(id: string) {
-  return this.http.delete(this.baseUrl + 'category/' + id);
-}
+  deleteProduct(id: string): Observable<any> {
+    return this.http.delete(this.baseUrl + 'Product/' + id);
+  }
 
-deleteBrand(id: string) {
-  return this.http.delete(this.baseUrl + 'brands/' + id);
-}
+  deleteCategory(id: string): Observable<any> {
+    return this.http.delete(this.baseUrl + 'category/' + id);
+  }
 
-updateProduct(product: any): Observable<Product> {
-  
-  return this.http.put<Product>(this.baseUrl + 'product', product);
-}
-updateProductImage(productId: string, formData: FormData): Observable<{ pictureUrl: string }> {
-  
-  return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/update-image/' + productId, formData);
-}
-addBrandsToCategory(categoryId: string, brandIds: string[]) {
-  return this.http.post(
-    `${this.baseUrl}category/${categoryId}/brands`,
-    brandIds
-  );
-}
+  deleteBrand(id: string): Observable<any> {
+    return this.http.delete(this.baseUrl + 'brands/' + id);
+  }
+
+  updateProduct(product: any): Observable<Product> {
+    return this.http.put<Product>(this.baseUrl + 'product', product);
+  }
+
+  updateProductImage(productId: string, formData: FormData): Observable<{ pictureUrl: string }> {
+    return this.http.post<{ pictureUrl: string }>(this.baseUrl + 'product/update-image/' + productId, formData);
+  }
+
+  addBrandsToCategory(categoryId: string, brandIds: string[]): Observable<any> {
+    return this.http.post(this.baseUrl + 'category/' + categoryId + '/brands', brandIds);
+  }
 }

@@ -10,26 +10,24 @@ import { SignalrService } from './signalrService';
   providedIn: 'root'
 })
 export class AccountService {
-  
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   currentUser = signal<User | null>(null);
   private signalrService = inject(SignalrService);
+
   isAdmin = computed(() => {
     const roles = this.currentUser()?.roles;
     return Array.isArray(roles) ? roles.includes('Admin') : roles === 'Admin';
   });
 
   login(values: any) {
-    let params = new HttpParams();
-    params = params.append('useCookies', true);
-    return this.http.post<User>(this.baseUrl + 'login', values, { params })
-      .pipe(
-        tap(user => {
-          this.currentUser.set(user);
-          this.signalrService.createHubConnection();
-        })
-      );
+    const params = new HttpParams().append('useCookies', true);
+    return this.http.post<User>(this.baseUrl + 'login', values, { params }).pipe(
+      tap(user => {
+        this.currentUser.set(user);
+        this.signalrService.createHubConnection();
+      })
+    );
   }
 
   register(values: any) {
@@ -37,23 +35,21 @@ export class AccountService {
   }
 
   getUserInfo() {
-    return this.http.get<User>(this.baseUrl + 'account/user-info')
-      .pipe(
-        map(user => {
-          this.currentUser.set(user);
-          return user;
-        })
-      );
+    return this.http.get<User>(this.baseUrl + 'account/user-info').pipe(
+      map(user => {
+        this.currentUser.set(user);
+        return user;
+      })
+    );
   }
 
   logout() {
-    return this.http.post(this.baseUrl + 'account/logout', {})
-      .pipe(
-        tap(() => {
-          this.currentUser.set(null);
-          this.signalrService.stopHubConnection();
-        })
-      );
+    return this.http.post(this.baseUrl + 'account/logout', {}).pipe(
+      tap(() => {
+        this.currentUser.set(null);
+        this.signalrService.stopHubConnection();
+      })
+    );
   }
 
   updateAddress(address: Address) {
@@ -62,9 +58,9 @@ export class AccountService {
         this.currentUser.update(user => {
           if (user) user.address = address;
           return user;
-        })
+        });
       })
-    )
+    );
   }
 
   getAuthState() {
@@ -73,40 +69,29 @@ export class AccountService {
 
   async loadUserFromStorage(): Promise<void> {
     try {
-      console.log('Loading user from storage...');
-      
       const authStatus = await lastValueFrom(
         this.getAuthState().pipe(
-          catchError(error => {
-            console.log('Auth status check failed:', error);
-            return of({ isAuthenticated: false });
-          })
+          catchError(() => of({ isAuthenticated: false }))
         )
       );
 
       if (authStatus.isAuthenticated) {
-        console.log('User is authenticated, fetching user info...');
         await lastValueFrom(
           this.getUserInfo().pipe(
-            catchError(error => {
-              console.log('Failed to get user info:', error);
+            catchError(() => {
               this.currentUser.set(null);
               return of(null);
             })
           )
         );
-        
-        // User bilgisi başarıyla yüklendiyse SignalR bağlantısı kur
+
         if (this.currentUser()) {
-          console.log('Creating SignalR connection after loading user...');
           this.signalrService.createHubConnection();
         }
       } else {
-        console.log('User not authenticated');
         this.currentUser.set(null);
       }
-    } catch (error) {
-      console.error('Error loading user from storage:', error);
+    } catch {
       this.currentUser.set(null);
     }
   }

@@ -93,7 +93,8 @@ export class Admin implements OnInit {
       brandName: ['', Validators.required]
     });
     this.categoryForm = this.fb.group({
-      name: ['', Validators.required]
+      name: ['', Validators.required],
+      parentCategoryId: [null] // eklendi: opsiyonel parent id
     });
     this.brandForm = this.fb.group({
       name: ['', Validators.required]
@@ -210,43 +211,49 @@ export class Admin implements OnInit {
   }
 
  addProduct() {
-  if (this.productForm.invalid || !this.selectedFile) return;
+   if (this.productForm.invalid || !this.selectedFile) return;
 
-  const formValue = this.productForm.value;
-  // ID'den kategori adını bul
-  const selectedCategory = this.categories.find(cat => cat.id === formValue.categoryName);
-  const categoryName = selectedCategory ? selectedCategory.name : '';
+   const formValue = this.productForm.value;
+   // ID'den kategori adını bul
+   const selectedCategory = this.categories.find(cat => cat.id === formValue.categoryName);
+   const categoryName = selectedCategory ? selectedCategory.name : '';
 
-  const formData = new FormData();
-  formData.append('Image', this.selectedFile);
+   const formData = new FormData();
+   formData.append('Image', this.selectedFile);
 
-  this.adminService.uploadImage(formData).subscribe({
-    next: (response: any) => {
-      const productData = {
-        ...formValue,
-        categoryName,
-        pictureUrl: response.pictureUrl
-      };
-      this.adminService.addProduct(productData).subscribe({
-        next: () => {
-          this.addProductSuccess = true;
-          this.addProductError = false;
-          this.productForm.reset();
-          this.selectedFile = null;
-          this.previewUrl = null;
-        },
-        error: (error: any) => {
-          this.addProductSuccess = false;
-          this.addProductError = true;
-        }
-      });
-    },
-    error: (error: any) => {
-      this.addProductSuccess = false;
-      this.addProductError = true;
-    }
-  });
-}
+   this.adminService.uploadImage(formData).subscribe({
+     next: (response: any) => {
+       const productData = {
+         ...formValue,
+         categoryName,
+         pictureUrl: response.pictureUrl
+       };
+       this.adminService.addProduct(productData).subscribe({
+         next: () => {
+           this.addProductSuccess = true;
+           this.addProductError = false;
+           this.productForm.reset();
+           this.selectedFile = null;
+           this.previewUrl = null;
+
+           // yenile: ürünleri tekrar çek ve UI güncelle
+           this.loadProducts();
+
+           // isteğe bağlı: ekleme formunu kapat
+           this.showAddProductModal = false;
+         },
+         error: (error: any) => {
+           this.addProductSuccess = false;
+           this.addProductError = true;
+         }
+       });
+     },
+     error: (error: any) => {
+       this.addProductSuccess = false;
+       this.addProductError = true;
+     }
+   });
+  }
 private markFormGroupTouched() {
   Object.keys(this.productForm.controls).forEach(key => {
     const control = this.productForm.get(key);
@@ -264,17 +271,33 @@ onCategoryChange(event: any) {
   }
 
   addCategory() {
-  if (this.categoryForm.invalid) return;
-  const categoryName = this.categoryForm.value.name;
-  // Servis ile kategori ekle (örnek)
-  this.adminService.addCategory({ name: categoryName }).subscribe({
-    next: (cat) => {
-      this.categories.push(cat);
-      this.categoryForm.reset();
-    },
-    error: (err) => console.error('Kategori ekleme hatası:', err)
-  });
-}
+    if (this.categoryForm.invalid) return;
+    const payload = {
+      name: this.categoryForm.value.name,
+      parentCategoryId: this.categoryForm.value.parentCategoryId || null
+    };
+
+    // backend endpoint: https://localhost:7091/api/Category
+    this.adminService.addCategory(payload).subscribe({
+      next: (cat) => {
+        // kategori eklendikten sonra güncel kategorileri yeniden yükle
+        this.productService.getCategories().subscribe({
+          next: (data) => {
+            this.categories = data;
+            this.categoryForm.reset({ name: '', parentCategoryId: null });
+            this.loadProducts();
+          },
+          error: (err) => {
+            console.error('Kategoriler yeniden yüklenemedi:', err);
+            // fallback: eklenen katgoritiyi listeye it
+            this.categories.push(cat);
+            this.categoryForm.reset({ name: '', parentCategoryId: null });
+          }
+        });
+      },
+      error: (err) => console.error('Kategori ekleme hatası:', err)
+    });
+  }
 
   onCategoryForBrandChange(event: any) {
   this.categoryForBrand = event.value;
@@ -294,6 +317,7 @@ onCategoryChange(event: any) {
             this.brands.push(brand);
             this.brandForm.reset();
             this.categoryForBrand = null;
+            this.loadProducts();
           },
           error: (err) => console.error('Marka kategoriye eklenemedi:', err)
         });
@@ -366,7 +390,7 @@ deleteProduct(id: string) {
 sendUpdateProduct(updated: any) {
   this.adminService.updateProduct(updated).subscribe({
     next: (res) => {
-      this.loadProducts(); // Ürünleri tekrar çek ve listeyi güncelle
+      this.loadProducts(); 
       this.closeUpdateForm();
     },
     error: (err) => { /* hata yönetimi */ }
@@ -389,6 +413,7 @@ deleteCategory(id: string) {
     next: () => {
       this.categories = this.categories.filter(c => c.id !== id);
       this.selectedCategoryId = null;
+      this.loadProducts();
     },
     error: err => console.error('Kategori silme hatası:', err)
   });
@@ -399,6 +424,7 @@ deleteBrand(id: string) {
     next: () => {
       this.brands = this.brands.filter(b => b.id !== id);
       this.selectedBrandId = null;
+      this.loadProducts();
     },
     error: err => console.error('Marka silme hatası:', err)
   });

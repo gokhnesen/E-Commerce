@@ -78,17 +78,17 @@ namespace ECommerceAPI.API.Controllers
             var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
 
-            // Resize image to 800x800 px
+      
             using (var inputStream = image.OpenReadStream())
             using (var img = await Image.LoadAsync(inputStream))
             {
                 img.Mutate(x => x.Resize(new ResizeOptions
                 {
-                    Size = new Size(1920, 1024),
-                    Mode = ResizeMode.Crop // or ResizeMode.Pad for padding
+                    Size = new Size(800, 800),
+                    Mode = ResizeMode.Crop
                 }));
 
-                await img.SaveAsync(filePath); // auto format based on extension
+                await img.SaveAsync(filePath); 
             }
 
             var imageUrl = $"{Request.Scheme}://{Request.Host}/images/products/{fileName}";

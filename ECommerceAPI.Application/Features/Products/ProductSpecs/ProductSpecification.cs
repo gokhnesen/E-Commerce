@@ -10,16 +10,25 @@ namespace ECommerceAPI.Application.Features.Products.ProductSpecs
 {
     public class ProductSpecification : BaseSpecification<Product>
     {
-        public ProductSpecification(ProductSpecParams specParams, List<string> allCategoryNames = null) : base(x => 
-        (string.IsNullOrEmpty(specParams.Search) || x.Name.ToLower().Contains(specParams.Search)) &&
-        (specParams.Brands.Count == 0 || specParams.Brands.Contains(x.Brand.Name)) &&
-        (specParams.Categories.Count == 0 || 
-            // If allCategoryNames is provided (includes parent and all children), use it for filtering
-            (allCategoryNames != null && allCategoryNames.Contains(x.Category.Name)) || 
-            // Otherwise use only the specified categories
-            (allCategoryNames == null && specParams.Categories.Contains(x.Category.Name)))
+        public ProductSpecification(ProductSpecParams specParams, List<string> allCategoryNames = null)
+    : base(x =>
+        // Search across name, brand, category and description when a search term is provided
+        (string.IsNullOrEmpty(specParams.Search ?? "") ||
+            (x.Name != null && x.Name.ToLower().Contains(specParams.Search ?? "")) ||
+            (x.Brand != null && x.Brand.Name != null && x.Brand.Name.ToLower().Contains(specParams.Search ?? "")) ||
+            (x.Category != null && x.Category.Name != null && x.Category.Name.ToLower().Contains(specParams.Search ?? "")) ||
+            (!string.IsNullOrEmpty(x.Description) && x.Description.ToLower().Contains(specParams.Search ?? ""))
         )
-
+        &&
+        // Brands filter (unchanged)
+        (specParams.Brands.Count == 0 || (x.Brand != null && specParams.Brands.Contains(x.Brand.Name)))
+        &&
+        // Categories filter (unchanged, supports allCategoryNames when populated)
+        (specParams.Categories.Count == 0 ||
+            (allCategoryNames != null && x.Category != null && allCategoryNames.Contains(x.Category.Name)) ||
+            (allCategoryNames == null && x.Category != null && specParams.Categories.Contains(x.Category.Name))
+        )
+    )
         {
 
             ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);

@@ -6,6 +6,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cartService';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-product-item',
@@ -16,8 +17,8 @@ import { CartService } from '../../../core/services/cartService';
     MatCardActions,
     MatButton,
     MatIcon,
-    RouterLink
-
+    RouterLink,
+    MatSnackBarModule
   ],
   templateUrl: './product-item.html',
   styleUrl: './product-item.scss'
@@ -25,4 +26,27 @@ import { CartService } from '../../../core/services/cartService';
 export class ProductItem {
   @Input() product?: Product;
   cartService = inject(CartService);
+  snackBar = inject(MatSnackBar);
+
+  async addToCart(product?: Product, event?: MouseEvent) {
+    event?.stopPropagation();
+    if (!product) return;
+
+    try {
+      await this.cartService.addItemToCart(product);
+      this.snackBar.open('Ürün sepete eklendi', undefined, {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-success'] // <-- yeşil stil sınıfı
+      });
+    } catch (err) {
+      this.snackBar.open('Sepete ekleme başarısız', undefined, {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-error'] // <-- hata için kırmızı
+      });
+    }
+  }
 }

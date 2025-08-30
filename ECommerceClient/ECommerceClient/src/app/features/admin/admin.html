@@ -94,7 +94,7 @@
         </div>
 
         <!-- Ürün Ekle Modalı -->
-        <div *ngIf="showAddProductModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div *ngIf="showAddProductModal" class="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
           <div class="bg-white p-6 rounded shadow-lg w-full max-w-lg">
             <h3 class="text-lg font-semibold mb-4">Yeni Ürün Ekle</h3>
             <form [formGroup]="productForm" (ngSubmit)="addProduct(); showAddProductModal = false">
@@ -139,8 +139,8 @@
           </div>
         </div>
 
-        <!-- Kategori Ekle Modalı -->
-        <div *ngIf="showAddCategoryModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+  
+        <div *ngIf="showAddCategoryModal" class="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
           <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <h3 class="text-lg font-semibold mb-4">Yeni Kategori Ekle</h3>
             <form [formGroup]="categoryForm" (ngSubmit)="addCategory(); showAddCategoryModal = false">
@@ -148,9 +148,17 @@
                 <mat-label>Yeni Kategori</mat-label>
                 <input matInput formControlName="name" placeholder="Kategori adı">
               </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full mb-4">
+                <mat-label>Üst Kategori (isteğe bağlı)</mat-label>
+                <mat-select formControlName="parentCategoryId">
+                  <mat-option [value]="null">-- Üst Kategori Yok --</mat-option>
+                  <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
               <div class="flex gap-2 mt-4 justify-end">
                 <button mat-raised-button color="primary" type="submit" [disabled]="categoryForm.invalid">Ekle</button>
-                <button mat-button type="button" (click)="showAddCategoryModal = false">Kapat</button>
               </div>
             </form>
 
@@ -171,13 +179,15 @@
               </mat-form-field>
               <div class="flex gap-2 justify-end">
                 <button mat-raised-button color="accent" type="submit" [disabled]="brandForm.invalid || !categoryForBrand">Marka Ekle</button>
+                <button mat-button type="button" (click)="showAddCategoryModal = false">Kapat</button>
+
               </div>
             </form>
           </div>
         </div>
 
         <!-- Kategori veya Marka Sil Modalı -->
-        <div *ngIf="showDeleteCategoryBrandModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div *ngIf="showDeleteCategoryBrandModal" class="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
           <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <h3 class="text-lg font-semibold mb-4">Kategori veya Marka Sil</h3>
             <form>

@@ -31,14 +31,37 @@
                         matStepperNext mat-flat-button>İleri</button>
                     </div>
             </mat-step>
-            <mat-step label="Ödeme" [completed]="completionStatus().card">
+       <mat-step label="Ödeme" [completed]="completionStatus().card">
                 <div id="payment-element"></div>
                         <div class="flex justify-between mt-6">
                         <button matStepperPrevious mat-stroked-button>Geri</button>
                         <button
                         [disabled]="!completionStatus().card" 
                         matStepperNext mat-flat-button>İleri</button>
+                     
                     </div>
+                                        
+                        <div class="mt-4 w-full ml-4">
+                          <div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700">
+                            <div class="font-medium mb-2">Ödeme Örneği</div>
+                            <table class="w-full text-sm">
+                              <tr>
+                                <td class="py-1 font-medium">Kart Numarası</td>
+                                <td class="py-1 text-right">4242 4242 4242 4242 - 5555 5555 5555 4444 - 4000 0000 0000 0002(Reddedilen Kart)</td>
+                              </tr>
+                              <tr>
+                                <td class="py-1 font-medium">Son Kullanma</td>
+                                <td class="py-1 text-right">04/44</td>
+                              </tr>
+                              <tr>
+                                <td class="py-1 font-medium">Güvenlik Kodu (CVC)</td>
+                                <td class="py-1 text-right">444</td>
+                              </tr>
+                            </table>
+                            <div class="text-xs text-gray-500 mt-2">Test karta ait örnek bilgiler — canlı ödemelerde gerçek kart kullanmayın.</div>
+                          </div>
+                        </div>
+                    
             </mat-step>
             <mat-step label="Onaylama">
                 <app-checkout-review [confirmationToken]="confirmationToken()"></app-checkout-review>

@@ -6,21 +6,21 @@
 
         </div>
         
-        <!-- Ürün bilgileri -->
+      
         <mat-card-content>
-            <!-- Marka adı -->
+           
             <span class="text-xs text-gray-600">{{product.brand}}</span>
             
-            <!-- Ürün adı - iki satırla sınırlı -->
+            
             <h2 class="text-sm font-semibold line-clamp-2">{{product.name}}</h2>
             
-            <!-- Fiyat bilgisi -->
+            
             <p class="font-light">{{product.price | currency:'₺':'symbol':'1.2-2'}}</p>    
         </mat-card-content>
         
-        <!-- Sepete ekle düğmesi - hover olduğunda görünür -->
+        
         <div class="absolute bottom-0 left-0 right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-3 bg-white bg-opacity-95">
-            <button mat-stroked-button color="primary" class="w-full" (click)="$event.stopPropagation(); cartService.addItemToCart(product)">
+            <button mat-stroked-button color="primary" class="w-full" (click)="addToCart(product, $event)">
                 <mat-icon>add_shopping_cart</mat-icon>
                 Sepete Ekle
             </button>
