@@ -101,9 +101,11 @@ namespace ECommerceAPI
             app.UseAuthorization();
             app.UseMiddleware<ExceptionMiddleware>();
 
-            app.UseDefaultFiles();
+            app.UseDefaultFiles(new DefaultFilesOptions
+            {
+                DefaultFileNames = new List<string> { "index.csr.html", "index.html" }
+            });
             app.UseStaticFiles();
-            
             app.MapControllers();
             app.MapGroup("api").MapIdentityApi<User>();
             app.MapHub<NotificationHub>("/hub/notifications");
