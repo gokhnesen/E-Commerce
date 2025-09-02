@@ -7,7 +7,7 @@ namespace ECommerceAPI.API.Controllers
     {
         public IActionResult Index()
         {
-            return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "browser", "index.csr.html"), "text/HTML");
+            return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(),"browser", "index.csr.html"), "text/HTML");
         }
     }
 }
