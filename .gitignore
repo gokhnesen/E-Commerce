@@ -367,3 +367,10 @@ ECommerceClient/ECommerceClient/src/environments/environment.development.ts
 ECommerceClient/ECommerceClient/src/environments/environment.development.ts
 ECommerceClient/ECommerceClient/src/environments/environment.ts
 ECommerceClient/ECommerceClient/proxy.conf.json
+/.vscode
+/ECommerceAPI.API/.config
+/ECommerceAPI.API/appsettings.Development.json
+/ECommerceAPI.API/wwwroot/browser
+/ECommerceAPI.API/wwwroot/server
+/ECommerceAPI.API/wwwroot/3rdpartylicenses.txt
+/ECommerceAPI.API/wwwroot/prerendered-routes.json
