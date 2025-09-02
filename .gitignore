@@ -359,14 +359,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# Fody - auto-generated XML schema
-FodyWeavers.xsd
-/ECommerceAPI/appsettings.json
-/ECommerceAPI.API/appsettings.json
-ECommerceClient/ECommerceClient/src/environments/environment.development.ts
-ECommerceClient/ECommerceClient/src/environments/environment.development.ts
-ECommerceClient/ECommerceClient/src/environments/environment.ts
-ECommerceClient/ECommerceClient/proxy.conf.json
-/.vscode
-/ECommerceAPI.API/.config
+
 

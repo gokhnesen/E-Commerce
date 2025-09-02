@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerceAPI.Persistence.Migrations
 {
     [DbContext(typeof(ECommerceAPIDbContext))]
-    [Migration("20250802082518_AddRoles")]
-    partial class AddRoles
+    [Migration("20250902161608_InitialMig")]
+    partial class InitialMig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -99,12 +99,41 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ParentCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ParentCategoryId");
+
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.CategoryBrand", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BrandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CategoryId", "BrandId");
+
+                    b.HasIndex("BrandId");
+
+                    b.ToTable("CategoryBrands", (string)null);
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.DeliveryMethod", b =>
@@ -365,12 +394,6 @@ namespace ECommerceAPI.Persistence.Migrations
                             Id = "customer-id",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
-                        },
-                        new
-                        {
-                            Id = "seller-id",
-                            Name = "Seller",
-                            NormalizedName = "SELLER"
                         });
                 });
 
@@ -478,6 +501,34 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Category", "ParentCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentCategoryId");
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.CategoryBrand", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Brand", "Brand")
+                        .WithMany("CategoryBrands")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerceAPI.Domain.Entities.Category", "Category")
+                        .WithMany("CategoryBrands")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order.Order", b =>
@@ -678,9 +729,18 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Brand", b =>
+                {
+                    b.Navigation("CategoryBrands");
+                });
+
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Category", b =>
                 {
+                    b.Navigation("CategoryBrands");
+
                     b.Navigation("Products");
+
+                    b.Navigation("SubCategories");
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order.Order", b =>

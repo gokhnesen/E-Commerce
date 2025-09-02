@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/27871cba-3f07-4e65-b877-053a2b0a199c/resourceGroups/EcommerceAPI/providers/Microsoft.Web/sites/gokhanesenapp",
+    "appService.deploySubpath": "ECommerceAPI.API\\bin\\Publish"
+}
