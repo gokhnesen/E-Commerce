@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ProductService } from '../../../core/services/productService';
 import {MatDivider} from '@angular/material/divider';
 import {MatListOption, MatSelectionList} from '@angular/material/list';
@@ -24,14 +24,25 @@ import { MatInput } from '@angular/material/input';
   templateUrl: './filters-dialog.html',
   styleUrl: './filters-dialog.scss'
 })
-export class FiltersDialog {
+export class FiltersDialog implements OnInit {
   productService = inject(ProductService);
   private dialogRef = inject(MatDialogRef<FiltersDialog>);
-  data = inject(MAT_DIALOG_DATA)
+  data = inject(MAT_DIALOG_DATA);
 
-  selectedBrands: Brand[] = this.data.selectedBrands || []
-  minPrice: number | null = this.data.minPrice || null
-  maxPrice: number | null = this.data.maxPrice || null
+
+  brands: Brand[] = [];
+
+  selectedBrands: Brand[] = this.data.selectedBrands || [];
+  minPrice: number | null = this.data.minPrice || null;
+  maxPrice: number | null = this.data.maxPrice || null;
+
+  ngOnInit(): void {
+
+    this.productService.getBrands().subscribe({
+      next: b => this.brands = b,
+      error: () => this.brands = []
+    });
+  }
 
   applyFilters(){
     this.dialogRef.close({

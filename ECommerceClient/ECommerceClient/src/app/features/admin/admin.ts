@@ -277,7 +277,7 @@ onCategoryChange(event: any) {
       parentCategoryId: this.categoryForm.value.parentCategoryId || null
     };
 
-    // backend endpoint: https://localhost:7091/api/Category
+  
     this.adminService.addCategory(payload).subscribe({
       next: (cat) => {
         // kategori eklendikten sonra güncel kategorileri yeniden yükle

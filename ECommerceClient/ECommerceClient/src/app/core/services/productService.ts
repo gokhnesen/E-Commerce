@@ -149,4 +149,42 @@ export class ProductService {
       })
     );
   }
+
+  /**
+   * Prerendering için kullanılacak tüm ürün ID'lerini getirir
+   */
+  getProductIdsForPrerendering(): Observable<{id: string}[]> {
+    return this.http.get<Product[]>(this.baseURL + 'Product/ids').pipe(
+      map(products => products.map(product => ({ id: product.id }))),
+      catchError(err => {
+        console.error('getProductIdsForPrerendering error', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  /**
+   * Prerendering için kullanılacak tüm kategori slug'larını getirir
+   */
+  getCategorySlugForPrerendering(): Observable<{slug: string}[]> {
+    return this.http.get<Category[]>(this.baseURL + 'Category').pipe(
+      map(categories => categories.map(category => ({ slug: category.name.toLowerCase() }))),
+      catchError(err => {
+        console.error('getCategorySlugForPrerendering error', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  /**
+   * Prerendering için kullanılacak tüm sipariş ID'lerini getirir
+   */
+  getOrderIdsForPrerendering(): Observable<{id: string}[]> {
+    return this.http.get<{id: string}[]>(this.baseURL + 'Order/ids').pipe(
+      catchError(err => {
+        console.error('getOrderIdsForPrerendering error', err);
+        return throwError(() => err);
+      })
+    );
+  }
 }

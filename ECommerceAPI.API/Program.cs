@@ -28,7 +28,6 @@ namespace ECommerceAPI
                 });
             });
 
-
             builder.Services.AddApplicationServices();
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -74,9 +73,7 @@ namespace ECommerceAPI
                         new List<string>()
                     }
                 });
-
             });
-
 
             builder.Services.AddAuthorization();
             builder.Services.AddIdentityApiEndpoints<User>()
@@ -86,6 +83,8 @@ namespace ECommerceAPI
             var app = builder.Build();
 
             app.UseHttpsRedirection();
+            
+
             app.UseCors("AllowSpecificOrigin");
 
             if (app.Environment.IsDevelopment())
@@ -101,10 +100,15 @@ namespace ECommerceAPI
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseDefaultFiles();
             app.UseStaticFiles();
+            
             app.MapControllers();
             app.MapGroup("api").MapIdentityApi<User>();
             app.MapHub<NotificationHub>("/hub/notifications");
+            
+            app.MapFallbackToController("Index", "Fallback");
 
             app.Run();
         }

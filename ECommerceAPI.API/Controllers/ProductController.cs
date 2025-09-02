@@ -71,7 +71,7 @@ namespace ECommerceAPI.API.Controllers
             if (image == null || image.Length == 0)
                 return BadRequest("Resim dosyası seçilmedi.");
 
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "browser", "images", "products");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
