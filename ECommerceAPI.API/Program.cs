@@ -6,6 +6,7 @@ using ECommerceAPI.Infrastructure;
 using ECommerceAPI.Persistence;
 using ECommerceAPI.Persistence.Contexts;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -105,7 +106,12 @@ namespace ECommerceAPI
             {
                 DefaultFileNames = new List<string> { "index.csr.html", "index.html" }
             });
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "browser")),
+                RequestPath = ""
+            });
             app.MapControllers();
             app.MapGroup("api").MapIdentityApi<User>();
             app.MapHub<NotificationHub>("/hub/notifications");
