@@ -16,7 +16,6 @@ import { ProductItem } from "../product-item/product-item";
 import { SidebarFilter } from "./sidebar-filter/sidebar-filter";
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { Brand } from '../../../shared/models/brands';
 
 @Component({
   selector: 'app-product-category',
@@ -44,7 +43,7 @@ export class ProductCategory implements OnInit {
   private productService = inject(ProductService);
 
   slug = '';
-  products: Product[] = []; // Array yerine observable kullanıyoruz
+  products: Product[] = []; 
   products$ = new BehaviorSubject<Product[]>([]);
   totalCount = 0;
   loading = false;
@@ -70,34 +69,32 @@ export class ProductCategory implements OnInit {
     { name: 'Yeni Eklenen', value: 'newest' }
   ];
 
-    ngOnInit(): void {
-  this.route.paramMap
-    .pipe(
-      tap(pm => {
-        const newSlug = pm.get('slug') ?? '';
-        if (newSlug !== this.slug) {
-          // Yeni bir kategoriye geçiş yapıldığında tüm değişkenleri sıfırla
-          this.slug = newSlug;
-          this.shopParams = {
-            brands: [],
-            categories: [],
-            sort: 'name',
-            pageNumber: 1,
-            pageSize: 9,
-            search: ''
-          }; // Reset all filters completely when changing categories
-          this.noMoreProducts = false;
-          this.products$.next([]);
-        }
-      }),
-      switchMap(() => this.fetchProducts())
-    )
-    .subscribe();
-}
+  ngOnInit(): void {
+    this.route.paramMap
+      .pipe(
+        tap(pm => {
+          const newSlug = pm.get('slug') ?? '';
+          if (newSlug !== this.slug) {
+            this.slug = newSlug;
+            this.shopParams = {
+              brands: [],
+              categories: [],
+              sort: 'name',
+              pageNumber: 1,
+              pageSize: 9,
+              search: ''
+            }; 
+            this.noMoreProducts = false;
+            this.products$.next([]);
+          }
+        }),
+        switchMap(() => this.fetchProducts())
+      )
+      .subscribe();
+  }
 
   private mapResponse(res: any): Product[] {
     if (!res) return [];
-    // Olası alan adları sırayla denenir
     return res.data
       ?? res.items
       ?? res.result
@@ -117,42 +114,36 @@ export class ProductCategory implements OnInit {
     if (!this.slug) {
       this.products$.next([]);
       this.totalCount = 0;
-      this.noMoreProducts = true; // Kategori yoksa daha fazla ürün yok
+      this.noMoreProducts = true; 
       return this.productService.getProductsByCategory('', this.shopParams);
     }
     
     this.loading = true;
-    this.noMoreProducts = false; // Her yeni yüklemede sıfırla
+    this.noMoreProducts = false; 
     
     return this.productService.getProductsByCategory(this.slug, this.shopParams).pipe(
       tap({
         next: (res: Pagination<Product> | any) => {
-          console.log('🛠 API yanıtı:', res);
           const list = this.mapResponse(res);
           const total = this.resolveTotal(res);
-          console.log('📦 Ürün sayısı:', list.length, 'Toplam:', total);
           
-          // Sayfa 1'den büyükse ve sonsuz kaydırma için kullanılıyorsa, ürünleri ekle
           if (this.shopParams.pageNumber > 1 && !this.loading) {
             const currentProducts = this.products$.getValue() || [];
             this.products$.next([...currentProducts, ...list]);
           } else {
-            // İlk yükleme veya filtre değişikliği için ürünleri sıfırla
             this.products$.next(list);
           }
           
           this.totalCount = total;
           
-          // Daha fazla ürün olup olmadığını kontrol et
           if (list.length < this.shopParams.pageSize) {
             this.noMoreProducts = true;
-            console.log('Tüm ürünler yüklendi (son sayfada az ürün var)');
           }
           
           this.loading = false;
         },
         error: (err) => {
-          console.error('❌ fetchProducts error:', err);
+          console.error('fetchProducts error:', err);
           this.products$.next([]);
           this.totalCount = 0;
           this.loading = false;
@@ -172,23 +163,16 @@ export class ProductCategory implements OnInit {
     this.productService.getProducts(this.shopParams).subscribe({
       next: (response) => {
         if (Array.isArray(response)) {
-          // Gelen verileri kontrol et
           if (response.length > 0) {
-            // IDs of existing products
             const existingIds = new Set(this.products.map(p => p.id));
-            
-            // Sadece yeni ürünleri ekle (tekrarlayanları filtrele)
             const newProducts = response.filter(p => !existingIds.has(p.id));
             
             if (this.shopParams.pageNumber === 1) {
-              // İlk sayfa ise, önceki ürünleri temizle
               this.products = [...response];
             } else if (newProducts.length > 0) {
-              // Diğer sayfalarda, sadece yeni ürünleri ekle
               this.products = [...this.products, ...newProducts];
             }
             
-            // Eğer hiç yeni ürün gelmediyse veya beklenen sayıdan az ürün geldiyse, tüm ürünler yüklenmiştir
             if (newProducts.length === 0 || response.length < this.shopParams.pageSize) {
               this.noMoreProducts = true;
             }
@@ -203,7 +187,7 @@ export class ProductCategory implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Ürünler yüklenirken hata:', error);
+        console.error('Error loading products:', error);
         this.loading = false;
       }
     });
@@ -223,63 +207,50 @@ export class ProductCategory implements OnInit {
       this.fetchProducts().subscribe();
     }
   }
+
   openFiltersDialog() {
     this.router.navigate(['products/category', this.slug], { queryParams: { ...this.shopParams } });
   }
 
-onFilterChange(event: any) {
-  console.log('Filtre değişikliği:', event);
-  
-  if (event.brands) {
-    this.shopParams.brands = event.brands;
-    console.log('Filtrelenecek marka ID\'leri:', this.shopParams.brands);
-    
-    this.shopParams.pageNumber = 1;
-    this.products$.next([]); 
-    this.noMoreProducts = false;
-    
-    this.fetchProducts().subscribe();
-  }
-}
-
-onScroll() {
-  if (this.noMoreProducts || this.loadingMore || this.loading) {
-    console.log('Kaydırma işlemi atlandı:', 
-      this.noMoreProducts ? 'Tüm ürünler görüntülendi' : 'Yükleme zaten devam ediyor');
-    return;
-  }
-  
-  console.log(`Sayfa kaydırıldı, yeni sayfa: ${this.shopParams.pageNumber + 1}`);
-  this.loadingMore = true;
-  
-  this.shopParams.pageNumber++;
-  
-  this.productService.getProductsByCategory(this.slug, this.shopParams).subscribe({
-    next: (response: any) => {
-      const currentProducts = this.products$.getValue() || [];
-      
-      const newProducts = this.mapResponse(response);
-      
-      const existingIds = new Set(currentProducts.map(p => p.id));
-      const uniqueNewProducts = newProducts.filter(p => !existingIds.has(p.id));
-      
-      console.log('Yeni ürünler:', uniqueNewProducts.length, 'Toplam gelen:', newProducts.length);
-      
-      if (uniqueNewProducts.length === 0 || newProducts.length < this.shopParams.pageSize) {
-        this.noMoreProducts = true;
-        console.log('Tüm ürünler yüklendi, başka ürün kalmadı.');
-      }
-      
-      if (uniqueNewProducts.length > 0) {
-        this.products$.next([...currentProducts, ...uniqueNewProducts]);
-      }
-      
-      this.loadingMore = false;
-    },
-    error: (error) => {
-      console.error('Daha fazla ürün yüklenirken hata:', error);
-      this.loadingMore = false;
+  onFilterChange(event: any) {
+    if (event.brands) {
+      this.shopParams.brands = event.brands;
+      this.shopParams.pageNumber = 1;
+      this.products$.next([]); 
+      this.noMoreProducts = false;
+      this.fetchProducts().subscribe();
     }
-  });
-}
+  }
+
+  onScroll() {
+    if (this.noMoreProducts || this.loadingMore || this.loading) {
+      return;
+    }
+    
+    this.loadingMore = true;
+    this.shopParams.pageNumber++;
+    
+    this.productService.getProductsByCategory(this.slug, this.shopParams).subscribe({
+      next: (response: any) => {
+        const currentProducts = this.products$.getValue() || [];
+        const newProducts = this.mapResponse(response);
+        const existingIds = new Set(currentProducts.map(p => p.id));
+        const uniqueNewProducts = newProducts.filter(p => !existingIds.has(p.id));
+        
+        if (uniqueNewProducts.length === 0 || newProducts.length < this.shopParams.pageSize) {
+          this.noMoreProducts = true;
+        }
+        
+        if (uniqueNewProducts.length > 0) {
+          this.products$.next([...currentProducts, ...uniqueNewProducts]);
+        }
+        
+        this.loadingMore = false;
+      },
+      error: (error) => {
+        console.error('Error loading more products:', error);
+        this.loadingMore = false;
+      }
+    });
+  }
 }

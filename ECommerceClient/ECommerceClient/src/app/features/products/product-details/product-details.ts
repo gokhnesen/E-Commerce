@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ProductService } from '../../../core/services/productService';
 import { ActivatedRoute } from '@angular/router';
 import { Product } from '../../../shared/models/product';
-import { error } from 'console';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -11,7 +10,6 @@ import { MatInput } from '@angular/material/input';
 import { MatDivider } from '@angular/material/divider';
 import { CartService } from '../../../core/services/cartService';
 import { FormsModule } from '@angular/forms';
-
 
 @Component({
   selector: 'app-product-details',
@@ -30,9 +28,6 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './product-details.scss'
 })
 export class ProductDetails implements OnInit {
-  ngOnInit(): void {
-    this.loadProduct();
-  }
   private productService = inject(ProductService);
   private activatedRoute = inject(ActivatedRoute);
   private cartService = inject(CartService);
@@ -42,56 +37,44 @@ export class ProductDetails implements OnInit {
   quantityInCart = 0;
   quantity = 1;
 
-  loadProduct(){
+  ngOnInit(): void {
+    this.loadProduct();
+  }
+
+  loadProduct() {
     const id = this.activatedRoute.snapshot.paramMap.get('id');
-    if(!id) return;
+    if (!id) return;
     
     this.productService.getProduct(id).subscribe({
       next: product => {
-        console.log('📦 GELEN VERİ:', product);
         this.product = product;
         this.updateQuantityInCart();
         this.cdr.detectChanges();
       },
-      error: err => console.error('❌ HATA:', err)
+      error: err => console.error('Error loading product:', err)
     });
   }
 
   updateCart() {
-    if(!this.product) {
-      console.log('No product selected');
-      return;
-    }
+    if (!this.product) return;
     
-    console.log('Current product:', this.product);
-    console.log('Current quantity in cart:', this.quantityInCart);
-    console.log('New quantity to set:', this.quantity);
-    
-    if(this.quantity > this.quantityInCart) {
+    if (this.quantity > this.quantityInCart) {
       const itemsToAdd = this.quantity - this.quantityInCart;
-      console.log('Adding items to cart:', itemsToAdd);
-      
-      try {
-        this.cartService.addItemToCart(this.product, itemsToAdd);
-        this.quantityInCart += itemsToAdd;
-        console.log('Items added successfully');
-      } catch (err) {
-        console.error('Error adding items to cart:', err);
-      }
+      this.cartService.addItemToCart(this.product, itemsToAdd);
+      this.quantityInCart += itemsToAdd;
     } else {
       const itemsToRemove = this.quantityInCart - this.quantity;
       this.quantityInCart -= itemsToRemove;
-      this.cartService.removeItemFromCart(this.product.id, itemsToRemove)
+      this.cartService.removeItemFromCart(this.product.id, itemsToRemove);
     }
   }
 
-  updateQuantityInCart(){
+  updateQuantityInCart() {
     this.quantityInCart = this.cartService.cart()?.items.find(x => x.productId === this.product?.id)?.quantity || 0;
     this.quantity = this.quantityInCart || 1;
-
   }
 
   getButtonText() {
-    return this.quantityInCart > 0 ? 'Update cart' : 'Add to cart'
+    return this.quantityInCart > 0 ? 'Update cart' : 'Add to cart';
   }
 }

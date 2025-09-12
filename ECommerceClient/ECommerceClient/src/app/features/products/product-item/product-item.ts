@@ -38,14 +38,14 @@ export class ProductItem {
         duration: 3000,
         horizontalPosition: 'right',
         verticalPosition: 'top',
-        panelClass: ['snackbar-success'] // <-- yeşil stil sınıfı
+        panelClass: ['snackbar-success']
       });
     } catch (err) {
       this.snackBar.open('Sepete ekleme başarısız', undefined, {
         duration: 3000,
         horizontalPosition: 'right',
         verticalPosition: 'top',
-        panelClass: ['snackbar-error'] // <-- hata için kırmızı
+        panelClass: ['snackbar-error'] 
       });
     }
   }

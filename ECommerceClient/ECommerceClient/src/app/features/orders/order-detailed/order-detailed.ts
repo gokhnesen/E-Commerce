@@ -66,12 +66,12 @@ export class OrderDetailed implements OnInit {
         console.log('Loaded order:', order);
         this.order = order;
         this.loading = false;
-        this.cdr.detectChanges(); // Manuel change detection
+        this.cdr.detectChanges();
       },
       error: error => {
         console.error('Error loading order:', error);
         this.loading = false;
-        this.cdr.detectChanges(); // Manuel change detection
+        this.cdr.detectChanges(); 
       }
     });
   }

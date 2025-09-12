@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
@@ -24,15 +24,15 @@ import { ProductService } from '../../../../core/services/productService';
   templateUrl: './sidebar-filter.html',
   styleUrls: ['./sidebar-filter.scss']
 })
-export class SidebarFilter implements OnInit {
-  @Input() activeCategory: string = '';
-  @Input() selectedBrands: string[] = []; // Add this input property
-  @Output() filterChange = new EventEmitter<{brands: string[]}>();
-  
+export class SidebarFilter implements OnInit, OnChanges {
+  @Input() activeCategory = '';
+  @Input() selectedBrands: string[] = [];
+  @Output() filterChange = new EventEmitter<{ brands: string[] }>();
+
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
-  
+
   categories: Category[] = [];
   isLoading = true;
   selectedBrandMap: Record<string, boolean> = {};
@@ -41,77 +41,58 @@ export class SidebarFilter implements OnInit {
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        const slug = params['slug'];
-        this.activeCategory = slug || '';
-        
+        const slug = params['slug'] ?? '';
+        this.activeCategory = slug;
         if (slug) {
           this.loadCategoryWithSubcategories();
         } else {
           this.loadAllCategories();
         }
       });
-      
-    // Initialize brand selections from input
-    this.updateBrandSelections();
+
+    this.applySelectedBrands();
   }
-  
-  // Watch for changes to selectedBrands input
-  ngOnChanges() {
-    // Completely reset the selectedBrandMap when selectedBrands changes
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedBrands']) {
+      this.applySelectedBrands();
+    }
+  }
+
+  private applySelectedBrands(): void {
     this.selectedBrandMap = {};
-    
-    // For each category, clear the selectedBrands
-    this.categories.forEach(category => {
-      if (category.selectedBrands) {
-        category.selectedBrands = [];
-      }
-    });
-    
-    // Then apply new selections from input
-    this.updateBrandSelections();
-  }
-  
-  // Method to update internal state when selectedBrands input changes
-  private updateBrandSelections() {
-    // Apply new selections from input (if any)
-    if (this.selectedBrands && this.selectedBrands.length) {
-      this.categories.forEach(category => {
-        if (category.brands) {
-          category.brands.forEach(brand => {
-            if (this.selectedBrands.includes(brand.name)) {
-              this.selectedBrandMap[brand.id] = true;
-              
-              if (!category.selectedBrands) {
-                category.selectedBrands = [];
-              }
-              
-              if (!category.selectedBrands.find(b => b.id === brand.id)) {
-                category.selectedBrands.push(brand);
-              }
-            }
-          });
+    if (!this.selectedBrands?.length || !this.categories?.length) return;
+
+    for (const category of this.categories) {
+      category.selectedBrands = [];
+      if (!category.brands) continue;
+
+      for (const brand of category.brands) {
+        if (this.selectedBrands.includes(brand.name)) {
+          this.selectedBrandMap[brand.id] = true;
+          category.selectedBrands.push(brand);
         }
-      });
+      }
     }
   }
 
   loadCategoryWithSubcategories(): void {
     this.isLoading = true;
-    
-    // Reset brand selections when loading new categories
     this.selectedBrandMap = {};
-    
+
     this.productService.getCategoryByName(this.activeCategory).subscribe({
-      next: (category) => {
+      next: category => {
         if (category.subCategories?.length) {
           this.categories = category.subCategories.map(sub => ({
             id: sub.id,
             name: sub.name,
             isExpanded: false
           } as Category));
-          // Make sure updateBrandSelections is called AFTER brands are loaded
-          this.categories.forEach(cat => this.loadCategoryBrands(cat));
-          setTimeout(() => this.updateBrandSelections(), 100);
+
+          // load brands for each subcategory
+          for (const cat of this.categories) {
+            this.loadCategoryBrands(cat);
+          }
         } else {
           this.categories = [{
             id: category.id,
@@ -121,21 +102,26 @@ export class SidebarFilter implements OnInit {
           this.loadCategoryBrands(this.categories[0]);
         }
         this.isLoading = false;
+        this.applySelectedBrands();
       },
-      error: () => this.loadAllCategories()
+      error: () => {
+        this.loadAllCategories();
+      }
     });
   }
 
   loadAllCategories(): void {
     this.isLoading = true;
-    
     this.productService.getCategories().subscribe({
-      next: (categories) => {
+      next: categories => {
         this.categories = categories;
         this.expandActiveCategory();
         this.isLoading = false;
+        this.applySelectedBrands();
       },
-      error: () => this.isLoading = false
+      error: () => {
+        this.isLoading = false;
+      }
     });
   }
 
@@ -147,27 +133,21 @@ export class SidebarFilter implements OnInit {
       .subscribe(brands => {
         category.brands = brands;
         category.selectedBrands = [];
-        
-        if (this.selectedBrands && this.selectedBrands.length) {
-          brands.forEach(brand => {
+
+        if (this.selectedBrands?.length) {
+          for (const brand of brands) {
             if (this.selectedBrands.includes(brand.name)) {
               this.selectedBrandMap[brand.id] = true;
-                if (!category.selectedBrands) {
-                category.selectedBrands = [];
-                }
-                category.selectedBrands.push(brand);
+              category.selectedBrands.push(brand);
             }
-          });
+          }
         }
       });
   }
 
   expandActiveCategory(): void {
     if (!this.categories.length || !this.activeCategory) return;
-
-    const category = this.categories.find(c => 
-      c.name.toLowerCase() === this.activeCategory.toLowerCase());
-    
+    const category = this.categories.find(c => c.name.toLowerCase() === this.activeCategory.toLowerCase());
     if (category) {
       category.isExpanded = true;
       this.loadCategoryBrands(category);
@@ -176,53 +156,44 @@ export class SidebarFilter implements OnInit {
 
   toggleCategory(category: Category): void {
     category.isExpanded = !category.isExpanded;
-    
     if (category.isExpanded && !category.brands) {
       this.loadCategoryBrands(category);
     }
   }
 
-  // Rename selectedBrands property to selectedBrandMap to avoid conflict
   toggleBrand(brand: Brand, category: Category): void {
-    const brandKey = brand.id;
-    this.selectedBrandMap[brandKey] = !this.selectedBrandMap[brandKey];
-    
-    if (!category.selectedBrands) {
-      category.selectedBrands = [];
-    }
-    
-    if (this.selectedBrandMap[brandKey]) {
+    const key = brand.id;
+    this.selectedBrandMap[key] = !this.selectedBrandMap[key];
+
+    category.selectedBrands = category.selectedBrands ?? [];
+    if (this.selectedBrandMap[key]) {
       if (!category.selectedBrands.find(b => b.id === brand.id)) {
         category.selectedBrands.push(brand);
       }
     } else {
       category.selectedBrands = category.selectedBrands.filter(b => b.id !== brand.id);
     }
-    
-    this.updateFilters();
+
+    this.emitFilters();
   }
 
   isBrandSelected(brand: Brand): boolean {
     return !!this.selectedBrandMap[brand.id];
   }
 
-  updateFilters(): void {
-    const selectedBrands = this.getSelectedBrands();
-    const brandNames = selectedBrands.map(brand => brand.name);
-    
-    this.filterChange.emit({ brands: brandNames });
+  private emitFilters(): void {
+    const names = this.getSelectedBrands().map(b => b.name);
+    this.filterChange.emit({ brands: names });
   }
 
   getSelectedBrands(): Brand[] {
-    const selectedBrands: Brand[] = [];
-    
-    this.categories.forEach(category => {
+    const selected: Brand[] = [];
+    for (const category of this.categories) {
       if (category.selectedBrands?.length) {
-        selectedBrands.push(...category.selectedBrands);
+        selected.push(...category.selectedBrands);
       }
-    });
-    
-    return selectedBrands;
+    }
+    return selected;
   }
 }
 
