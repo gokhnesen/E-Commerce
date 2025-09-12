@@ -280,7 +280,6 @@ onCategoryChange(event: any) {
   
     this.adminService.addCategory(payload).subscribe({
       next: (cat) => {
-        // kategori eklendikten sonra güncel kategorileri yeniden yükle
         this.productService.getCategories().subscribe({
           next: (data) => {
             this.categories = data;
@@ -289,7 +288,6 @@ onCategoryChange(event: any) {
           },
           error: (err) => {
             console.error('Kategoriler yeniden yüklenemedi:', err);
-            // fallback: eklenen katgoritiyi listeye it
             this.categories.push(cat);
             this.categoryForm.reset({ name: '', parentCategoryId: null });
           }
@@ -303,15 +301,12 @@ onCategoryChange(event: any) {
   this.categoryForBrand = event.value;
 }
 
-  // Marka ekleme fonksiyonu
   addBrand() {
     if (this.brandForm.invalid || !this.categoryForBrand) return;
     const brandName = this.brandForm.value.name;
 
-    // Önce marka oluştur, sonra kategoriye ekle
     this.adminService.addBrand({ name: brandName }).subscribe({
       next: (brand) => {
-        // Marka başarıyla oluşturulduysa kategoriye ekle
         this.adminService.addBrandsToCategory(this.categoryForBrand!, [brand.id]).subscribe({
           next: () => {
             this.brands.push(brand);
@@ -329,7 +324,7 @@ onCategoryChange(event: any) {
 deleteProduct(id: string) {
   this.adminService.deleteProduct(id).subscribe({
     next: () => {
-      this.loadProducts(); // Ürünleri tekrar çek ve listeyi güncelle
+      this.loadProducts();
     },
     error: (err) => console.error('Silme hatası:', err)
   });

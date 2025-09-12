@@ -22,7 +22,7 @@ export class AccountService {
 
   login(values: any) {
     const params = new HttpParams().append('useCookies', true);
-    return this.http.post<User>(this.baseUrl + 'login', values, { params }).pipe(
+    return this.http.post<User>(this.baseUrl + 'login', values, { params, withCredentials: true }).pipe(
       tap(user => {
         this.currentUser.set(user);
         this.signalrService.createHubConnection();
@@ -31,11 +31,11 @@ export class AccountService {
   }
 
   register(values: any) {
-    return this.http.post(this.baseUrl + 'account/register', values);
+    return this.http.post(this.baseUrl + 'account/register', values, { withCredentials: true });
   }
 
   getUserInfo() {
-    return this.http.get<User>(this.baseUrl + 'account/user-info').pipe(
+    return this.http.get<User>(this.baseUrl + 'account/user-info', { withCredentials: true }).pipe(
       map(user => {
         this.currentUser.set(user);
         return user;
@@ -44,7 +44,7 @@ export class AccountService {
   }
 
   logout() {
-    return this.http.post(this.baseUrl + 'account/logout', {}).pipe(
+    return this.http.post(this.baseUrl + 'account/logout', {}, { withCredentials: true }).pipe(
       tap(() => {
         this.currentUser.set(null);
         this.signalrService.stopHubConnection();
@@ -53,7 +53,7 @@ export class AccountService {
   }
 
   updateAddress(address: Address) {
-    return this.http.post(this.baseUrl + 'account/address', address).pipe(
+    return this.http.post(this.baseUrl + 'account/address', address, { withCredentials: true }).pipe(
       tap(() => {
         this.currentUser.update(user => {
           if (user) user.address = address;
@@ -64,7 +64,7 @@ export class AccountService {
   }
 
   getAuthState() {
-    return this.http.get<{ isAuthenticated: boolean }>(this.baseUrl + 'account/auth-status');
+    return this.http.get<{ isAuthenticated: boolean }>(this.baseUrl + 'account/auth-status', { withCredentials: true });
   }
 
   async loadUserFromStorage(): Promise<void> {
