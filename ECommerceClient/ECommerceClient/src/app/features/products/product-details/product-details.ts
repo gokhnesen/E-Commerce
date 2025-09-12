@@ -57,16 +57,31 @@ export class ProductDetails implements OnInit {
     });
   }
 
-  updateCart(){
-    if(!this.product) return;
-    if(this.quantity > this.quantityInCart){
+  updateCart() {
+    if(!this.product) {
+      console.log('No product selected');
+      return;
+    }
+    
+    console.log('Current product:', this.product);
+    console.log('Current quantity in cart:', this.quantityInCart);
+    console.log('New quantity to set:', this.quantity);
+    
+    if(this.quantity > this.quantityInCart) {
       const itemsToAdd = this.quantity - this.quantityInCart;
-      this.quantityInCart += itemsToAdd;
-      this.cartService.addItemToCart(this.product, itemsToAdd);
+      console.log('Adding items to cart:', itemsToAdd);
+      
+      try {
+        this.cartService.addItemToCart(this.product, itemsToAdd);
+        this.quantityInCart += itemsToAdd;
+        console.log('Items added successfully');
+      } catch (err) {
+        console.error('Error adding items to cart:', err);
+      }
     } else {
       const itemsToRemove = this.quantityInCart - this.quantity;
       this.quantityInCart -= itemsToRemove;
-      this.cartService.removeİtemFromCart(this.product.id, itemsToRemove)
+      this.cartService.removeItemFromCart(this.product.id, itemsToRemove)
     }
   }
 

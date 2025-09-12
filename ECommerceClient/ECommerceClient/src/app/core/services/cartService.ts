@@ -58,7 +58,7 @@ export class CartService {
     await firstValueFrom(this.setCart(cart));
   }
 
-  async removeİtemFromCart(productId: string, quantity = 1) {
+  async removeItemFromCart(productId: string, quantity = 1) {
     const cart = this.cart();
     if (!cart) return;
     const index = cart.items.findIndex(x => x.productId === productId);

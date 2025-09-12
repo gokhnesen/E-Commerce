@@ -42,7 +42,6 @@ namespace ECommerceAPI.API.Controllers
             return Ok(await dmRepo.GetAllAsync());
         }
 
-        // Webhook'un Stripe tarafından erişilebilir olması için AllowAnonymous ekleyin
         [AllowAnonymous]
         [HttpPost("webhook")]
         public async Task<IActionResult> StripeWebhook()
@@ -160,7 +159,6 @@ namespace ECommerceAPI.API.Controllers
                     return;
                 }
 
-                // İdempotency: zaten başarısız olarak işaretlendiyse tekrar işleme
                 if (order.Status == Domain.Entities.Order.OrderStatus.Basarisiz)
                 {
                     logger.LogInformation("Order {OrderId} already marked as Basarisiz, skipping.", order.Id);
