@@ -11,7 +11,6 @@ Amacım, hem backend hem de frontend tarafında **gerçek dünyada kullanılan t
 - **Alışveriş Sepeti:** Kullanıcıların ürün ekleyip çıkarabildiği dinamik sepet  
 - **Kimlik Doğrulama:** JWT tabanlı giriş, kayıt ve rol bazlı yetkilendirme denemeleri  
 - **Gerçek Zamanlı Bildirimler:** SignalR kullanarak sipariş durum güncellemeleri  
-- **Önbellekleme:** Redis ile performans denemeleri  
 
 ---
 
