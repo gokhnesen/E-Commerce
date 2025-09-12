@@ -357,3 +357,5 @@ MigrationBackup/
 
 
 
+/ECommerceAPI.API/appsettings.json
+/ECommerceAPI.API/appsettings.Development.json
