@@ -5,36 +5,44 @@ Amacım, hem backend hem de frontend tarafında **gerçek dünyada kullanılan t
 
 ---
 
-## ✨ Öğrenme Sürecinde Edindiğim Özellikler
-- **Ürün Yönetimi:** Ürünleri listeleme, filtreleme, arama ve yönetim işlemleri  
-- **Yönetici Paneli:** Ürün, sipariş ve kullanıcı işlemleri için basit bir yönetici arayüzü  
-- **Alışveriş Sepeti:** Kullanıcıların ürün ekleyip çıkarabildiği dinamik sepet  
-- **Kimlik Doğrulama:** JWT tabanlı giriş, kayıt ve rol bazlı yetkilendirme denemeleri  
-- **Gerçek Zamanlı Bildirimler:** SignalR kullanarak sipariş durum güncellemeleri  
+##  Ekran Görüntüleri
+
+| **Anasayfa** | **Giriş** | **Kayıt Olma** | **Ürünler Sayfası** | **Sepet Sayfası** | **Sipariş Sayfası** | **Admin Sayfası** | **Ürün Yönetimi** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:| :---:|
+| ![Home](https://github.com/user-attachments/assets/3600cf40-6379-454a-b484-807fe94f0a1b) | ![login](https://github.com/user-attachments/assets/9b226f0b-a4ff-4ff2-b6fd-b7d619f92f1e) | ![register](https://github.com/user-attachments/assets/fb4d3938-dd40-4cf3-9b9f-095168c4e218) | ![productsPage](https://github.com/user-attachments/assets/933e4533-670c-49e8-ad40-05fecdb5d34f) | ![cartPage](https://github.com/user-attachments/assets/1266f26f-63b6-4616-aff8-654ee7cf6c79) |![checkoutPage](https://github.com/user-attachments/assets/6ce9466b-bc76-4086-ba6d-fe8d92f64d8c) | ![adminPage](https://github.com/user-attachments/assets/e421407a-cbe3-45ef-a76b-931672a04ffa) | ![productManagementPage](https://github.com/user-attachments/assets/4d16e3fe-f24b-4d2e-97b5-d33448a578d6)
+
 
 ---
 
-## 🏗️ Öğrenmeye Çalıştığım Konular
-- **Clean Architecture** ile katmanlı ve sürdürülebilir bir yapı kurmak  
-- **CQRS & MediatR** desenleri ile komut ve sorguları ayrıştırmak  
-- **Repository Pattern** ile veri erişim mantığını soyutlamak  
-- **FluentValidation & AutoMapper** kullanarak temiz iş mantığı yazmak  
-- **SignalR** ile gerçek zamanlı iletişimi keşfetmek  
+## 🚀 Özellikler
+
+### Temel Özellikler
+- ✅ **Clean Architecture** - Domain, Application, Infrastructure, Persistence katmanları
+- ✅ **CQRS Pattern** - MediatR ile komut ve sorgu ayrımı
+- ✅ **Redis Cache** - Yüksek performanslı veri önbellekleme
+- ✅ **ASP.NET Core Identity** - Kullanıcı yönetimi ve rol bazlı yetkilendirme
+- ✅ **Entity Framework Core** - SQL Server ile ORM desteği
+- ✅ **SignalR** - Gerçek zamanlı bildirimler
+- ✅ **Stripe Integration** - Ödeme işlemleri ve webhook desteği
+- ✅ **FluentValidation** - Komut ve sorgu validasyonu
+- ✅ **AutoMapper** - Entity-DTO dönüşümleri
 
 ---
 
-## 🎨 Frontend Tarafında Öğrendiklerim
-- **Angular** ile component tabanlı frontend geliştirme  
-- **Angular Material & Tailwind** ile modern arayüz tasarlama  
-- **Service ve HttpClient** kullanarak backend API ile iletişim kurma  
-- **SignalR Client** ile anlık bildirimleri frontend’e aktarma  
-
----
 
 ## 💻 Kullandığım Teknolojiler
-- **Backend:** .NET 9, ASP.NET Core, Entity Framework Core, SignalR, JWT  
-- **Frontend:** Angular 20, Angular Material, Tailwind CSS  
-- **Veritabanı & Önbellek:** SQL Server, Redis  
+**Backend:**
+- .NET 9.0
+- ASP.NET Core Web API
+- Entity Framework Core 9.0
+- SQL Server
+- Redis (StackExchange.Redis)
+- MediatR 12.5
+- AutoMapper 14.0
+- FluentValidation 12.0
+- Stripe.net 48.3
+- SignalR
+- ImageSharp 3.1
 
 ---
 
