@@ -34,15 +34,14 @@ Amacım, hem backend hem de frontend tarafında **gerçek dünyada kullanılan t
 **Backend:**
 - .NET 9.0
 - ASP.NET Core Web API
-- Entity Framework Core 9.0
+- Entity Framework Core
 - SQL Server
 - Redis (StackExchange.Redis)
-- MediatR 12.5
-- AutoMapper 14.0
-- FluentValidation 12.0
-- Stripe.net 48.3
+- MediatR
+- AutoMapper 
+- FluentValidation 
+- Stripe.net 
 - SignalR
-- ImageSharp 3.1
 
 ---
 
